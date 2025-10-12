@@ -1,0 +1,16 @@
+customer_id,customer_name,email,region,signup_date,total_orders,lifetime_value,customer_tier,is_active
+1001,"Alice Johnson","alice.johnson@email.com","North America","2023-01-15",25,2450.75,"Gold",true
+1002,"Bob Smith","bob.smith@email.com","Europe","2023-02-20",18,1890.50,"Silver",true
+1003,"Carol Davis","carol.davis@email.com","Asia Pacific","2023-01-30",42,4200.25,"Platinum",true
+1004,"David Wilson","david.wilson@email.com","North America","2023-03-10",7,650.00,"Bronze",false
+1005,"Eve Brown","eve.brown@email.com","Europe","2023-02-05",33,3250.80,"Gold",true
+1006,"Frank Garcia","frank.garcia@email.com","South America","2023-04-01",15,1450.90,"Silver",true
+1007,"Grace Chen","grace.chen@email.com","Asia Pacific","2023-04-15",28,2850.60,"Gold",true
+1008,"Henry Johnson","henry.johnson@email.com","Europe","2023-04-20",9,890.75,"Bronze",true
+1009,"Ivy Wilson","ivy.wilson@email.com","North America","2023-05-01",31,3100.40,"Gold",true
+1010,"Jack Davis","jack.davis@email.com","Africa","2023-05-10",22,2200.85,"Silver",true
+1011,"Kate Brown","kate.brown@email.com","Australia","2023-05-15",16,1600.30,"Silver",true
+1012,"Lisa Wong","lisa.wong@email.com","Asia Pacific","2023-06-01",45,4750.20,"Platinum",true
+1013,"Mike Thompson","mike.thompson@email.com","North America","2023-06-05",12,1180.65,"Bronze",true
+1014,"Nancy Miller","nancy.miller@email.com","Europe","2023-06-10",38,3800.90,"Gold",true
+1015,"Oscar Davis","oscar.davis@email.com","South America","2023-06-15",29,2900.45,"Gold",true

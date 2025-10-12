@@ -1,0 +1,210 @@
+[
+  {
+    "order_id": "ORD-2023-001",
+    "customer_id": 1001,
+    "order_date": "2023-07-01T10:30:00Z",
+    "order_status": "completed",
+    "items": [
+      {
+        "product_id": "PROD-101",
+        "product_name": "Wireless Headphones",
+        "category": "Electronics",
+        "quantity": 2,
+        "unit_price": 79.99,
+        "discount": 0.10
+      },
+      {
+        "product_id": "PROD-205",
+        "product_name": "Bluetooth Speaker",
+        "category": "Electronics", 
+        "quantity": 1,
+        "unit_price": 49.99,
+        "discount": 0.00
+      }
+    ],
+    "shipping": {
+      "address": {
+        "street": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "method": "standard",
+      "cost": 9.99
+    },
+    "payment": {
+      "method": "credit_card",
+      "last_four": "1234",
+      "amount": 209.97
+    },
+    "metadata": {
+      "source": "web",
+      "campaign": "summer_sale_2023",
+      "referrer": "google_ads"
+    }
+  },
+  {
+    "order_id": "ORD-2023-002", 
+    "customer_id": 1003,
+    "order_date": "2023-07-02T14:15:00Z",
+    "order_status": "shipped",
+    "items": [
+      {
+        "product_id": "PROD-301",
+        "product_name": "Coffee Maker",
+        "category": "Home & Kitchen",
+        "quantity": 1,
+        "unit_price": 129.99,
+        "discount": 0.15
+      },
+      {
+        "product_id": "PROD-302",
+        "product_name": "Coffee Beans",
+        "category": "Food & Beverage",
+        "quantity": 3,
+        "unit_price": 12.99,
+        "discount": 0.00
+      }
+    ],
+    "shipping": {
+      "address": {
+        "street": "456 Oak Ave",
+        "city": "Sydney",
+        "state": "NSW",
+        "zip": "2000",
+        "country": "Australia"
+      },
+      "method": "express",
+      "cost": 19.99
+    },
+    "payment": {
+      "method": "paypal",
+      "amount": 169.46
+    },
+    "metadata": {
+      "source": "mobile_app",
+      "campaign": "new_user_discount",
+      "referrer": "direct"
+    }
+  },
+  {
+    "order_id": "ORD-2023-003",
+    "customer_id": 1005,
+    "order_date": "2023-07-03T09:45:00Z", 
+    "order_status": "processing",
+    "items": [
+      {
+        "product_id": "PROD-401",
+        "product_name": "Running Shoes",
+        "category": "Sports & Outdoors",
+        "quantity": 1,
+        "unit_price": 89.99,
+        "discount": 0.20
+      }
+    ],
+    "shipping": {
+      "address": {
+        "street": "789 Pine Rd",
+        "city": "London",
+        "state": "England",
+        "zip": "SW1A 1AA",
+        "country": "UK"
+      },
+      "method": "standard",
+      "cost": 12.99
+    },
+    "payment": {
+      "method": "debit_card",
+      "last_four": "5678",
+      "amount": 84.98
+    },
+    "metadata": {
+      "source": "web",
+      "campaign": "fitness_month",
+      "referrer": "email_newsletter"
+    }
+  },
+  {
+    "order_id": "ORD-2023-004",
+    "customer_id": 1007,
+    "order_date": "2023-07-04T16:20:00Z",
+    "order_status": "completed",
+    "items": [
+      {
+        "product_id": "PROD-501",
+        "product_name": "Laptop Stand",
+        "category": "Office Supplies",
+        "quantity": 2,
+        "unit_price": 34.99,
+        "discount": 0.05
+      },
+      {
+        "product_id": "PROD-502", 
+        "product_name": "Wireless Mouse",
+        "category": "Electronics",
+        "quantity": 1,
+        "unit_price": 24.99,
+        "discount": 0.00
+      }
+    ],
+    "shipping": {
+      "address": {
+        "street": "321 Cedar St",
+        "city": "Singapore",
+        "state": "Singapore",
+        "zip": "018989",
+        "country": "Singapore"
+      },
+      "method": "express",
+      "cost": 15.99
+    },
+    "payment": {
+      "method": "credit_card",
+      "last_four": "9012",
+      "amount": 106.46
+    },
+    "metadata": {
+      "source": "mobile_app",
+      "campaign": "work_from_home",
+      "referrer": "social_media"
+    }
+  },
+  {
+    "order_id": "ORD-2023-005",
+    "customer_id": 1012,
+    "order_date": "2023-07-05T11:30:00Z",
+    "order_status": "cancelled",
+    "items": [
+      {
+        "product_id": "PROD-601",
+        "product_name": "Smart Watch",
+        "category": "Wearables",
+        "quantity": 1,
+        "unit_price": 199.99,
+        "discount": 0.00
+      }
+    ],
+    "shipping": {
+      "address": {
+        "street": "654 Maple Dr",
+        "city": "Tokyo",
+        "state": "Tokyo",
+        "zip": "100-0001",
+        "country": "Japan"
+      },
+      "method": "standard",
+      "cost": 14.99
+    },
+    "payment": {
+      "method": "credit_card",
+      "last_four": "3456",
+      "amount": 214.98
+    },
+    "metadata": {
+      "source": "web",
+      "campaign": "tech_gadgets",
+      "referrer": "price_comparison"
+    }
+  }
+]
