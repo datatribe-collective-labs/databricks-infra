@@ -3,82 +3,8 @@
     {
       "user_name": "chanukya.pekala@gmail.com",
       "display_name": "Chanukya Pekala",
-      "groups": ["admins", "pilot"],
-      "workspace_access": "CAN_ATTACH_TO",
-      "catalog_permissions": {
-        "main": "READ",
-        "samples": "USE"
-      }
-    },
-    {
-      "user_name": "komal.azram@gmail.com",
-      "display_name": "Komal Azram",
-      "groups": ["admins", "pilot"],
-      "workspace_access": "CAN_ATTACH_TO",
-      "catalog_permissions": {
-        "main": "READ",
-        "samples": "USE"
-      }
-    },
-    {
-      "user_name": "yangtuomailbox@gmail.com",
-      "display_name": "Yang Tuo",
-      "groups": ["pilot"],
-      "workspace_access": "CAN_ATTACH_TO",
-      "catalog_permissions": {
-            "main": "READ",
-            "samples": "USE"
-        }
-    },
-    {
-      "user_name": "Joonas.f.koskinen@gmail.com",
-      "display_name": "Joonas Koskinen",
-      "groups": ["pilot"],
-      "workspace_access": "CAN_ATTACH_TO",
-      "catalog_permissions": {
-        "main": "READ",
-        "samples": "USE"
-      }
-    },
-    {
-      "user_name": "rafaela.kschroeder@gmail.com",
-      "display_name": "Rafaela Kschroeder",
-      "groups": ["pilot"],
-      "workspace_access": "CAN_ATTACH_TO",
-      "catalog_permissions": {
-        "main": "READ",
-        "samples": "USE"
-      }
-    },
-    {
-      "user_name": "amydn16@gmail.com",
-      "display_name": "Amy Ngo",
-      "groups": ["pilot"],
-      "workspace_access": "CAN_ATTACH_TO",
-      "catalog_permissions": {
-        "main": "READ",
-        "samples": "USE"
-      }
-    },
-    {
-      "user_name": "oiivantsov@outlook.com",
-      "display_name": "Oleg Tsov",
-      "groups": ["pilot"],
-      "workspace_access": "CAN_ATTACH_TO",
-      "catalog_permissions": {
-            "main": "READ",
-            "samples": "USE"
-      }
-    },
-    {
-      "user_name": "tishchuk167@gmail.com",
-      "display_name": "Grigori",
-      "groups": ["pilot"],
-      "workspace_access": "CAN_ATTACH_TO",
-        "catalog_permissions": {
-                "main": "READ",
-                "samples": "USE"
-        }
+      "groups": ["admins"],
+      "workspace_access": "CAN_ATTACH_TO"
     }
   ]
 }

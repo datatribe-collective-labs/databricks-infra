@@ -10,12 +10,26 @@ By following this guide, you'll set up a complete Databricks learning environmen
 - **User management is centralized** through Infrastructure as Code
 - **Everything is reproducible** across different environments
 
-## 📋 Prerequisites (Day 0)
+## 📋 Prerequisites
 
 ### Required Access & Tools
-- **Databricks workspace** with admin access (Free tier) and you get it when you sign up at [databricks.com/try-databricks](https://databricks.com/try-databricks)
+- **Databricks workspace** with admin access
+  - Free tier: Sign up at [databricks.com/try-databricks](https://databricks.com/try-databricks)
+  - Premium/Enterprise: Request from your organization's admin
 - **GitHub account** for repository access
 - **Basic Terraform knowledge** (resources, variables, state management)
+
+### Understanding Your Workspace Type
+This infrastructure works with both **Free Edition** and **Premium/Enterprise** workspaces:
+
+| Feature | Free Edition | Premium/Enterprise |
+|---------|-------------|-------------------|
+| **Catalog Creation** | Manual (via UI) + Import | Terraform manages |
+| **Group Creation** | Terraform manages | Terraform manages |
+| **Schema Creation** | Terraform manages | Terraform manages |
+| **Setup Approach** | Import catalogs first | Create or import all |
+
+**This guide assumes you're using the recommended approach**: Create catalogs manually and import them (works for both editions)
 
 ### Install Required Tools
 ```bash
@@ -31,7 +45,7 @@ brew tap hashicorp/tap && brew install terraform  # macOS
 # OR: Download from https://terraform.io/downloads
 ```
 
-## 🚀 Day 1: Initial Setup
+## Initial Setup
 
 ### Step 1: Get the Infrastructure Code
 ```bash
@@ -91,14 +105,31 @@ catalog_config = [
 ]
 ```
 
-### Step 4: Deploy Infrastructure (10 minutes)
+### Step 4: Create Catalogs in Databricks UI
+**Important**: Databricks requires catalogs to be created with proper storage configuration.
+
+1. Navigate to **Data** → **Create Catalog** in Databricks UI
+2. Create these catalogs (one at a time):
+   - `sales_dev`
+   - `sales_prod`
+   - `marketing_dev`
+   - `marketing_prod`
+3. Use default storage settings when prompted
+
+### Step 5: Deploy Infrastructure (15 minutes)
 ```bash
 cd terraform
 
 # Initialize Terraform
 terraform init
 
-# Review what will be created
+# Import the manually created catalogs
+terraform import 'databricks_catalog.custom_catalogs["sales_dev"]' sales_dev
+terraform import 'databricks_catalog.custom_catalogs["sales_prod"]' sales_prod
+terraform import 'databricks_catalog.custom_catalogs["marketing_dev"]' marketing_dev
+terraform import 'databricks_catalog.custom_catalogs["marketing_prod"]' marketing_prod
+
+# Review what will be created (groups, schemas, permissions, notebooks)
 terraform plan
 
 # Deploy everything
@@ -108,19 +139,22 @@ terraform apply
 
 **What Gets Created:**
 - ✅ User accounts for all students
-- ✅ Groups with appropriate permissions
-- ✅ Catalogs and schemas (bronze, silver, gold layers)
+- ✅ Groups with appropriate permissions (platform_admins)
+- ✅ Schemas in catalogs (bronze, silver, gold layers + experiments)
 - ✅ Course notebooks deployed to `/Shared/terraform-managed/course/notebooks/`
 - ✅ Sample datasets in shared location
 - ✅ Permission grants for students to access content
 
-## 👥 Day 2: Student Onboarding (10 minutes per student)
+**What Gets Imported:**
+- ✅ Existing catalogs (sales_dev, sales_prod, marketing_dev, marketing_prod)
 
-### Onboard Your Students
-Send each student:
+## 👥 User/Student Onboarding
+
+### Onboard Your Users
+Send each user:
 
 1. **Workspace Access**:
-   - Workspace URL: `https://your-workspace.cloud.databricks.com`
+   - Workspace URL: `https://dbc-d8111651-e8b1.cloud.databricks.com`
    - Login instructions (SSO via e-mail account)
 
 2. **Getting Started Guide**:
@@ -169,7 +203,7 @@ terraform apply
 # 1. Pull latest changes
 git pull origin main
 
-# 2. Review what's new (optional
+# 2. Review what's new (optional)
 git log --oneline --since="1 week ago" course/notebooks/
 
 # 3. Deploy updates to student workspace
@@ -250,16 +284,66 @@ DATABRICKS_HOST=https://your-workspace.cloud.databricks.com
 DATABRICKS_TOKEN=your-personal-access-token
 ```
 
+## 🔄 Switching to a New Workspace
+
+If you need to deploy this infrastructure to a different Databricks workspace:
+
+### Quick Migration Steps
+```bash
+# 1. Configure new workspace authentication
+databricks auth login --profile new-workspace
+# Enter new workspace URL and token
+
+# 2. Update Terraform provider (if using profiles)
+# Edit terraform/versions.tf to use new profile
+
+# OR set environment variables
+export DATABRICKS_HOST="https://new-workspace.cloud.databricks.com"
+export DATABRICKS_TOKEN="your-new-token"
+
+# 3. Create catalogs in new workspace UI
+# Navigate to Data → Create Catalog (see Step 4 above)
+
+# 4. Re-initialize and import
+cd terraform
+terraform init -reconfigure
+
+# Import catalogs
+terraform import 'databricks_catalog.custom_catalogs["sales_dev"]' sales_dev
+terraform import 'databricks_catalog.custom_catalogs["sales_prod"]' sales_prod
+terraform import 'databricks_catalog.custom_catalogs["marketing_dev"]' marketing_dev
+terraform import 'databricks_catalog.custom_catalogs["marketing_prod"]' marketing_prod
+
+# 5. Deploy to new workspace
+terraform plan
+terraform apply
+```
+
 ## 🚨 Troubleshooting
 
 ### Common Issues
 
-**"Cannot create catalog" Error**
+**"Cannot create catalog: Metastore storage root URL does not exist" Error**
 ```bash
-# Solution: Create catalogs manually first (Free Edition limitation)
-# 1. In Databricks UI: Data → Create Catalog
+# Root Cause: Databricks requires storage location for catalogs
+# Solution: Create catalogs manually in UI first, then import to Terraform
+
+# 1. In Databricks UI: Data → Create Catalog (use default storage)
 # 2. Import to Terraform:
 terraform import 'databricks_catalog.custom_catalogs["catalog_name"]' catalog_name
+
+# 3. Verify catalog is imported:
+terraform state list | grep catalog
+```
+
+**"Catalog must be replaced due to storage_root change" Error**
+```bash
+# Root Cause: Terraform config doesn't match existing catalog storage
+# Solution: Already fixed in catalogs.tf with lifecycle ignore_changes
+
+# Verify the fix is in place:
+grep -A 5 "lifecycle" terraform/catalogs.tf
+# Should show: ignore_changes = [storage_root, storage_location]
 ```
 
 **"Group already exists" Error** 
@@ -304,12 +388,6 @@ terraform import 'databricks_user.users["user@email.com"]' user@email.com
 
 ### Health Checks
 ```bash
-# Verify infrastructure health
-poetry run python -m src.cli status
-
-# Validate all notebooks
-poetry run validate-notebooks
-
 # Check Terraform state
 terraform plan  # Should show "No changes"
 ```

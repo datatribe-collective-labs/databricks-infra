@@ -4,8 +4,15 @@ resource "databricks_catalog" "custom_catalogs" {
   name           = each.key
   comment        = "Catalog managed by Terraform"
   properties     = {}
-  isolation_mode = "OPEN"
-  storage_root   = "s3://dbstorage-prod-nj0pi/uc/841f0d32-d62a-458b-b2f9-34aa65ce130e/76a86886-8a5f-4f4b-b890-a352622aaad1"
+  isolation_mode = "ISOLATED"
+  # storage_root is managed by Databricks and will be imported from existing catalogs
+
+  lifecycle {
+    ignore_changes = [
+      storage_root,  # Don't change storage location after creation
+      storage_location  # Don't change storage location after creation
+    ]
+  }
 }
 
 # Data source to reference existing catalogs when not creating them
@@ -39,10 +46,15 @@ resource "databricks_schema" "custom_schemas_with_existing_catalogs" {
 # Local to unify schema references (only when creating schemas)
 locals {
   all_schemas = var.create_schemas ? (
-    var.create_catalogs ? 
-      databricks_schema.custom_schemas_with_created_catalogs : 
+    var.create_catalogs ?
+      databricks_schema.custom_schemas_with_created_catalogs :
       databricks_schema.custom_schemas_with_existing_catalogs
   ) : {}
+
+  # Static schema map for grants to avoid dependency issues
+  schema_grant_map = var.create_schemas ? {
+    for schema in local.schemas_config : "${schema.catalog_name}.${schema.schema_name}" => schema
+  } : {}
 }
 
 # Grant catalog permissions (only when catalogs are created)
@@ -60,7 +72,7 @@ resource "databricks_grants" "catalog_grants" {
 
 # Grant schema permissions (only when schemas are managed by Terraform)
 resource "databricks_grants" "schema_grants" {
-  for_each = var.create_schemas ? local.all_schemas : {}
+  for_each = local.schema_grant_map
   schema   = each.key
 
   grant {
@@ -68,5 +80,9 @@ resource "databricks_grants" "schema_grants" {
     privileges = ["USE_SCHEMA", "CREATE_TABLE"]
   }
 
-  depends_on = [databricks_user.users]
+  depends_on = [
+    databricks_schema.custom_schemas_with_created_catalogs,
+    databricks_schema.custom_schemas_with_existing_catalogs,
+    databricks_user.users
+  ]
 }
