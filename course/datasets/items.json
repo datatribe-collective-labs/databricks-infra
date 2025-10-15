@@ -1,0 +1,342 @@
+[
+  {
+    "item_id": "ITM-001",
+    "product_id": "PROD-1001",
+    "sku": "WHD-BLK-001",
+    "variant": {
+      "color": "Black",
+      "size": "Standard",
+      "weight": "300g"
+    },
+    "pricing": {
+      "base_price": 79.99,
+      "sale_price": 71.99,
+      "cost": 35.50,
+      "currency": "USD"
+    },
+    "inventory": {
+      "warehouse_id": "WH-EAST-01",
+      "location": "A-12-C",
+      "quantity_available": 145,
+      "quantity_reserved": 5,
+      "reorder_level": 25
+    },
+    "attributes": {
+      "brand": "TechCorp",
+      "category": "Electronics",
+      "subcategory": "Audio",
+      "wireless": true,
+      "bluetooth_version": "5.0",
+      "battery_life_hours": 20
+    },
+    "created_at": "2023-01-15T10:30:00Z",
+    "updated_at": "2023-07-01T14:22:00Z",
+    "is_active": true
+  },
+  {
+    "item_id": "ITM-002",
+    "product_id": "PROD-1002",
+    "sku": "CFM-SLV-002",
+    "variant": {
+      "color": "Silver",
+      "size": "12-Cup",
+      "weight": "2.1kg"
+    },
+    "pricing": {
+      "base_price": 129.99,
+      "sale_price": null,
+      "cost": 65.00,
+      "currency": "USD"
+    },
+    "inventory": {
+      "warehouse_id": "WH-WEST-01",
+      "location": "B-08-A",
+      "quantity_available": 72,
+      "quantity_reserved": 3,
+      "reorder_level": 15
+    },
+    "attributes": {
+      "brand": "HomeMax",
+      "category": "Home & Kitchen",
+      "subcategory": "Appliances",
+      "programmable": true,
+      "auto_shutoff": true,
+      "water_capacity_cups": 12
+    },
+    "created_at": "2023-02-20T09:15:00Z",
+    "updated_at": "2023-06-28T11:45:00Z",
+    "is_active": true
+  },
+  {
+    "item_id": "ITM-003",
+    "product_id": "PROD-1003",
+    "sku": "RNS-BLU-003",
+    "variant": {
+      "color": "Blue",
+      "size": "10.5",
+      "weight": "800g"
+    },
+    "pricing": {
+      "base_price": 89.99,
+      "sale_price": 71.99,
+      "cost": 45.25,
+      "currency": "USD"
+    },
+    "inventory": {
+      "warehouse_id": "WH-CENTRAL-01",
+      "location": "C-15-B",
+      "quantity_available": 198,
+      "quantity_reserved": 2,
+      "reorder_level": 30
+    },
+    "attributes": {
+      "brand": "SportsPro",
+      "category": "Sports & Outdoors",
+      "subcategory": "Footwear",
+      "waterproof": false,
+      "cushioning": "memory_foam",
+      "sole_type": "rubber"
+    },
+    "created_at": "2023-01-10T16:20:00Z",
+    "updated_at": "2023-07-02T08:30:00Z",
+    "is_active": true
+  },
+  {
+    "item_id": "ITM-004",
+    "product_id": "PROD-1004",
+    "sku": "PRG-PB-004",
+    "variant": {
+      "color": null,
+      "size": "Paperback",
+      "weight": "600g"
+    },
+    "pricing": {
+      "base_price": 49.99,
+      "sale_price": 39.99,
+      "cost": 15.00,
+      "currency": "USD"
+    },
+    "inventory": {
+      "warehouse_id": "WH-EAST-01",
+      "location": "D-03-A",
+      "quantity_available": 48,
+      "quantity_reserved": 2,
+      "reorder_level": 10
+    },
+    "attributes": {
+      "brand": "ReadWell",
+      "category": "Books",
+      "subcategory": "Technology",
+      "pages": 450,
+      "language": "English",
+      "isbn": "978-1234567890"
+    },
+    "created_at": "2023-04-05T12:00:00Z",
+    "updated_at": "2023-06-15T16:45:00Z",
+    "is_active": true
+  },
+  {
+    "item_id": "ITM-005",
+    "product_id": "PROD-1005",
+    "sku": "TSH-GRN-005",
+    "variant": {
+      "color": "Green",
+      "size": "L",
+      "weight": "200g"
+    },
+    "pricing": {
+      "base_price": 24.99,
+      "sale_price": 19.99,
+      "cost": 8.50,
+      "currency": "USD"
+    },
+    "inventory": {
+      "warehouse_id": "WH-WEST-01",
+      "location": "E-20-C",
+      "quantity_available": 295,
+      "quantity_reserved": 5,
+      "reorder_level": 50
+    },
+    "attributes": {
+      "brand": "FashionStyle",
+      "category": "Clothing",
+      "subcategory": "Shirts",
+      "material": "100% Cotton",
+      "fit": "Regular",
+      "care_instructions": "Machine wash cold"
+    },
+    "created_at": "2023-03-22T14:30:00Z",
+    "updated_at": "2023-07-01T10:15:00Z",
+    "is_active": true
+  },
+  {
+    "item_id": "ITM-006",
+    "product_id": "PROD-1006",
+    "sku": "VIT-MLT-006",
+    "variant": {
+      "color": null,
+      "size": "60 Count",
+      "weight": "400g"
+    },
+    "pricing": {
+      "base_price": 34.99,
+      "sale_price": null,
+      "cost": 12.75,
+      "currency": "USD"
+    },
+    "inventory": {
+      "warehouse_id": "WH-CENTRAL-01",
+      "location": "F-07-B",
+      "quantity_available": 118,
+      "quantity_reserved": 2,
+      "reorder_level": 20
+    },
+    "attributes": {
+      "brand": "HealthFirst",
+      "category": "Health & Beauty",
+      "subcategory": "Supplements",
+      "vitamin_type": "Multivitamin",
+      "dosage": "Daily",
+      "expiration_months": 24
+    },
+    "created_at": "2023-05-01T11:45:00Z",
+    "updated_at": "2023-06-30T15:20:00Z",
+    "is_active": true
+  },
+  {
+    "item_id": "ITM-007",
+    "product_id": "PROD-1007",
+    "sku": "BTS-RED-007",
+    "variant": {
+      "color": "Red",
+      "size": "Portable",
+      "weight": "500g"
+    },
+    "pricing": {
+      "base_price": 49.99,
+      "sale_price": 44.99,
+      "cost": 22.50,
+      "currency": "USD"
+    },
+    "inventory": {
+      "warehouse_id": "WH-EAST-01",
+      "location": "A-18-D",
+      "quantity_available": 175,
+      "quantity_reserved": 5,
+      "reorder_level": 25
+    },
+    "attributes": {
+      "brand": "TechCorp",
+      "category": "Electronics",
+      "subcategory": "Audio",
+      "wireless": true,
+      "bluetooth_version": "5.1",
+      "battery_life_hours": 12
+    },
+    "created_at": "2023-02-14T13:15:00Z",
+    "updated_at": "2023-06-25T09:30:00Z",
+    "is_active": true
+  },
+  {
+    "item_id": "ITM-008",
+    "product_id": "PROD-1008",
+    "sku": "KNF-SET-008",
+    "variant": {
+      "color": "Stainless Steel",
+      "size": "5-Piece Set",
+      "weight": "1.2kg"
+    },
+    "pricing": {
+      "base_price": 89.99,
+      "sale_price": 79.99,
+      "cost": 40.00,
+      "currency": "USD"
+    },
+    "inventory": {
+      "warehouse_id": "WH-WEST-01",
+      "location": "B-12-A",
+      "quantity_available": 92,
+      "quantity_reserved": 3,
+      "reorder_level": 15
+    },
+    "attributes": {
+      "brand": "HomeMax",
+      "category": "Home & Kitchen",
+      "subcategory": "Cutlery",
+      "material": "High Carbon Steel",
+      "dishwasher_safe": true,
+      "pieces_included": 5
+    },
+    "created_at": "2023-01-28T10:00:00Z",
+    "updated_at": "2023-07-03T14:10:00Z",
+    "is_active": true
+  },
+  {
+    "item_id": "ITM-009",
+    "product_id": "PROD-1009",
+    "sku": "YGM-PRP-009",
+    "variant": {
+      "color": "Purple",
+      "size": "6mm Thick",
+      "weight": "1.5kg"
+    },
+    "pricing": {
+      "base_price": 29.99,
+      "sale_price": 24.99,
+      "cost": 12.00,
+      "currency": "USD"
+    },
+    "inventory": {
+      "warehouse_id": "WH-CENTRAL-01",
+      "location": "C-22-C",
+      "quantity_available": 248,
+      "quantity_reserved": 2,
+      "reorder_level": 40
+    },
+    "attributes": {
+      "brand": "SportsPro",
+      "category": "Sports & Outdoors",
+      "subcategory": "Fitness",
+      "material": "TPE",
+      "non_slip": true,
+      "length_cm": 180
+    },
+    "created_at": "2023-03-08T15:45:00Z",
+    "updated_at": "2023-06-20T12:00:00Z",
+    "is_active": true
+  },
+  {
+    "item_id": "ITM-010",
+    "product_id": "PROD-1010",
+    "sku": "MYS-HB-010",
+    "variant": {
+      "color": null,
+      "size": "Hardback",
+      "weight": "400g"
+    },
+    "pricing": {
+      "base_price": 14.99,
+      "sale_price": null,
+      "cost": 6.50,
+      "currency": "USD"
+    },
+    "inventory": {
+      "warehouse_id": "WH-EAST-01",
+      "location": "D-08-B",
+      "quantity_available": 172,
+      "quantity_reserved": 3,
+      "reorder_level": 25
+    },
+    "attributes": {
+      "brand": "ReadWell",
+      "category": "Books",
+      "subcategory": "Fiction",
+      "pages": 320,
+      "language": "English",
+      "isbn": "978-9876543210"
+    },
+    "created_at": "2023-04-12T09:30:00Z",
+    "updated_at": "2023-06-18T11:25:00Z",
+    "is_active": true
+  }
+]

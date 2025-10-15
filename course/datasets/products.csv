@@ -1,0 +1,16 @@
+product_id,product_name,category,brand,price,cost,inventory_count,created_date,is_active,rating,review_count,weight_kg,dimensions_cm
+PROD-1001,Wireless Headphones,Electronics,TechCorp,79.99,35.50,150,2023-03-15,true,4.2,89,0.3,20x18x8
+PROD-1002,Coffee Maker,Home & Kitchen,HomeMax,129.99,65.00,75,2023-02-20,true,4.5,156,2.1,25x30x35
+PROD-1003,Running Shoes,Sports & Outdoors,SportsPro,89.99,45.25,200,2023-01-10,true,4.1,234,0.8,30x12x10
+PROD-1004,Programming Book,Books,ReadWell,49.99,15.00,50,2023-04-05,true,4.7,67,0.6,23x15x3
+PROD-1005,Cotton T-Shirt,Clothing,FashionStyle,24.99,8.50,300,2023-03-22,true,4.0,145,0.2,25x35x1
+PROD-1006,Vitamin Supplements,Health & Beauty,HealthFirst,34.99,12.75,120,2023-05-01,true,4.3,78,0.4,8x8x12
+PROD-1007,Bluetooth Speaker,Electronics,TechCorp,49.99,22.50,180,2023-02-14,true,4.4,203,0.5,15x8x8
+PROD-1008,Kitchen Knife Set,Home & Kitchen,HomeMax,89.99,40.00,95,2023-01-28,true,4.6,167,1.2,35x25x5
+PROD-1009,Yoga Mat,Sports & Outdoors,SportsPro,29.99,12.00,250,2023-03-08,true,4.2,189,1.5,180x60x1
+PROD-1010,Mystery Novel,Books,ReadWell,14.99,6.50,175,2023-04-12,true,4.1,98,0.4,20x13x2
+PROD-1011,Jeans,Clothing,FashionStyle,69.99,28.00,140,2023-02-25,true,4.3,134,0.7,30x40x2
+PROD-1012,Face Cream,Health & Beauty,HealthFirst,45.99,18.75,85,2023-05-08,true,4.5,156,0.3,8x8x6
+PROD-1013,Laptop Stand,Electronics,TechCorp,34.99,16.25,110,2023-03-30,true,4.1,89,0.9,25x20x15
+PROD-1014,Blender,Home & Kitchen,HomeMax,159.99,75.50,60,2023-01-18,true,4.4,178,3.2,35x20x40
+PROD-1015,Basketball,Sports & Outdoors,SportsPro,39.99,18.00,200,2023-04-20,true,4.3,156,0.6,24x24x24

@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "databricks-infra"
+version = "0.1.0"
+description = "Databricks Infrastructure as Code with data engineering course"
+authors = ["Chanukya Pekala <chanukya.pekala@gmail.com>"]
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+databricks-cli = "^0.18.0"
+click = "^8.1.0"
+pyyaml = "^6.0"
+requests = "^2.31.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.0"
+pytest = "^8.2.2"
+pre-commit = "^3.7.1"
+
+[tool.poetry.scripts]
+databricks-setup = "src.cli:setup_databricks"
+generate-datasets = "src.utils:generate_sample_data"
+validate-notebooks = "src.validation:validate_notebooks"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]

@@ -1,0 +1,10 @@
+{
+  "users": [
+    {
+      "user_name": "chanukya.pekala@gmail.com",
+      "display_name": "Chanukya Pekala",
+      "groups": ["admins"],
+      "workspace_access": "CAN_ATTACH_TO"
+    }
+  ]
+}
