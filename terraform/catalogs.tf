@@ -9,8 +9,8 @@ resource "databricks_catalog" "custom_catalogs" {
 
   lifecycle {
     ignore_changes = [
-      storage_root,  # Don't change storage location after creation
-      storage_location  # Don't change storage location after creation
+      storage_root,    # Don't change storage location after creation
+      storage_location # Don't change storage location after creation
     ]
   }
 }
@@ -47,8 +47,8 @@ resource "databricks_schema" "custom_schemas_with_existing_catalogs" {
 locals {
   all_schemas = var.create_schemas ? (
     var.create_catalogs ?
-      databricks_schema.custom_schemas_with_created_catalogs :
-      databricks_schema.custom_schemas_with_existing_catalogs
+    databricks_schema.custom_schemas_with_created_catalogs :
+    databricks_schema.custom_schemas_with_existing_catalogs
   ) : {}
 
   # Static schema map for grants to avoid dependency issues
@@ -67,6 +67,41 @@ resource "databricks_grants" "catalog_grants" {
     privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
   }
 
+  grant {
+    principal  = "komal.azram@gmail.com"
+    privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
+  }
+
+  grant {
+    principal  = "yangtuomailbox@gmail.com"
+    privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
+  }
+
+  grant {
+    principal  = "Joonas.f.koskinen@gmail.com"
+    privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
+  }
+
+  grant {
+    principal  = "rafaela.kschroeder@gmail.com"
+    privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
+  }
+
+  grant {
+    principal  = "amydn16@gmail.com"
+    privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
+  }
+
+  grant {
+    principal  = "oiivantsov@outlook.com"
+    privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
+  }
+
+  grant {
+    principal  = "tishchuk167@gmail.com"
+    privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
+  }
+
   depends_on = [databricks_catalog.custom_catalogs, databricks_user.users]
 }
 
@@ -77,6 +112,41 @@ resource "databricks_grants" "schema_grants" {
 
   grant {
     principal  = "chanukya.pekala@gmail.com"
+    privileges = ["USE_SCHEMA", "CREATE_TABLE"]
+  }
+
+  grant {
+    principal  = "komal.azram@gmail.com"
+    privileges = ["USE_SCHEMA", "CREATE_TABLE"]
+  }
+
+  grant {
+    principal  = "yangtuomailbox@gmail.com"
+    privileges = ["USE_SCHEMA", "CREATE_TABLE"]
+  }
+
+  grant {
+    principal  = "Joonas.f.koskinen@gmail.com"
+    privileges = ["USE_SCHEMA", "CREATE_TABLE"]
+  }
+
+  grant {
+    principal  = "rafaela.kschroeder@gmail.com"
+    privileges = ["USE_SCHEMA", "CREATE_TABLE"]
+  }
+
+  grant {
+    principal  = "amydn16@gmail.com"
+    privileges = ["USE_SCHEMA", "CREATE_TABLE"]
+  }
+
+  grant {
+    principal  = "oiivantsov@outlook.com"
+    privileges = ["USE_SCHEMA", "CREATE_TABLE"]
+  }
+
+  grant {
+    principal  = "tishchuk167@gmail.com"
     privileges = ["USE_SCHEMA", "CREATE_TABLE"]
   }
 

@@ -6,11 +6,12 @@ authors = ["Chanukya Pekala <chanukya.pekala@gmail.com>"]
 packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 databricks-cli = "^0.18.0"
 click = "^8.1.0"
 pyyaml = "^6.0"
 requests = "^2.31.0"
+pandas = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.0"
@@ -28,7 +29,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 line-length = 88
-target-version = "py39"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W"]

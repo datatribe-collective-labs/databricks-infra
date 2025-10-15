@@ -1,6 +1,6 @@
 output "notebook_paths" {
   description = "Paths to all created notebooks"
-  value       = {
+  value = {
     for key, notebook in databricks_notebook.notebooks : key => notebook.path
   }
 }
@@ -33,7 +33,7 @@ output "created_users" {
 
 output "created_groups" {
   description = "Map of created groups and their IDs"
-  value       = {
+  value = {
     for key, group in databricks_group.groups : key => group.id
   }
 }

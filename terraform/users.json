@@ -3,8 +3,42 @@
     {
       "user_name": "chanukya.pekala@gmail.com",
       "display_name": "Chanukya Pekala",
-      "groups": ["admins"],
-      "workspace_access": "CAN_ATTACH_TO"
+      "groups": ["admins"]
+    },
+    {
+      "user_name": "komal.azram@gmail.com",
+      "display_name": "Komal Azram",
+      "groups": ["admins"]
+    },
+    {
+      "user_name": "yangtuomailbox@gmail.com",
+      "display_name": "Yang Tuo",
+      "groups": ["admins"]
+    },
+    {
+      "user_name": "Joonas.f.koskinen@gmail.com",
+      "display_name": "Joonas Koskinen",
+      "groups": ["admins"]
+    },
+    {
+      "user_name": "rafaela.kschroeder@gmail.com",
+      "display_name": "Rafaela Kschroeder",
+      "groups": ["admins"]
+    },
+    {
+      "user_name": "amydn16@gmail.com",
+      "display_name": "Amy Ngo",
+      "groups": ["admins"]
+    },
+    {
+      "user_name": "oiivantsov@outlook.com",
+      "display_name": "Oleg Tsov",
+      "groups": ["admins"]
+    },
+    {
+      "user_name": "tishchuk167@gmail.com",
+      "display_name": "Grigori",
+      "groups": ["admins"]
     }
   ]
 }

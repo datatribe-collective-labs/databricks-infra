@@ -28,19 +28,19 @@ resource "databricks_directory" "notebooks_dir" {
 
 # Create notebook subdirectories (manually listed)
 resource "databricks_directory" "notebook_subdirs" {
-  for_each = toset(var.notebook_subdirs)
-  path     = "${databricks_directory.notebooks_dir.path}/${each.key}"
+  for_each         = toset(var.notebook_subdirs)
+  path             = "${databricks_directory.notebooks_dir.path}/${each.key}"
   delete_recursive = true
-  depends_on = [databricks_directory.notebooks_dir]
+  depends_on       = [databricks_directory.notebooks_dir]
 }
 
 # Upload notebooks (manually listed)
 resource "databricks_notebook" "notebooks" {
   for_each = var.notebooks
 
-  path     = "${databricks_directory.notebooks_dir.path}/${each.key}"
-  source   = "${path.module}/../course/notebooks/${each.key}"
-  language = each.value
+  path       = "${databricks_directory.notebooks_dir.path}/${each.key}"
+  source     = "${path.module}/../course/notebooks/${each.key}"
+  language   = each.value
   depends_on = [databricks_directory.notebook_subdirs]
 }
 
@@ -53,7 +53,7 @@ resource "databricks_directory" "datasets_dir" {
 
 # Upload datasets
 resource "databricks_workspace_file" "test_csv" {
-  source = "${path.module}/../course/datasets/test.csv"
-  path   = "${databricks_directory.datasets_dir.path}/test.csv"
+  source     = "${path.module}/../course/datasets/test.csv"
+  path       = "${databricks_directory.datasets_dir.path}/test.csv"
   depends_on = [databricks_directory.datasets_dir]
 }

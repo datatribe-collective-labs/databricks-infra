@@ -46,9 +46,20 @@ A complete Databricks learning platform with Infrastructure as Code (Terraform) 
 | **4** | End-to-End Workflows | 2 | Complete pipeline development |
 | **5** | Job Orchestration | 3 | Production automation and monitoring |
 
+## 🏗️ Current Infrastructure
+
+This repository is configured for production deployment:
+
+- **Workspace**: Premium Edition with full Terraform management
+- **CI/CD**: Automated deployments via GitHub Actions
+- **Users**: 8 users with full catalog access
+- **Catalogs**: 4 catalogs (sales_dev, sales_prod, marketing_dev, marketing_prod)
+- **Schemas**: 13 schemas with medallion architecture (bronze, silver, gold + experiments)
+- **Course Content**: 21 notebooks automatically deployed
+
 ## 📞 Support
 
-- **🐛 Issues**: Use GitHub Issues for bugs and feature requests  
+- **🐛 Issues**: Use GitHub Issues for bugs and feature requests
 - **📖 Technical Docs**: See [CLAUDE.md](./CLAUDE.md) for detailed technical guidance
 - **💬 Questions**: Check notebook troubleshooting sections
 

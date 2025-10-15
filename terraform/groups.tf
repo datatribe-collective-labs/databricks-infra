@@ -23,7 +23,7 @@ locals {
 resource "databricks_group_member" "user_groups" {
   for_each = {
     for mapping in local.user_group_mappings : "${mapping.user}-${mapping.group}" => {
-      user = mapping.user
+      user  = mapping.user
       group = mapping.group
     }
   }

@@ -4,18 +4,25 @@ This file provides comprehensive technical guidance for Claude Code (claude.ai/c
 
 ## Repository Architecture
 
-This is a production-ready Databricks Infrastructure as Code (IaC) project combining:
-- **Terraform**: Unity Catalog, users, permissions management
+This is a **production-deployed** Databricks Infrastructure as Code (IaC) project combining:
+- **Terraform**: Unity Catalog, users, permissions management (currently managing 8 users, 4 catalogs, 13 schemas)
 - **Python Package**: Professional tooling with Poetry, CLI, validation
-- **Databricks Course**: 16 notebooks across 5 weeks (fundamentals to job orchestration)
-- **CI/CD Pipeline**: GitHub Actions with automated deployment
+- **Databricks Course**: 21 notebooks across 5 weeks (fundamentals to job orchestration)
+- **CI/CD Pipeline**: GitHub Actions with automated deployment to Premium Edition workspace
+
+### Current Production State
+- **Workspace**: Premium Edition (https://dbc-d8111651-e8b1.cloud.databricks.com)
+- **Users**: 8 active users with full catalog access
+- **Catalogs**: 4 imported catalogs (sales_dev, sales_prod, marketing_dev, marketing_prod)
+- **Schemas**: 13 schemas using medallion architecture
+- **Deployment**: Managed via Terraform with imported resources
 
 ## Core Technologies Stack
 
 - **Infrastructure**: Terraform + Databricks Provider (~> 1.29)
-- **Python**: 3.9+ with Poetry dependency management
+- **Python**: 3.11+ with Poetry dependency management
 - **Data Engineering**: PySpark, Delta Lake, Unity Catalog
-- **Quality Tools**: Pre-commit hooks, Black, isort, flake8, mypy, pytest
+- **Quality Tools**: Pre-commit hooks, pytest, ruff
 - **Deployment**: GitHub Actions with conditional resource creation
 
 ## Project Structure
