@@ -3,13 +3,10 @@ locals {
   users_raw = jsondecode(file("${path.module}/users.json"))
   users_config = {
     for user in local.users_raw.users : user.user_name => {
-      user_name           = user.user_name
-      display_name        = user.display_name
-      groups             = user.groups
-      catalog_permissions = try(user.catalog_permissions, {
-        main    = "USE"
-        samples = "READ"
-      })
+      user_name      = user.user_name
+      display_name   = user.display_name
+      groups         = user.groups
+      catalog_access = try(user.catalog_access, [])
     }
   }
 
