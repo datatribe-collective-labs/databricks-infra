@@ -20,9 +20,9 @@ This is a **production-deployed** Databricks Infrastructure as Code (IaC) projec
 ## Core Technologies Stack
 
 - **Infrastructure**: Terraform + Databricks Provider (~> 1.29)
-- **Python**: 3.9+ with Poetry dependency management
+- **Python**: 3.11+ with Poetry dependency management
 - **Data Engineering**: PySpark, Delta Lake, Unity Catalog
-- **Quality Tools**: Pre-commit hooks, pytest
+- **Quality Tools**: Pre-commit hooks, pytest, ruff
 - **Deployment**: GitHub Actions with conditional resource creation
 
 ## Project Structure
