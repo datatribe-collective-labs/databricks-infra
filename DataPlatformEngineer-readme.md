@@ -58,14 +58,46 @@ poetry install
 ```
 
 ### Step 2: Configure Authentication
-```bash
-# Authenticate with your Databricks workspace
-databricks auth login
-# Enter your workspace URL: https://your-workspace.cloud.databricks.com
-# Create and enter your personal access token
 
-# Verify connection
+**IMPORTANT**: This project requires **Personal Access Token (PAT)** authentication with **workspace admin privileges** for full Terraform automation.
+
+#### Generate Personal Access Token
+1. Log into your Databricks workspace
+2. Navigate to **User Settings** → **Developer** → **Access Tokens**
+3. Click **Generate New Token**
+4. Set token lifetime (90 days recommended for development)
+5. Copy and save the token securely (shown only once)
+
+**Prerequisite**: Ensure you have **workspace admin** access:
+- Your account must be in the "admins" group
+- Required for SCIM API access (user/group management)
+- OAuth authentication has limitations - always use PAT for full automation
+
+#### Configure Databricks CLI
+```bash
+# Create/update CLI profile with PAT
+cat > ~/.databrickscfg << EOF
+[datatribe]
+host  = https://your-workspace.cloud.databricks.com
+token = dapi1234567890abcdef...  # Your PAT from above
+EOF
+
+# Or use interactive setup
+databricks configure --token --profile datatribe
+# Enter your workspace URL: https://your-workspace.cloud.databricks.com
+# Enter your PAT when prompted
+
+# Verify connection and admin access
 databricks workspace list /
+databricks users list  # Should work if you have admin privileges
+```
+
+#### Update Terraform Provider Configuration
+Edit `terraform/versions.tf` to use your profile:
+```hcl
+provider "databricks" {
+  profile = "datatribe"  # Match your profile name in ~/.databrickscfg
+}
 ```
 
 ### Step 3: Customize for Your Organization
@@ -273,15 +305,21 @@ terraform apply -var="environment=prod"
 ### CI/CD Integration
 Your repository includes GitHub Actions that:
 - **Automatically deploy** when you push changes
-- **Use conditional deployment** for different environments
+- **Use conditional deployment** for different environments (notebooks only, not infrastructure)
 - **Require secrets**: `DATABRICKS_HOST` and `DATABRICKS_TOKEN`
+
+**Important**: CI/CD uses **reference-only mode** (`create_*=false`) since GitHub Actions has no Terraform state file. It only manages notebooks and directories, referencing existing infrastructure.
 
 To enable:
 ```bash
 # Add secrets to your GitHub repository:
 # Settings → Secrets → Actions
 DATABRICKS_HOST=https://your-workspace.cloud.databricks.com
-DATABRICKS_TOKEN=your-personal-access-token
+DATABRICKS_TOKEN=your-personal-access-token  # Same PAT with admin privileges
+
+# Note: The workflow is configured to:
+# - Local dev: Manages ALL resources (catalogs, users, schemas, notebooks)
+# - CI/CD: Only manages notebooks (references existing infrastructure)
 ```
 
 ## 🔄 Switching to a New Workspace
@@ -350,6 +388,28 @@ grep -A 5 "lifecycle" terraform/catalogs.tf
 ```bash
 # Solution: Use existing groups
 terraform apply -var="create_groups=false"
+```
+
+**"Only accessible by admins" or SCIM API errors**
+```bash
+# Root Cause: PAT lacks workspace admin privileges or was generated before admin access
+# Solution: Regenerate PAT after ensuring workspace admin access
+
+# 1. Verify you're in admins group (in Databricks UI or CLI):
+databricks users list --filter 'userName eq "your-email@domain.com"'
+# Check groups field includes "admins"
+
+# 2. Regenerate PAT after confirming admin access:
+# - Databricks UI → User Settings → Developer → Access Tokens
+# - Generate new token (delete old one)
+# - Update ~/.databrickscfg with new token
+
+# 3. Verify SCIM API access:
+databricks users list  # Should work without errors
+databricks groups list  # Should return groups
+
+# 4. Retry Terraform:
+terraform plan
 ```
 
 **Users can't access notebooks**

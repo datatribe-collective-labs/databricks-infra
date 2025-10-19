@@ -68,6 +68,11 @@ resource "databricks_grants" "catalog_grants" {
   }
 
   grant {
+    principal  = "datatribe.collective@gmail.com"
+    privileges = ["ALL_PRIVILEGES"]
+  }
+
+  grant {
     principal  = "komal.azram@gmail.com"
     privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
   }
@@ -112,6 +117,11 @@ resource "databricks_grants" "schema_grants" {
 
   grant {
     principal  = "chanukya.pekala@gmail.com"
+    privileges = ["USE_SCHEMA", "CREATE_TABLE"]
+  }
+
+  grant {
+    principal  = "datatribe.collective@gmail.com"
     privileges = ["USE_SCHEMA", "CREATE_TABLE"]
   }
 
