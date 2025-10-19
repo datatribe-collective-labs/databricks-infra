@@ -64,7 +64,7 @@ resource "databricks_grants" "catalog_grants" {
 
   grant {
     principal  = "chanukya.pekala@gmail.com"
-    privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
+    privileges = ["ALL_PRIVILEGES"]
   }
 
   grant {
@@ -78,7 +78,7 @@ resource "databricks_grants" "catalog_grants" {
   }
 
   grant {
-    principal  = "Joonas.f.koskinen@gmail.com"
+    principal  = "joonas.f.koskinen@gmail.com"
     privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
   }
 
@@ -102,7 +102,7 @@ resource "databricks_grants" "catalog_grants" {
     privileges = ["USE_CATALOG", "CREATE_SCHEMA"]
   }
 
-  depends_on = [databricks_catalog.custom_catalogs, databricks_user.users]
+  depends_on = [databricks_catalog.custom_catalogs]
 }
 
 # Grant schema permissions (only when schemas are managed by Terraform)
@@ -126,7 +126,7 @@ resource "databricks_grants" "schema_grants" {
   }
 
   grant {
-    principal  = "Joonas.f.koskinen@gmail.com"
+    principal  = "joonas.f.koskinen@gmail.com"
     privileges = ["USE_SCHEMA", "CREATE_TABLE"]
   }
 
@@ -152,7 +152,6 @@ resource "databricks_grants" "schema_grants" {
 
   depends_on = [
     databricks_schema.custom_schemas_with_created_catalogs,
-    databricks_schema.custom_schemas_with_existing_catalogs,
-    databricks_user.users
+    databricks_schema.custom_schemas_with_existing_catalogs
   ]
 }

@@ -38,7 +38,7 @@ jobs:
         working-directory: terraform
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan -var="create_catalogs=false" -var="create_groups=false" -var="create_schemas=false"
+        run: terraform plan -out=tfplan -var="create_users=true" -var="create_groups=true" -var="create_catalogs=true" -var="create_schemas=true"
         working-directory: terraform
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}

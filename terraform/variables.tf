@@ -22,6 +22,12 @@ variable "create_schemas" {
   default     = true
 }
 
+variable "create_users" {
+  description = "Whether to create users (set to false if users already exist or SCIM API is not available)"
+  type        = bool
+  default     = true
+}
+
 variable "notebook_subdirs" {
   type    = list(string)
   default = ["01_week", "02_week", "03_week", "04_week", "05_week"]

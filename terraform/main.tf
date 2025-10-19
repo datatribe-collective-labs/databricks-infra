@@ -1,15 +1,15 @@
 # Data source for current user
 data "databricks_current_user" "me" {}
 
-# Create users from JSON file
+# Create users from JSON file (conditional)
 resource "databricks_user" "users" {
-  for_each     = local.users_config
+  for_each     = var.create_users ? local.users_config : {}
   user_name    = each.value.user_name
   display_name = each.value.display_name
   force        = true
 
   lifecycle {
-    ignore_changes = [external_id]
+    ignore_changes = [external_id, display_name]
   }
 }
 

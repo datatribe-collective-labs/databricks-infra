@@ -19,14 +19,14 @@ locals {
   group_refs = var.create_groups ? databricks_group.groups : data.databricks_group.existing_groups
 }
 
-# Add users to their groups
+# Add users to their groups (conditional - only if creating both users and groups)
 resource "databricks_group_member" "user_groups" {
-  for_each = {
+  for_each = (var.create_users && var.create_groups) ? {
     for mapping in local.user_group_mappings : "${mapping.user}-${mapping.group}" => {
       user  = mapping.user
       group = mapping.group
     }
-  }
+  } : {}
 
   group_id  = local.group_refs[each.value.group].id
   member_id = databricks_user.users[each.value.user].id
