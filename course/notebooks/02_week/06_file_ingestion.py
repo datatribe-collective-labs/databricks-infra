@@ -28,8 +28,8 @@
 # COMMAND ----------
 
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, TimestampType, DateType
-from pyspark.sql.functions import current_timestamp, input_file_name, col, to_date, lit
-from datetime import datetime
+from pyspark.sql.functions import current_timestamp, col, lit
+from datetime import date, datetime
 
 # Configuration
 CATALOG = "sales_dev"  # Change to sales_prod for production
@@ -63,11 +63,11 @@ sales_schema = StructType([
 
 # Sample CSV data (simulating file from source system)
 sales_data = [
-    (1001, 101, 201, "Laptop", 1, 1299.99, 1299.99, "2024-01-15", "New York"),
-    (1002, 102, 202, "Mouse", 2, 29.99, 59.98, "2024-01-15", "San Francisco"),
-    (1003, 103, 203, "Keyboard", 1, 89.99, 89.99, "2024-01-15", "Chicago"),
-    (1004, 101, 204, "Monitor", 1, 399.99, 399.99, "2024-01-16", "New York"),
-    (1005, 104, 201, "Laptop", 1, 1299.99, 1299.99, "2024-01-16", "Seattle"),
+    (1001, 101, 201, "Laptop", 1, 1299.99, 1299.99, date(2024, 1, 15), "New York"),
+    (1002, 102, 202, "Mouse", 2, 29.99, 59.98, date(2024, 1, 15), "San Francisco"),
+    (1003, 103, 203, "Keyboard", 1, 89.99, 89.99, date(2024, 1, 15), "Chicago"),
+    (1004, 101, 204, "Monitor", 1, 399.99, 399.99, date(2024, 1, 16), "New York"),
+    (1005, 104, 201, "Laptop", 1, 1299.99, 1299.99, date(2024, 1, 16), "Seattle"),
 ]
 
 df_sales = spark.createDataFrame(sales_data, sales_schema)
@@ -176,11 +176,11 @@ inventory_schema = StructType([
 
 # Sample inventory data
 inventory_data = [
-    (201, "Laptop", "Electronics", 50, "Warehouse_A", datetime(2024, 1, 15, 8, 0, 0), "2024-01-15"),
-    (202, "Mouse", "Accessories", 200, "Warehouse_A", datetime(2024, 1, 15, 8, 0, 0), "2024-01-15"),
-    (203, "Keyboard", "Accessories", 150, "Warehouse_B", datetime(2024, 1, 15, 8, 0, 0), "2024-01-15"),
-    (204, "Monitor", "Electronics", 75, "Warehouse_A", datetime(2024, 1, 15, 8, 0, 0), "2024-01-15"),
-    (205, "Desk", "Furniture", 30, "Warehouse_C", datetime(2024, 1, 15, 8, 0, 0), "2024-01-15"),
+    (201, "Laptop", "Electronics", 50, "Warehouse_A", datetime(2024, 1, 15, 8, 0, 0), date(2024, 1, 15)),
+    (202, "Mouse", "Accessories", 200, "Warehouse_A", datetime(2024, 1, 15, 8, 0, 0), date(2024, 1, 15)),
+    (203, "Keyboard", "Accessories", 150, "Warehouse_B", datetime(2024, 1, 15, 8, 0, 0), date(2024, 1, 15)),
+    (204, "Monitor", "Electronics", 75, "Warehouse_A", datetime(2024, 1, 15, 8, 0, 0), date(2024, 1, 15)),
+    (205, "Desk", "Furniture", 30, "Warehouse_C", datetime(2024, 1, 15, 8, 0, 0), date(2024, 1, 15)),
 ]
 
 df_inventory = spark.createDataFrame(inventory_data, inventory_schema)
@@ -265,8 +265,8 @@ print("=== Incremental File Ingestion ===\n")
 
 # Initial load
 initial_sales = [
-    (3001, 301, 401, "Headphones", 1, 149.99, 149.99, "2024-01-18", "Austin"),
-    (3002, 302, 402, "Speaker", 2, 79.99, 159.98, "2024-01-18", "Austin"),
+    (3001, 301, 401, "Headphones", 1, 149.99, 149.99, date(2024, 1, 18), "Austin"),
+    (3002, 302, 402, "Speaker", 2, 79.99, 159.98, date(2024, 1, 18), "Austin"),
 ]
 
 df_initial = spark.createDataFrame(initial_sales, sales_schema)
@@ -279,8 +279,8 @@ print(f"Initial load: {df_initial.count()} records")
 
 # Incremental load (new data arrives)
 new_sales = [
-    (3003, 303, 403, "Webcam", 1, 89.99, 89.99, "2024-01-18", "Austin"),
-    (3004, 304, 404, "Microphone", 1, 129.99, 129.99, "2024-01-18", "Denver"),
+    (3003, 303, 403, "Webcam", 1, 89.99, 89.99, date(2024, 1, 18), "Austin"),
+    (3004, 304, 404, "Microphone", 1, 129.99, 129.99, date(2024, 1, 18), "Denver"),
 ]
 
 df_new = spark.createDataFrame(new_sales, sales_schema)
@@ -317,9 +317,9 @@ campaign_schema = StructType([
 
 # Sample marketing data
 campaign_data = [
-    ("camp_001", "Winter Sale 2024", "email", 5000.00, "2024-01-15", "2024-01-31", "existing_customers"),
-    ("camp_002", "New Product Launch", "social_media", 10000.00, "2024-01-20", "2024-02-15", "tech_enthusiasts"),
-    ("camp_003", "Seasonal Promotion", "display_ads", 7500.00, "2024-01-25", "2024-02-10", "all_users"),
+    ("camp_001", "Winter Sale 2024", "email", 5000.00, date(2024, 1, 15), date(2024, 1, 31), "existing_customers"),
+    ("camp_002", "New Product Launch", "social_media", 10000.00, date(2024, 1, 20), date(2024, 2, 15), "tech_enthusiasts"),
+    ("camp_003", "Seasonal Promotion", "display_ads", 7500.00, date(2024, 1, 25), date(2024, 2, 10), "all_users"),
 ]
 
 df_campaigns = spark.createDataFrame(campaign_data, campaign_schema)
