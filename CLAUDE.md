@@ -79,27 +79,66 @@ poetry run mypy src/                       # Type checking
 poetry run pre-commit run --all-files     # All quality checks
 ```
 
+### Authentication Setup
+
+**IMPORTANT**: This project uses **Personal Access Token (PAT)** authentication for full Terraform automation.
+
+#### Prerequisites
+- Databricks workspace admin role (required for user/group management via SCIM API)
+- Personal Access Token with admin privileges
+
+#### Generate Personal Access Token (PAT)
+1. **Login to Databricks workspace** as workspace admin:
+   - URL: https://dbc-d8111651-e8b1.cloud.databricks.com
+2. **Navigate to Settings**:
+   - Profile Icon → Settings → Developer → Access Tokens
+3. **Generate new token**:
+   - Comment: `Terraform Infrastructure Management`
+   - Lifetime: 90 days (recommended) or as needed
+   - Click "Generate" and **copy token immediately**
+4. **Configure Databricks CLI**:
+   ```bash
+   # Edit ~/.databrickscfg
+   [datatribe]
+   host  = https://dbc-d8111651-e8b1.cloud.databricks.com
+   token = dapi...  # Your PAT here
+   ```
+
+#### GitHub Secrets Configuration
+For CI/CD to work, configure these secrets in GitHub repository:
+- **Settings** → **Secrets and variables** → **Actions**
+- Add/Update secrets:
+  - `DATABRICKS_HOST`: https://dbc-d8111651-e8b1.cloud.databricks.com
+  - `DATABRICKS_TOKEN`: Your PAT (same as local config)
+
 ### Terraform Deployment Patterns
 
-#### Local Development (Full Control)
+#### Local Development (Full Management with PAT)
 ```bash
 cd terraform
 terraform init
-terraform plan                            # Creates all resources
-terraform apply
+
+# Full resource management (users, groups, catalogs, schemas, notebooks)
+terraform plan -var="create_users=true" -var="create_groups=true" -var="create_catalogs=true" -var="create_schemas=true"
+terraform apply -var="create_users=true" -var="create_groups=true" -var="create_catalogs=true" -var="create_schemas=true"
 ```
 
-#### CI/CD Deployment (Databricks Free Edition)
+#### CI/CD Deployment (Reference Existing Resources)
 ```bash
-# Uses existing resources via data sources
-terraform plan -var="create_catalogs=false" -var="create_groups=false" -var="create_schemas=false"
-terraform apply -var="create_catalogs=false" -var="create_groups=false" -var="create_schemas=false"
+# Uses existing resources via data sources, only manages notebooks
+terraform plan -var="create_users=false" -var="create_groups=false" -var="create_catalogs=false" -var="create_schemas=false"
+terraform apply -var="create_users=false" -var="create_groups=false" -var="create_catalogs=false" -var="create_schemas=false"
 ```
 
 #### Configuration Variables
+- `create_users` (default: true) - Whether to create users via Terraform (requires workspace admin + PAT)
+- `create_groups` (default: true) - Whether to create groups via Terraform (requires workspace admin + PAT)
 - `create_catalogs` (default: true) - Whether to create catalogs via Terraform
-- `create_groups` (default: true) - Whether to create groups via Terraform  
 - `create_schemas` (default: true) - Whether to create schemas via Terraform
+
+#### Why Different Settings for Local vs CI/CD?
+- **Local**: Has Terraform state file → Can manage all resources ✅
+- **CI/CD**: No state file in repo → Only manages notebooks, references existing infrastructure via data sources ✅
 
 ## Key Design Patterns
 
@@ -381,14 +420,32 @@ terraform state rm <problematic_resource>
 terraform import <resource_address> <resource_id>
 ```
 
-### Databricks Authentication
+### Databricks Authentication Issues
+
+**Problem**: "only accessible by admins" or SCIM API errors
+**Solution**: Regenerate PAT with workspace admin privileges
+
 ```bash
-# Reconfigure CLI
-databricks configure --token --profile dev
-# Or use environment variables
-export DATABRICKS_HOST="https://your-workspace.cloud.databricks.com"
-export DATABRICKS_TOKEN="your-token"
+# Step 1: Ensure you have workspace admin role
+databricks current-user me --profile datatribe | grep admins
+
+# Step 2: Generate new PAT in Databricks UI
+# Settings → Developer → Access Tokens → Generate new token
+
+# Step 3: Update ~/.databrickscfg
+[datatribe]
+host  = https://dbc-d8111651-e8b1.cloud.databricks.com
+token = dapi...  # New PAT with admin privileges
+
+# Step 4: Test authentication
+databricks current-user me --profile datatribe
+databricks users list --profile datatribe  # Should work if admin
+
+# Step 5: Update GitHub Secret
+# GitHub repo → Settings → Secrets → DATABRICKS_TOKEN
 ```
+
+**Important**: OAuth authentication (`auth_type = databricks-cli`) has limitations with SCIM API. Always use PAT for full automation.
 
 ### Poetry Environment Issues
 ```bash

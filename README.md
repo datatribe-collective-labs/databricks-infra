@@ -65,6 +65,8 @@ This repository is configured for production deployment:
 - **Course Content**: 21 notebooks automatically deployed
 - **Permissions**: Group-based access control with workspace-level groups
 
+**Important**: For platform engineers managing infrastructure, workspace admin access and PAT authentication are required for full Terraform automation (user/group management, SCIM API access).
+
 ## 📞 Support
 
 - **🐛 Issues**: Use GitHub Issues for bugs and feature requests

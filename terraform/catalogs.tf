@@ -217,7 +217,12 @@ resource "databricks_grants" "course_shared_schema_grants" {
 
   grant {
     principal  = "datatribe.collective@gmail.com"
-    privileges = ["ALL_PRIVILEGES"]
+    privileges = ["USE_SCHEMA", "CREATE_TABLE"]
+  }
+
+  grant {
+    principal  = "komal.azram@gmail.com"
+    privileges = ["USE_SCHEMA", "CREATE_TABLE"]
   }
 
   # Admin group gets full control
