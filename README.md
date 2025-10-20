@@ -50,13 +50,20 @@ A complete Databricks learning platform with Infrastructure as Code (Terraform) 
 
 This repository is configured for production deployment:
 
-- **Workspace**: Premium Edition with full Terraform management
-- **Authentication**: Personal Access Token (PAT) with workspace admin privileges required
+- **Workspace**: Free Edition with Unity Catalog
+- **Authentication**: PAT (Personal Access Token) based
 - **CI/CD**: Automated deployments via GitHub Actions
-- **Users**: 8 users with full catalog access
-- **Catalogs**: 4 catalogs (sales_dev, sales_prod, marketing_dev, marketing_prod)
-- **Schemas**: 13 schemas with medallion architecture (bronze, silver, gold + experiments)
+- **Users**: 8 active users (7 admins, 1 student)
+- **Groups**: 2 workspace-level groups (platform_admins, platform_students)
+- **Catalogs**: 5 Unity Catalogs total
+  - 4 shared reference catalogs (sales_dev, sales_prod, marketing_dev, marketing_prod)
+  - 1 course catalog (databricks_course) with user-specific schemas
+- **Schemas**: 24 total schemas
+  - 13 shared reference schemas (bronze, silver, gold, experiments)
+  - 3 course shared schemas (shared_bronze, shared_silver, shared_gold)
+  - 8 user personal schemas (one per user)
 - **Course Content**: 21 notebooks automatically deployed
+- **Permissions**: Group-based access control with workspace-level groups
 
 **Important**: For platform engineers managing infrastructure, workspace admin access and PAT authentication are required for full Terraform automation (user/group management, SCIM API access).
 

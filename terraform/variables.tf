@@ -11,7 +11,7 @@ variable "create_catalogs" {
 }
 
 variable "create_groups" {
-  description = "Whether to create groups (set to false if groups already exist)"
+  description = "Whether to create groups (workspace-level groups for Unity Catalog grants)"
   type        = bool
   default     = true
 }

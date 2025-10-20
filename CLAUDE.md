@@ -11,11 +11,17 @@ This is a **production-deployed** Databricks Infrastructure as Code (IaC) projec
 - **CI/CD Pipeline**: GitHub Actions with automated deployment to Premium Edition workspace
 
 ### Current Production State
-- **Workspace**: Premium Edition (https://dbc-d8111651-e8b1.cloud.databricks.com)
-- **Users**: 8 active users with full catalog access
-- **Catalogs**: 4 imported catalogs (sales_dev, sales_prod, marketing_dev, marketing_prod)
-- **Schemas**: 13 schemas using medallion architecture
-- **Deployment**: Managed via Terraform with imported resources
+- **Workspace**: Free Edition (https://dbc-d8111651-e8b1.cloud.databricks.com)
+- **Users**: 8 active users (7 admins, 1 student)
+- **Groups**: 2 workspace-level groups (platform_admins, platform_students)
+- **Catalogs**: 5 catalogs total
+  - 4 shared reference catalogs (sales_dev, sales_prod, marketing_dev, marketing_prod)
+  - 1 course catalog (databricks_course) with user-specific schemas
+- **Schemas**: 24 total schemas
+  - 13 shared reference schemas (bronze, silver, gold, experiments)
+  - 3 course shared schemas (shared_bronze, shared_silver, shared_gold)
+  - 8 user personal schemas (one per user)
+- **Deployment**: Fully automated via Terraform with PAT authentication
 
 ## Core Technologies Stack
 
@@ -153,9 +159,57 @@ data "databricks_catalog" "existing_catalogs" {
 ```
 
 ### Unity Catalog Architecture
-- **Catalogs**: `sales_dev`, `sales_prod`, `marketing_dev`, `marketing_prod`
-- **Schemas**: `bronze` (raw data), `silver` (cleaned), `gold` (aggregated), `experiments` (marketing_dev only)
-- **Tables**: Created dynamically by notebooks with proper partitioning
+
+#### Catalog Structure
+The infrastructure manages 5 Unity Catalogs with distinct purposes:
+
+**Shared Reference Catalogs** (Read-only for users):
+- `sales_dev`, `sales_prod` - Sales department data (dev/prod environments)
+- `marketing_dev`, `marketing_prod` - Marketing department data (dev/prod environments)
+- Each contains medallion architecture schemas: `bronze`, `silver`, `gold`
+- `marketing_dev` includes additional `experiments` schema
+
+**Course Catalog** (User workspaces):
+- `databricks_course` - Single catalog for all student work
+- Contains 3 shared schemas: `shared_bronze`, `shared_silver`, `shared_gold`
+- Contains 8 user-personal schemas (one per user)
+- User schemas named from email: `chanukya_pekala`, `komal_azram`, etc.
+
+#### Schema Generation Logic
+User schema names are automatically generated from email addresses:
+```hcl
+# Example: chanukya.pekala@gmail.com → chanukya_pekala
+user_schema_base_names = {
+  for user_email in keys(local.users_config) :
+  user_email => replace(split("@", user_email)[0], ".", "_")
+}
+```
+
+Deduplication handles name conflicts:
+- First occurrence: `john_smith`
+- Second occurrence: `john_smith_2`
+- Third occurrence: `john_smith_3`
+
+#### Group-Based Access Control
+Two workspace-level groups manage permissions:
+
+**platform_admins**:
+- Members: 7 users (chanukya, komal, joonas, rafaela, amy, oleg, grigori)
+- Permissions: ALL_PRIVILEGES on all catalogs and schemas
+- Use case: Course instructors, platform engineers
+
+**platform_students**:
+- Members: 1 user (yangtuomailbox - test account)
+- Permissions:
+  - ALL_PRIVILEGES on their own schema
+  - SELECT + USE_SCHEMA on all other schemas (peer learning)
+  - SELECT + USE_SCHEMA on shared catalogs
+- Use case: Regular students, limited access
+
+#### Super Admin Principals
+Two individual principals have unrestricted access:
+- `chanukya.pekala@gmail.com` - ALL_PRIVILEGES everywhere
+- `datatribe.collective@gmail.com` - ALL_PRIVILEGES everywhere
 
 ### Data Engineering Patterns
 - **Schema-First Approach**: Explicit schemas prevent inference issues
@@ -198,20 +252,79 @@ Focus: Job orchestration and production deployment
 
 ## Working with This Repository
 
-### Adding New Users
-1. Edit `terraform/users.json`:
+### User Management
+
+#### Adding New Students
+Onboarding a new student is fully automated via Terraform:
+
+**For Admin Users** (instructors, platform engineers):
 ```json
 {
-  "users": [
-    {
-      "user_name": "new.user@example.com",
-      "display_name": "New User", 
-      "groups": ["pilot"]
-    }
-  ]
+  "user_name": "new.instructor@university.edu",
+  "display_name": "New Instructor",
+  "groups": ["admins"]
 }
 ```
-2. Run `terraform plan && terraform apply`
+
+**For Regular Students**:
+```json
+{
+  "user_name": "new.student@university.edu",
+  "display_name": "New Student",
+  "groups": ["students"]
+}
+```
+
+**Automatic Provisioning**:
+1. Edit `terraform/users.json` and add user entry
+2. Run `terraform apply`
+3. Terraform automatically:
+   - Creates user account in Databricks
+   - Adds user to specified group (platform_admins or platform_students)
+   - Creates personal schema: `databricks_course.new_student`
+   - Configures all permissions based on group membership
+
+**Permissions by Group**:
+
+*platform_admins members get*:
+- ALL_PRIVILEGES on all catalogs and schemas
+- Full access to all user workspaces
+- Can create/modify/delete any resource
+
+*platform_students members get*:
+- ALL_PRIVILEGES on their own schema only
+- SELECT + USE_SCHEMA on all shared catalogs (read-only)
+- SELECT + USE_SCHEMA on all peer schemas (peer learning)
+- USE_CATALOG + CREATE_SCHEMA on databricks_course
+
+#### Removing Users
+
+**Complete Removal** (deletes user and all data):
+1. Remove user entry from `terraform/users.json`
+2. Run `terraform apply`
+3. User account, personal schema, and all data permanently deleted
+
+**⚠️ Data Loss Warning**: User schemas have `force_destroy = true`, meaning all tables and data are permanently deleted.
+
+**Preserving User Work Before Removal**:
+```sql
+-- Transfer schema ownership
+ALTER SCHEMA databricks_course.student_name
+OWNER TO `chanukya.pekala@gmail.com`;
+
+-- Then remove user from users.json
+```
+
+#### Changing User Roles
+To promote a student to admin or vice versa:
+```json
+{
+  "user_name": "user@example.com",
+  "display_name": "User Name",
+  "groups": ["admins"]  // Changed from ["students"]
+}
+```
+Run `terraform apply` - permissions update automatically.
 
 ### Adding New Catalogs
 For Free Edition (manual catalog creation required):
