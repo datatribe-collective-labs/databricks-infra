@@ -39,6 +39,11 @@
       "user_name": "tishchuk167@gmail.com",
       "display_name": "Grigori",
       "groups": ["admins"]
+    },
+    {
+      "user_name": "eveliina.ves@gmail.com",
+      "display_name": "Eveliina Vesala",
+      "groups": ["admins"]
     }
   ]
 }
