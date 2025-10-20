@@ -70,29 +70,33 @@ databricks workspace list /
 
 ### Step 3: Customize for Your Organization
 
-#### Configure Students
+#### Configure Users and Groups
 Edit `terraform/users.json` with your team:
 ```json
 {
   "users": [
     {
-      "user_name": "alice@yourcompany.com",
-      "display_name": "Alice Johnson",
-      "groups": ["data_engineers"]
+      "user_name": "instructor@yourcompany.com",
+      "display_name": "Lead Instructor",
+      "groups": ["admins"]
     },
     {
-      "user_name": "bob@yourcompany.com", 
-      "display_name": "Bob Smith",
-      "groups": ["data_engineers"]
+      "user_name": "student1@yourcompany.com",
+      "display_name": "Student One",
+      "groups": ["students"]
     },
     {
-      "user_name": "charlie@yourcompany.com",
-      "display_name": "Charlie Davis", 
-      "groups": ["data_engineers", "advanced_users"]
+      "user_name": "student2@yourcompany.com",
+      "display_name": "Student Two",
+      "groups": ["students"]
     }
   ]
 }
 ```
+
+**Group Permissions**:
+- `admins` → `platform_admins` workspace group → ALL_PRIVILEGES on all resources
+- `students` → `platform_students` workspace group → Own schema + read-only on shared resources
 
 #### Customize Catalogs (Optional)
 Edit `terraform/locals.tf` to match your naming conventions:
@@ -180,21 +184,73 @@ databricks workspace list /Shared/terraform-managed/course/notebooks
 
 ## 🔄 Ongoing Management
 
-### Adding New Users (optional)
-```bash
-# 1. Edit terraform/users.json - add new user
+### Adding New Users
+
+**For Regular Students**:
+```json
+// Edit terraform/users.json
 {
   "user_name": "newstudent@yourcompany.com",
   "display_name": "New Student",
-  "groups": ["data_engineers"]
+  "groups": ["students"]
 }
+```
 
-# 2. Deploy changes
+**For Admin/Instructors**:
+```json
+{
+  "user_name": "newinstructor@yourcompany.com",
+  "display_name": "New Instructor",
+  "groups": ["admins"]
+}
+```
+
+**Deploy**:
+```bash
 cd terraform
-terraform plan
 terraform apply
+```
 
-# 3. New user gets automatic access to all course content
+**What Happens Automatically**:
+- User account created in Databricks
+- Added to workspace group (platform_students or platform_admins)
+- Personal schema created: `databricks_course.newstudent`
+- Permissions configured based on group membership
+
+### Removing Users
+
+**Step 1: Backup User Data (if needed)**:
+```sql
+-- Log into Databricks SQL Editor
+-- Transfer schema ownership before removal
+ALTER SCHEMA databricks_course.student_name
+OWNER TO `admin@yourcompany.com`;
+```
+
+**Step 2: Remove from users.json**:
+```bash
+# Delete the user entry from terraform/users.json
+# Then apply:
+terraform apply
+```
+
+**⚠️ Warning**: User account, personal schema, and ALL data will be permanently deleted unless ownership is transferred first.
+
+### Changing User Roles
+
+**Promote Student to Admin**:
+```json
+{
+  "user_name": "user@yourcompany.com",
+  "display_name": "User Name",
+  "groups": ["admins"]  // Changed from ["students"]
+}
+```
+
+**Apply changes**:
+```bash
+terraform apply
+# Permissions update automatically
 ```
 
 ### Getting Course Updates
