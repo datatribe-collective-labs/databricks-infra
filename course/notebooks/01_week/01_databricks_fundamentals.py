@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Databricks Fundamentals - Week 0x
+# MAGIC # Databricks Fundamentals - Week 01
 # MAGIC 
 # MAGIC Welcome to the comprehensive Databricks fundamentals course! This notebook series provides in-depth coverage of Databricks concepts, architecture, and practical usage patterns.
 # MAGIC 
@@ -11,18 +11,16 @@
 # MAGIC - Unity Catalog structure and data governance
 # MAGIC - Cluster management and compute optimization
 # MAGIC - Databricks Runtime and Spark fundamentals
-# MAGIC - Data lakehouse architecture principles
-# MAGIC - Security and access control patterns
+# MAGIC - Data Lakehouse technical foundation with Delta Lake (ACID & Schema)
 # MAGIC 
 # MAGIC ## Course Structure
 # MAGIC 
 # MAGIC This week consists of 6 comprehensive notebooks:
-# MAGIC - **00_databricks_fundamentals** (this notebook) - Overview and architecture
-# MAGIC - **01_unity_catalog_deep_dive** - Data governance and catalog structure
-# MAGIC - **02_cluster_management** - Compute resources and optimization
-# MAGIC - **03_spark_on_databricks** - Distributed computing fundamentals
-# MAGIC - **04_data_lakehouse_patterns** - Modern data architecture
-# MAGIC - **05_security_and_governance** - Access control and compliance
+# MAGIC - **01_databricks_fundamentals** (this notebook) - Overview and architecture
+# MAGIC - **02_unity_catalog_deep_dive** - Data governance and catalog structure
+# MAGIC - **03_cluster_management** - Compute resources and optimization
+# MAGIC - **04_spark_on_databricks** - Distributed computing fundamentals
+# MAGIC - **05_delta_lake_concepts_explained** - Delta Lake: ACID Transactions and Schema Management
 
 # COMMAND ----------
 
@@ -51,21 +49,21 @@
 # MAGIC ```
 # MAGIC ┌─────────────────────────────────────────────────────────────┐
 # MAGIC │                    Databricks Control Plane                 │
-# MAGIC │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-# MAGIC │  │ Workspace   │  │ Unity       │  │ Job Scheduler       │ │
-# MAGIC │  │ Management  │  │ Catalog     │  │ & Orchestration     │ │
-# MAGIC │  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+# MAGIC │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+# MAGIC │  │ Workspace   │  │ Unity       │  │ Job Scheduler       │  │
+# MAGIC │  │ Management  │  │ Catalog     │  │ & Orchestration     │  │
+# MAGIC │  └─────────────┘  └─────────────┘  └─────────────────────┘  │
 # MAGIC └─────────────────────────────────────────────────────────────┘
 # MAGIC                              │
 # MAGIC                              ▼
 # MAGIC ┌─────────────────────────────────────────────────────────────┐
 # MAGIC │                    Databricks Data Plane                    │
-# MAGIC │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-# MAGIC │  │ Compute     │  │ Storage     │  │ Networking          │ │
-# MAGIC │  │ Clusters    │  │ (DBFS,      │  │ (VPC, Security      │ │
-# MAGIC │  │             │  │ Unity       │  │ Groups)             │ │
-# MAGIC │  │             │  │ Catalog)    │  │                     │ │
-# MAGIC │  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+# MAGIC │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+# MAGIC │  │ Compute     │  │ Storage     │  │ Networking          │  │
+# MAGIC │  │ Clusters    │  │ (DBFS,      │  │ (VPC, Security      │  │
+# MAGIC │  │             │  │ Unity       │  │ Groups)             │  │
+# MAGIC │  │             │  │ Catalog)    │  │                     │  │
+# MAGIC │  └─────────────┘  └─────────────┘  └─────────────────────┘  │
 # MAGIC └─────────────────────────────────────────────────────────────┘
 # MAGIC ```
 # MAGIC 
@@ -190,30 +188,30 @@ df.printSchema()
 # MAGIC ```
 # MAGIC ┌─────────────────────────────────────────────────────────────┐
 # MAGIC │                    Analytics & ML Layer                     │
-# MAGIC │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-# MAGIC │  │ BI Tools    │  │ ML Platforms│  │ Analytics Apps      │ │
-# MAGIC │  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+# MAGIC │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+# MAGIC │  │ BI Tools    │  │ ML Platforms│  │ Analytics Apps      │  │
+# MAGIC │  └─────────────┘  └─────────────┘  └─────────────────────┘  │
 # MAGIC └─────────────────────────────────────────────────────────────┘
 # MAGIC                              │
 # MAGIC                              ▼
 # MAGIC ┌─────────────────────────────────────────────────────────────┐
 # MAGIC │                    Databricks Lakehouse                     │
-# MAGIC │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-# MAGIC │  │ Unity       │  │ Delta Lake  │  │ Apache Spark        │ │
-# MAGIC │  │ Catalog     │  │ (ACID,      │  │ (Compute Engine)    │ │
-# MAGIC │  │ (Governance)│  │ Time Travel)│  │                     │ │
-# MAGIC │  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+# MAGIC │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+# MAGIC │  │ Unity       │  │ Delta Lake  │  │ Apache Spark        │  │
+# MAGIC │  │ Catalog     │  │ (ACID,      │  │ (Compute Engine)    │  │
+# MAGIC │  │ (Governance)│  │ Time Travel)│  │                     │  │
+# MAGIC │  └─────────────┘  └─────────────┘  └─────────────────────┘  │
 # MAGIC └─────────────────────────────────────────────────────────────┘
 # MAGIC                              │
 # MAGIC                              ▼
 # MAGIC ┌─────────────────────────────────────────────────────────────┐
 # MAGIC │                      Storage Layer                          │
-# MAGIC │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-# MAGIC │  │ Cloud       │  │ On-Premises │  │ Multi-Cloud         │ │
-# MAGIC │  │ Storage     │  │ Storage     │  │ Storage             │ │
-# MAGIC │  │ (S3, ADLS,  │  │ (HDFS, NFS) │  │ (Hybrid)            │ │
-# MAGIC │  │ GCS)        │  │             │  │                     │ │
-# MAGIC │  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+# MAGIC │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+# MAGIC │  │ Cloud       │  │ On-Premises │  │ Multi-Cloud         │  │
+# MAGIC │  │ Storage     │  │ Storage     │  │ Storage             │  │
+# MAGIC │  │ (S3, ADLS,  │  │ (HDFS, NFS) │  │ (Hybrid)            │  │
+# MAGIC │  │ GCS)        │  │             │  │                     │  │
+# MAGIC │  └─────────────┘  └─────────────┘  └─────────────────────┘  │
 # MAGIC └─────────────────────────────────────────────────────────────┘
 # MAGIC ```
 # MAGIC 
@@ -289,11 +287,10 @@ print("   - Consider spot instances for cost optimization")
 # MAGIC 
 # MAGIC Continue to the next notebooks in this series:
 # MAGIC 
-# MAGIC 1. **01_unity_catalog_deep_dive**: Learn about data governance and catalog structure
-# MAGIC 2. **02_cluster_management**: Master compute resources and optimization
-# MAGIC 3. **03_spark_on_databricks**: Deep dive into distributed computing
-# MAGIC 4. **04_data_lakehouse_patterns**: Explore modern data architecture patterns
-# MAGIC 5. **05_security_and_governance**: Understand access control and compliance
+# MAGIC 1. **02_unity_catalog_deep_dive**: Learn about data governance and catalog structure
+# MAGIC 2. **03_cluster_management**: Master compute resources and optimization
+# MAGIC 3. **04_spark_on_databricks**: Deep dive into distributed computing
+# MAGIC 4. **05_delta_lake_concepts_explained**: Explore Delta Lake's ACID transactions and schema management
 # MAGIC 
 # MAGIC Each notebook builds upon the concepts introduced here and provides hands-on experience with Databricks features.
 
