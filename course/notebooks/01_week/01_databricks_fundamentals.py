@@ -15,7 +15,7 @@
 # MAGIC 
 # MAGIC ## Course Structure
 # MAGIC 
-# MAGIC This week consists of 6 comprehensive notebooks:
+# MAGIC This week consists of 5 comprehensive notebooks:
 # MAGIC - **01_databricks_fundamentals** (this notebook) - Overview and architecture
 # MAGIC - **02_unity_catalog_deep_dive** - Data governance and catalog structure
 # MAGIC - **03_cluster_management** - Compute resources and optimization
