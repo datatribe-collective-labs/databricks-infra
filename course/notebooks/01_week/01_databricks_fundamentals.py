@@ -20,7 +20,7 @@
 # MAGIC - **02_unity_catalog_deep_dive** - Data governance and catalog structure
 # MAGIC - **03_cluster_management** - Compute resources and optimization
 # MAGIC - **04_spark_on_databricks** - Distributed computing fundamentals
-# MAGIC - **05_delta_lake_concepts_explained** - Delta Lake: ACID Transactions and Schema Management
+# MAGIC - **05_delta_lake_concepts_explained** - Delta Lake: ACID transactions and schema management
 
 # COMMAND ----------
 
