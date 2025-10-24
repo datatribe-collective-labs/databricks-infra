@@ -12,7 +12,7 @@
 # MAGIC - Implement error handling and data quality checks
 # MAGIC - Use partition strategies for performance
 # MAGIC
-# MAGIC ## Unity Catalog Structure
+# MAGIC ## Example Unity Catalog Structure
 # MAGIC
 # MAGIC ```
 # MAGIC sales_dev.bronze.*      - Raw sales data (development)
@@ -32,12 +32,25 @@ from pyspark.sql.functions import current_timestamp, col, lit
 from datetime import date, datetime
 
 # Configuration
-CATALOG = "sales_dev"  # Change to sales_prod for production
+CATALOG = "databricks_course"  # We will use the course catalog here instead
 BRONZE_SCHEMA = "bronze"
 SILVER_SCHEMA = "silver"
 
 print(f"Target Catalog: {CATALOG}")
 print(f"Bronze Schema: {CATALOG}.{BRONZE_SCHEMA}")
+
+# COMMAND ----------
+
+import re
+
+# The course schema for write access
+CATALOG = "databricks_course" 
+# Get logged in user's username
+USER_SCHEMA_RAW = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
+# Remove latter part of email address, and replace special characters with underscore to avoid SQL parsing errors
+USER_SCHEMA = re.sub(r'[^a-zA-Z0-9_]', '_', USER_SCHEMA_RAW.split('@')[0])
+# If schema didn't exist before, now it is being created
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {CATALOG}.{USER_SCHEMA}")
 
 # COMMAND ----------
 
@@ -81,7 +94,7 @@ print("Sample sales data:")
 df_sales_bronze.show(5, truncate=False)
 
 # Write to Bronze layer in Unity Catalog
-bronze_table = f"{CATALOG}.{BRONZE_SCHEMA}.sales_transactions"
+bronze_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}sales_transactions"
 
 df_sales_bronze.write \
     .format("delta") \
@@ -144,7 +157,7 @@ print("Sample customer events:")
 df_events_bronze.show(5, truncate=False)
 
 # Write to Bronze layer
-bronze_events_table = f"{CATALOG}.{BRONZE_SCHEMA}.customer_events"
+bronze_events_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}customer_events"
 
 df_events_bronze.write \
     .format("delta") \
@@ -193,7 +206,7 @@ print("Sample inventory data:")
 df_inventory_bronze.show(5, truncate=False)
 
 # Write to Bronze layer with partitioning
-bronze_inventory_table = f"{CATALOG}.{BRONZE_SCHEMA}.product_inventory"
+bronze_inventory_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}product_inventory"
 
 df_inventory_bronze.write \
     .format("delta") \
@@ -214,12 +227,43 @@ print(f"✅ Partitioned by: snapshot_date")
 
 print("=== Data Quality Validation ===\n")
 
-# Create data with quality issues
+"""
+This was defined before with customer_id field nullable=False. Test run it to see differences in execution.
+    StructField("customer_id", IntegerType(), nullable=True),
+"""
+sales_schema = StructType([
+    StructField("transaction_id", IntegerType(), nullable=False),
+    StructField("customer_id", IntegerType(), nullable=True),
+    StructField("product_id", IntegerType(), nullable=False),
+    StructField("product_name", StringType(), nullable=False),
+    StructField("quantity", IntegerType(), nullable=False),
+    StructField("unit_price", DoubleType(), nullable=False),
+    StructField("total_amount", DoubleType(), nullable=False),
+    StructField("transaction_date", DateType(), nullable=False),
+    StructField("store_location", StringType(), nullable=True)
+])
+
+
+"""
+UNCOMMENT code blocks to test differences in Version 1 and 2.
+NOTICE: Date format, negative and null values.
+"""
+# Version 1: Create data with quality issues. 
+""" 
 sales_with_issues = [
     (2001, 201, 301, "Tablet", 1, 599.99, 599.99, "2024-01-17", "Boston"),
     (2002, 202, 302, "Charger", -5, 19.99, -99.95, "2024-01-17", "Boston"),  # Negative quantity
     (2003, 203, 303, "Cable", 3, 9.99, 29.97, "2024-01-17", "Boston"),
     (2004, None, 304, "Adapter", 2, 14.99, 29.98, "2024-01-17", "Boston"),  # Null customer_id
+] 
+"""
+
+# Version 2: Create data with quality issues
+sales_with_issues = [
+    (2001, 201, 301, "Tablet", 1, 599.99, 599.99, date(2024, 1, 7), "Boston"),
+    (2002, 202, 302, "Charger", -5, 19.99, -99.95, date(2024, 1, -17), "Boston"),  # Negative quantity
+    (2003, 203, 303, "Cable", 3, 9.99, 29.97, date(2024, 1, 17), "Boston"),
+    (2004, None, 304, "Adapter", 2, 14.99, 29.98, date(2024, 1, 17), "Boston"),  # customer_id is null
 ]
 
 df_sales_issues = spark.createDataFrame(sales_with_issues, sales_schema)
@@ -244,11 +288,11 @@ print(f"\n✅ Good records: {df_good.count()}")
 print(f"❌ Bad records: {df_bad.count()}")
 
 # Write good data to Bronze
-good_table = f"{CATALOG}.{BRONZE_SCHEMA}.sales_validated"
+good_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}sales_validated"
 df_good.write.format("delta").mode("overwrite").saveAsTable(good_table)
 
 # Write bad data to quarantine
-quarantine_table = f"{CATALOG}.{BRONZE_SCHEMA}.sales_quarantine"
+quarantine_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}sales_quarantine"
 df_bad.write.format("delta").mode("overwrite").saveAsTable(quarantine_table)
 
 print(f"\n✅ Good data → {good_table}")
@@ -271,7 +315,7 @@ initial_sales = [
 
 df_initial = spark.createDataFrame(initial_sales, sales_schema)
 
-incremental_table = f"{CATALOG}.{BRONZE_SCHEMA}.sales_incremental"
+incremental_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}sales_incremental"
 
 # Initial write
 df_initial.write.format("delta").mode("overwrite").saveAsTable(incremental_table)
@@ -333,7 +377,7 @@ print("Marketing campaign data:")
 df_campaigns_bronze.show(truncate=False)
 
 # Write to marketing_dev catalog
-marketing_table = f"marketing_dev.{BRONZE_SCHEMA}.campaigns"
+marketing_table = f"{USER_SCHEMA}.{BRONZE_SCHEMA}campaigns"
 
 df_campaigns_bronze.write \
     .format("delta") \
