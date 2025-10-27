@@ -10,7 +10,7 @@ from pyspark.sql.functions import sum as _sum, avg, count, max as _max, min as _
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/user_schema_setup
+# MAGIC %run ../utils/user_schema_setup.py
 
 # COMMAND ----------
 

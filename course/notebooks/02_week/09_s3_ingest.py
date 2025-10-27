@@ -10,7 +10,7 @@ from pyspark.sql.functions import current_timestamp
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/user_schema_setup
+# MAGIC %run ../utils/user_schema_setup.py
 
 # COMMAND ----------
 

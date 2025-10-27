@@ -11,7 +11,7 @@ from pyspark.sql.functions import row_number, rank, dense_rank, sum as _sum, avg
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/user_schema_setup
+# MAGIC %run ../utils/user_schema_setup.py
 
 # COMMAND ----------
 
