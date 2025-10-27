@@ -41,12 +41,12 @@ print(f"Bronze Schema: {CATALOG}.{BRONZE_SCHEMA}")
 
 # COMMAND ----------
 
-# Import user schema configuration utility
-from src.user_schema import get_user_schema_config
+# MAGIC %run ../utils/user_schema_setup
 
-# Initialize user-specific schema configuration
-config = get_user_schema_config(spark, dbutils)
-config.print_config()  # Show current configuration
+# COMMAND ----------
+
+# Display user configuration
+print_user_config()
 
 # COMMAND ----------
 
@@ -90,7 +90,7 @@ print("Sample sales data:")
 df_sales_bronze.show(5, truncate=False)
 
 # Write to Bronze layer in Unity Catalog
-bronze_table = config.get_table_path("bronze", "sales_transactions")
+bronze_table = get_table_path("bronze", "sales_transactions")
 
 df_sales_bronze.write \
     .format("delta") \
@@ -153,7 +153,7 @@ print("Sample customer events:")
 df_events_bronze.show(5, truncate=False)
 
 # Write to Bronze layer
-bronze_events_table = config.get_table_path("bronze", "customer_events")
+bronze_events_table = get_table_path("bronze", "customer_events")
 
 df_events_bronze.write \
     .format("delta") \
@@ -202,7 +202,7 @@ print("Sample inventory data:")
 df_inventory_bronze.show(5, truncate=False)
 
 # Write to Bronze layer with partitioning
-bronze_inventory_table = config.get_table_path("bronze", "product_inventory")
+bronze_inventory_table = get_table_path("bronze", "product_inventory")
 
 df_inventory_bronze.write \
     .format("delta") \
@@ -284,11 +284,11 @@ print(f"\n✅ Good records: {df_good.count()}")
 print(f"❌ Bad records: {df_bad.count()}")
 
 # Write good data to Bronze
-good_table = config.get_table_path("bronze", "sales_validated")
+good_table = get_table_path("bronze", "sales_validated")
 df_good.write.format("delta").mode("overwrite").saveAsTable(good_table)
 
 # Write bad data to quarantine
-quarantine_table = config.get_table_path("bronze", "sales_quarantine")
+quarantine_table = get_table_path("bronze", "sales_quarantine")
 df_bad.write.format("delta").mode("overwrite").saveAsTable(quarantine_table)
 
 print(f"\n✅ Good data → {good_table}")
@@ -311,7 +311,7 @@ initial_sales = [
 
 df_initial = spark.createDataFrame(initial_sales, sales_schema)
 
-incremental_table = config.get_table_path("bronze", "sales_incremental")
+incremental_table = get_table_path("bronze", "sales_incremental")
 
 # Initial write
 df_initial.write.format("delta").mode("overwrite").saveAsTable(incremental_table)
@@ -373,7 +373,7 @@ print("Marketing campaign data:")
 df_campaigns_bronze.show(truncate=False)
 
 # Write to user's schema
-marketing_table = config.get_table_path("bronze", "campaigns")
+marketing_table = get_table_path("bronze", "campaigns")
 
 df_campaigns_bronze.write \
     .format("delta") \

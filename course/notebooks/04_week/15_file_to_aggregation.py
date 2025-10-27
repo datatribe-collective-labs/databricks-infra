@@ -9,7 +9,11 @@
 from pyspark.sql.functions import *
 from delta.tables import DeltaTable
 
-CATALOG = "sales_dev"
+# COMMAND ----------
+
+# MAGIC %run ../utils/user_schema_setup
+
+# COMMAND ----------
 
 # Step 1: Bronze - Ingest raw data
 print("=== Step 1: Bronze Layer ===")
@@ -20,7 +24,7 @@ raw_data = [
 df_raw = spark.createDataFrame(raw_data, ["transaction_id", "customer_id", "product_id", "product_name", "quantity", "unit_price", "total_amount", "transaction_date", "store_location"])
 df_raw = df_raw.withColumn("ingestion_timestamp", current_timestamp())
 
-bronze_table = f"{CATALOG}.bronze.daily_sales"
+bronze_table = get_table_path("bronze", "daily_sales")
 df_raw.write.format("delta").mode("append").saveAsTable(bronze_table)
 print(f"✅ Bronze: {bronze_table}")
 
@@ -31,7 +35,7 @@ df_silver = df_bronze \
     .filter(col("quantity") > 0) \
     .withColumn("store_location", upper(col("store_location")))
 
-silver_table = f"{CATALOG}.silver.daily_sales"
+silver_table = get_table_path("silver", "daily_sales")
 df_silver.write.format("delta").mode("overwrite").saveAsTable(silver_table)
 print(f"✅ Silver: {silver_table}")
 
@@ -44,7 +48,7 @@ df_gold = df_silver \
         count("*").alias("transactions")
     )
 
-gold_table = f"{CATALOG}.gold.daily_summary"
+gold_table = get_table_path("gold", "daily_summary")
 df_gold.write.format("delta").mode("overwrite").saveAsTable(gold_table)
 print(f"✅ Gold: {gold_table}")
 

@@ -8,8 +8,13 @@
 
 from pyspark.sql.functions import current_timestamp, lit
 
-CATALOG = "sales_dev"
-BRONZE_SCHEMA = "bronze"
+# COMMAND ----------
+
+# MAGIC %run ../utils/user_schema_setup
+
+# COMMAND ----------
+
+print_user_config()
 
 # Simulate database table data
 customers_db = [
@@ -22,7 +27,7 @@ df = spark.createDataFrame(customers_db, ["id", "name", "email", "city"])
 df_bronze = df.withColumn("ingestion_timestamp", current_timestamp())
 
 # Write to Unity Catalog
-table = f"{CATALOG}.{BRONZE_SCHEMA}.db_customers"
+table = get_table_path("bronze", "db_customers")
 df_bronze.write.format("delta").mode("overwrite").saveAsTable(table)
 
 print(f"✅ Written to: {table}")

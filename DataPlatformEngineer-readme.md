@@ -205,6 +205,12 @@ Send each user:
    # Clone notebooks to personal folder for editing
    ```
 
+4. **Important: Data Isolation**:
+   - Notebooks automatically use user-specific schemas (no setup needed)
+   - Each user's data is isolated: `databricks_course.username.bronze_table`
+   - Read from shared catalogs, write to personal workspace
+   - No conflicts with other students' work
+
 ### Verify Student Access
 ```bash
 # Check deployed notebooks
@@ -248,6 +254,7 @@ terraform apply
 - Added to workspace group (platform_students or platform_admins)
 - Personal schema created: `databricks_course.newstudent`
 - Permissions configured based on group membership
+- **Data Isolation**: When user runs notebooks with `%run ../utils/user_schema_setup`, all table writes go to their isolated schema (e.g., `databricks_course.newstudent.bronze_sales`), preventing conflicts with other users
 
 ### Removing Users
 
@@ -331,16 +338,28 @@ terraform apply   # Deploy to students
 
 ### Catalog Structure
 ```
-training_dev                # Development environment
-├── bronze/                 # Raw data layer
-├── silver/                # Cleaned data layer
-└── gold/                  # Aggregated data layer
+sales_dev / marketing_dev   # Reference catalogs (READ-ONLY for students)
+├── bronze/                 # Shared raw data - students read from here
+├── silver/                 # Shared cleaned data
+└── gold/                   # Shared aggregated data
 
-training_prod              # Production environment  
-├── bronze/
-├── silver/
-└── gold/
+databricks_course           # Course catalog (READ + WRITE for students)
+├── shared_bronze/          # Legacy shared schemas (deprecated)
+├── shared_silver/
+├── shared_gold/
+├── user1_name/             # Auto-created per-user schema (ISOLATED)
+│   ├── bronze_sales        # User writes their own bronze tables here
+│   ├── silver_cleaned      # User's silver layer
+│   └── gold_summary        # User's gold layer
+└── user2_name/             # Each user has their own workspace
+    └── bronze_data
 ```
+
+**User Data Isolation Pattern**:
+- Students **READ** from shared reference catalogs (`sales_dev`, `marketing_dev`)
+- Students **WRITE** to their personal schema (`databricks_course.username.*`)
+- Implemented via `%run ../utils/user_schema_setup` in notebooks
+- Prevents data conflicts between concurrent users
 
 ## 🔧 Advanced Configuration
 
