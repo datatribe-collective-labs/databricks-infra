@@ -11,8 +11,11 @@ __email__ = "chanukya.pekala@gmail.com"
 
 # Make key classes and functions available at package level
 from .utils import generate_sample_data, validate_file_size
+from .user_schema import UserSchemaConfig, get_user_schema_config
 
 __all__ = [
     "generate_sample_data",
     "validate_file_size",
+    "UserSchemaConfig",
+    "get_user_schema_config",
 ]

@@ -41,16 +41,12 @@ print(f"Bronze Schema: {CATALOG}.{BRONZE_SCHEMA}")
 
 # COMMAND ----------
 
-import re
+# Import user schema configuration utility
+from src.user_schema import get_user_schema_config
 
-# The course schema for write access
-CATALOG = "databricks_course" 
-# Get logged in user's username
-USER_SCHEMA_RAW = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
-# Remove latter part of email address, and replace special characters with underscore to avoid SQL parsing errors
-USER_SCHEMA = re.sub(r'[^a-zA-Z0-9_]', '_', USER_SCHEMA_RAW.split('@')[0])
-# If schema didn't exist before, now it is being created
-spark.sql(f"CREATE SCHEMA IF NOT EXISTS {CATALOG}.{USER_SCHEMA}")
+# Initialize user-specific schema configuration
+config = get_user_schema_config(spark, dbutils)
+config.print_config()  # Show current configuration
 
 # COMMAND ----------
 
@@ -94,7 +90,7 @@ print("Sample sales data:")
 df_sales_bronze.show(5, truncate=False)
 
 # Write to Bronze layer in Unity Catalog
-bronze_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}sales_transactions"
+bronze_table = config.get_table_path("bronze", "sales_transactions")
 
 df_sales_bronze.write \
     .format("delta") \
@@ -157,7 +153,7 @@ print("Sample customer events:")
 df_events_bronze.show(5, truncate=False)
 
 # Write to Bronze layer
-bronze_events_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}customer_events"
+bronze_events_table = config.get_table_path("bronze", "customer_events")
 
 df_events_bronze.write \
     .format("delta") \
@@ -206,7 +202,7 @@ print("Sample inventory data:")
 df_inventory_bronze.show(5, truncate=False)
 
 # Write to Bronze layer with partitioning
-bronze_inventory_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}product_inventory"
+bronze_inventory_table = config.get_table_path("bronze", "product_inventory")
 
 df_inventory_bronze.write \
     .format("delta") \
@@ -288,11 +284,11 @@ print(f"\n✅ Good records: {df_good.count()}")
 print(f"❌ Bad records: {df_bad.count()}")
 
 # Write good data to Bronze
-good_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}sales_validated"
+good_table = config.get_table_path("bronze", "sales_validated")
 df_good.write.format("delta").mode("overwrite").saveAsTable(good_table)
 
 # Write bad data to quarantine
-quarantine_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}sales_quarantine"
+quarantine_table = config.get_table_path("bronze", "sales_quarantine")
 df_bad.write.format("delta").mode("overwrite").saveAsTable(quarantine_table)
 
 print(f"\n✅ Good data → {good_table}")
@@ -315,7 +311,7 @@ initial_sales = [
 
 df_initial = spark.createDataFrame(initial_sales, sales_schema)
 
-incremental_table = f"{CATALOG}.{USER_SCHEMA}.{BRONZE_SCHEMA}sales_incremental"
+incremental_table = config.get_table_path("bronze", "sales_incremental")
 
 # Initial write
 df_initial.write.format("delta").mode("overwrite").saveAsTable(incremental_table)
@@ -376,8 +372,8 @@ df_campaigns_bronze = df_campaigns \
 print("Marketing campaign data:")
 df_campaigns_bronze.show(truncate=False)
 
-# Write to marketing_dev catalog
-marketing_table = f"{USER_SCHEMA}.{BRONZE_SCHEMA}campaigns"
+# Write to user's schema
+marketing_table = config.get_table_path("bronze", "campaigns")
 
 df_campaigns_bronze.write \
     .format("delta") \
