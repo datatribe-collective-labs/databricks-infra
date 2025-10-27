@@ -30,12 +30,15 @@ variable "create_users" {
 
 variable "notebook_subdirs" {
   type    = list(string)
-  default = ["01_week", "02_week", "03_week", "04_week", "05_week"]
+  default = ["utils", "01_week", "02_week", "03_week", "04_week", "05_week"]
 }
 
 variable "notebooks" {
   type = map(string)
   default = {
+    # Shared utilities
+    "utils/user_schema_setup.py" = "PYTHON"
+
     # Week 1: Databricks Fundamentals (01-05)
     "01_week/01_databricks_fundamentals.py"       = "PYTHON"
     "01_week/02_unity_catalog_deep_dive.py"       = "PYTHON"
