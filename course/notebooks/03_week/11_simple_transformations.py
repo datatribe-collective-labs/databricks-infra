@@ -9,12 +9,18 @@
 from pyspark.sql.functions import col, trim, upper, when, regexp_replace
 from delta.tables import DeltaTable
 
-CATALOG_DEV = "sales_dev"
-BRONZE = "bronze"
-SILVER = "silver"
+# COMMAND ----------
 
-# Read from Bronze
-df_bronze = spark.table(f"{CATALOG_DEV}.{BRONZE}.sales_transactions")
+# MAGIC %run ../utils/user_schema_setup
+
+# COMMAND ----------
+
+# Read from reference catalog (shared, read-only) OR user's own bronze table
+# Option 1: Read from shared reference catalog
+df_bronze = spark.table("sales_dev.bronze.sales_transactions")
+
+# Option 2: Read from user's own bronze table (if they created it in previous notebooks)
+# df_bronze = spark.table(get_table_path("bronze", "sales_transactions"))
 
 print("Bronze data (raw):")
 df_bronze.show(5)
@@ -33,8 +39,8 @@ df_silver = df_bronze \
 print("\nSilver data (cleaned):")
 df_silver.show(5)
 
-# Write to Silver
-silver_table = f"{CATALOG_DEV}.{SILVER}.sales_transactions"
+# Write to user's Silver layer
+silver_table = get_table_path("silver", "sales_transactions")
 df_silver.write.format("delta").mode("overwrite").saveAsTable(silver_table)
 
 print(f"✅ Written to: {silver_table}")

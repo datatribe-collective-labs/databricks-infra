@@ -8,8 +8,13 @@
 
 from pyspark.sql.functions import current_timestamp
 
-CATALOG = "sales_dev"
-BRONZE_SCHEMA = "bronze"
+# COMMAND ----------
+
+# MAGIC %run ../utils/user_schema_setup
+
+# COMMAND ----------
+
+print_user_config()
 
 # Simulate S3 file data
 s3_data = [
@@ -22,7 +27,7 @@ df = spark.createDataFrame(s3_data, ["filename", "date", "record_count"])
 df_bronze = df.withColumn("ingestion_timestamp", current_timestamp())
 
 # Write to Unity Catalog  
-table = f"{CATALOG}.{BRONZE_SCHEMA}.s3_files"
+table = get_table_path("bronze", "s3_files")
 df_bronze.write.format("delta").mode("overwrite").saveAsTable(table)
 
 print(f"✅ Written to: {table}")

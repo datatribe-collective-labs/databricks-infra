@@ -47,9 +47,20 @@ databricks-infra/
 ├── src/                         # Python package
 │   ├── __init__.py              # Package initialization
 │   ├── utils.py                 # Data generation and utilities
+│   └── user_schema.py           # User schema management (alternative to %run)
 ├── course/                      # Learning materials
-│   ├── notebooks/               # 16 Databricks notebooks (5 weeks)
+│   ├── notebooks/               # 21 Databricks notebooks (5 weeks)
+│   │   ├── utils/               # Shared utility notebooks
+│   │   │   └── user_schema_setup.py  # User schema config (used via %run)
+│   │   ├── 01_week/             # Week 1: Platform fundamentals
+│   │   ├── 02_week/             # Week 2: Data ingestion (updated with user schemas)
+│   │   ├── 03_week/             # Week 3: Transformations (updated with user schemas)
+│   │   ├── 04_week/             # Week 4: Pipelines (updated with user schemas)
+│   │   └── 05_week/             # Week 5: Job orchestration
 │   └── datasets/                # Sample data (CSV, JSON, Parquet)
+├── docs/                        # Documentation
+│   ├── USER_SCHEMA_GUIDE.md     # Complete user schema usage guide
+│   └── USER_SCHEMA_IMPLEMENTATION_SUMMARY.md  # Implementation overview
 ├── tests/                       # Test suite
 ├── pyproject.toml               # Poetry configuration and tool settings
 ├── .pre-commit-config.yaml      # Code quality automation
@@ -217,6 +228,139 @@ Two individual principals have unrestricted access:
 - **Delta Lake Integration**: ACID transactions, time travel, optimization
 - **Performance Optimization**: Partitioning, Z-ordering, caching strategies
 
+### User Schema Management for Data Isolation
+
+**Implementation Date:** 2025-10-27
+**Status:** ✅ Production Ready
+**Coverage:** 10/21 notebooks (all notebooks that write data)
+
+#### Problem Statement
+Prior to this implementation, all users wrote to shared schemas (`shared_bronze`, `shared_silver`, `shared_gold`), causing:
+- Data overwrites and conflicts between users
+- Unpredictable table states
+- No ability to track individual student progress
+- No data isolation in multi-user environment
+
+#### Solution Architecture
+Implemented user-specific schema management using Databricks-native `%run` pattern:
+
+```
+Reference Catalogs (READ-ONLY, Shared)
+  ├── sales_dev.bronze.*
+  ├── sales_dev.silver.*
+  ├── marketing_dev.bronze.*
+  └── marketing_dev.silver.*
+         ↓ Users READ from reference catalogs
+    Transform Data
+         ↓ Users WRITE to personal schemas
+User Workspaces (READ + WRITE, Isolated)
+  databricks_course/
+  ├── chanukya_pekala/
+  │   ├── bronze_sales_transactions
+  │   ├── silver_sales_cleaned
+  │   └── gold_daily_summary
+  ├── komal_azram/
+  │   └── bronze_customer_events
+  └── joonas_lalli/
+      └── bronze_api_data
+```
+
+#### Technical Implementation
+
+**1. Shared Utility Notebook** (`course/notebooks/utils/user_schema_setup.py`):
+```python
+# Automatically creates user-specific schema configuration
+import re
+
+CATALOG = "databricks_course"
+USER_EMAIL = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
+USER_SCHEMA = re.sub(r'[^a-zA-Z0-9_]', '_', USER_EMAIL.split('@')[0]).lower()
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {CATALOG}.{USER_SCHEMA}")
+
+def get_table_path(layer, table_name):
+    """Build user-specific table path: databricks_course.chanukya_pekala.bronze_table"""
+    return f"{CATALOG}.{USER_SCHEMA}.{layer}_{table_name}"
+```
+
+**2. Notebook Usage Pattern:**
+```python
+# COMMAND ----------
+%run ../utils/user_schema_setup
+
+# COMMAND ----------
+# Read from shared reference catalog (no conflicts)
+df = spark.table("sales_dev.bronze.sales_transactions")
+
+# Write to user's isolated schema
+output_table = get_table_path("bronze", "sales_transactions")
+df.write.saveAsTable(output_table)
+# Result: databricks_course.chanukya_pekala.bronze_sales_transactions
+```
+
+#### Updated Notebooks
+
+**Week 2 - Data Ingestion (4 notebooks):**
+- ✅ `06_file_ingestion.py` - CSV, JSON, Parquet ingestion
+- ✅ `07_api_ingest.py` - REST API data ingestion
+- ✅ `08_database_ingest.py` - JDBC/database ingestion
+- ✅ `09_s3_ingest.py` - Cloud storage ingestion
+
+**Week 3 - Transformations (3 notebooks):**
+- ✅ `11_simple_transformations.py` - Bronze to Silver transformations
+- ✅ `12_window_transformations.py` - Window functions and analytics
+- ✅ `13_aggregations.py` - Silver to Gold aggregations
+
+**Week 4 - End-to-End Pipelines (2 notebooks):**
+- ✅ `15_file_to_aggregation.py` - Complete Bronze→Silver→Gold pipeline
+- ✅ `16_api_to_aggregation.py` - API to aggregation pipeline
+
+**Week 5 - Job Orchestration (1 notebook):**
+- ✅ `19_create_job_with_wheel.py` - Already using parameterized catalogs
+
+#### Table Naming Convention
+
+**Format:** `{catalog}.{user_schema}.{layer}_{table_name}`
+
+**Examples:**
+- `databricks_course.chanukya_pekala.bronze_sales_transactions`
+- `databricks_course.komal_azram.silver_sales_cleaned`
+- `databricks_course.joonas_lalli.gold_daily_summary`
+
+**Benefits:**
+- Flat structure (all tables in one schema per user)
+- Clear data lineage with layer prefixes (`bronze_`, `silver_`, `gold_`)
+- Simple permissions (grant on single schema)
+- Easy querying: `SHOW TABLES IN databricks_course.user_schema`
+
+#### Key Benefits
+1. **Data Isolation** - Each user has their own workspace, no conflicts
+2. **Scalability** - Works for unlimited concurrent users
+3. **Simplicity** - Just one line: `%run ../utils/user_schema_setup`
+4. **Databricks-Native** - Uses standard `%run` pattern, no import issues
+5. **Maintainability** - Logic centralized in one utility notebook
+6. **Transparency** - Users can see exactly which schema they're using
+7. **Flexibility** - Read from shared catalogs, write to user schemas
+
+#### Documentation
+- **Complete Guide:** `docs/USER_SCHEMA_GUIDE.md` - Full usage instructions, API reference, troubleshooting
+- **Implementation Summary:** `docs/USER_SCHEMA_IMPLEMENTATION_SUMMARY.md` - Architecture overview, migration guide
+- **Reference Implementation:** `02_week/06_file_ingestion.py` - Example notebook showing all patterns
+
+#### Helper Functions
+
+**Available in all notebooks after `%run ../utils/user_schema_setup`:**
+```python
+# Variables
+CATALOG        # "databricks_course"
+USER_EMAIL     # "chanukya.pekala@gmail.com"
+USER_SCHEMA    # "chanukya_pekala"
+
+# Functions
+get_table_path(layer, table_name)  # Build table paths
+get_schema_path()                  # Get schema path
+print_user_config()                # Display config for debugging
+```
+
 ## Course Curriculum Technical Details
 
 ### Week 1: Platform Mastery (4 notebooks)
@@ -283,6 +427,10 @@ Onboarding a new student is fully automated via Terraform:
    - Adds user to specified group (platform_admins or platform_students)
    - Creates personal schema: `databricks_course.new_student`
    - Configures all permissions based on group membership
+4. When user runs notebooks with `%run ../utils/user_schema_setup`:
+   - Schema is auto-created if Terraform hasn't created it yet
+   - All tables are written to user's isolated schema
+   - No conflicts with other users' data
 
 **Permissions by Group**:
 
@@ -344,7 +492,17 @@ catalog_config = [
 
 ### Adding New Notebooks
 1. Create notebook file in `course/notebooks/XX_week/`
-2. Update `terraform/variables.tf`:
+2. **If the notebook writes data**, add user schema setup at the top:
+```python
+# COMMAND ----------
+%run ../utils/user_schema_setup
+
+# COMMAND ----------
+# Now use get_table_path() for all table writes
+output_table = get_table_path("bronze", "my_table")
+df.write.saveAsTable(output_table)
+```
+3. Update `terraform/variables.tf`:
 ```hcl
 variable "notebooks" {
   type = map(string)
@@ -354,7 +512,13 @@ variable "notebooks" {
   }
 }
 ```
-3. Deploy: `terraform plan && terraform apply`
+4. Deploy: `terraform plan && terraform apply`
+
+**Best Practices for New Notebooks:**
+- Use `%run ../utils/user_schema_setup` for any notebook that writes data
+- Read from reference catalogs: `spark.table("sales_dev.bronze.table")`
+- Write to user schemas: `get_table_path("bronze", "table")`
+- See `02_week/06_file_ingestion.py` as reference implementation
 
 ### Modifying Course Structure
 1. Update physical files in `course/notebooks/`

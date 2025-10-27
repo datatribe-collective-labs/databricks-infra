@@ -36,11 +36,14 @@ from datetime import datetime, timedelta
 import json
 import time
 
-# Configuration
-CATALOG = "sales_dev"
-BRONZE_SCHEMA = "bronze"
+# COMMAND ----------
 
-print(f"Target: {CATALOG}.{BRONZE_SCHEMA}")
+# MAGIC %run ../utils/user_schema_setup
+
+# COMMAND ----------
+
+# Display user configuration
+print_user_config()
 
 # COMMAND ----------
 
@@ -134,7 +137,7 @@ print("\nFlattened structure:")
 df_flattened.show(truncate=False)
 
 # Write to Bronze
-bronze_table = f"{CATALOG}.{BRONZE_SCHEMA}.api_products"
+bronze_table = get_table_path("bronze", "api_products")
 df_flattened.write.format("delta").mode("overwrite").saveAsTable(bronze_table)
 
 print(f"\n Written to: {bronze_table}")
@@ -211,7 +214,7 @@ print("\nAll customer data:")
 df_customers_bronze.show()
 
 # Write to Bronze
-customers_table = f"{CATALOG}.{BRONZE_SCHEMA}.api_customers"
+customers_table = get_table_path("bronze", "api_customers")
 df_customers_bronze.write.format("delta").mode("overwrite").saveAsTable(customers_table)
 
 print(f" Written to: {customers_table}")
