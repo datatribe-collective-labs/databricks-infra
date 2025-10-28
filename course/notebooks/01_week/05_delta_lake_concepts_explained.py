@@ -624,7 +624,7 @@ except Exception as e:
 
 print(f"✅ Orders table created at {orders_path}")
 print("Initial orders:")
-df_orders.show(truncate=False)
+spark.read.format("delta").load(orders_path).show()
 
 # COMMAND ----------
 
