@@ -1,11 +1,11 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Unity Catalog Deep Dive - Week 0x
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog is Databricks' unified governance solution for data and AI assets. This notebook provides comprehensive coverage of Unity Catalog architecture, features, and best practices.
-# MAGIC 
+# MAGIC
 # MAGIC ## Learning Objectives
-# MAGIC 
+# MAGIC
 # MAGIC - Understand Unity Catalog architecture and hierarchy
 # MAGIC - Learn about data governance and lineage tracking
 # MAGIC - Master access control and permission management
@@ -16,9 +16,9 @@
 
 # MAGIC %md
 # MAGIC ## Unity Catalog Architecture
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog provides a three-level namespace for organizing data assets:
-# MAGIC 
+# MAGIC
 # MAGIC ```
 # MAGIC Account
 # MAGIC ├── Metastore (regional)
@@ -38,9 +38,9 @@
 # MAGIC     ├── Workspace_2
 # MAGIC     └── Workspace_N
 # MAGIC ```
-# MAGIC 
+# MAGIC
 # MAGIC ### Key Components
-# MAGIC 
+# MAGIC
 # MAGIC 1. **Account**: Top-level Databricks organization
 # MAGIC 2. **Metastore**: Regional metadata repository
 # MAGIC 3. **Catalog**: Highest level of data organization
@@ -51,7 +51,7 @@
 
 # MAGIC %md
 # MAGIC ## Current Environment Exploration
-# MAGIC 
+# MAGIC
 # MAGIC Let's explore the Unity Catalog structure in our current environment:
 
 # COMMAND ----------
@@ -124,11 +124,11 @@ for catalog in catalog_names[:3]:  # Limit to first 3 catalogs to avoid overwhel
 
 # MAGIC %md
 # MAGIC ## Unity Catalog Permissions Model
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog implements a hierarchical permissions model:
-# MAGIC 
+# MAGIC
 # MAGIC ### Permission Hierarchy
-# MAGIC 
+# MAGIC
 # MAGIC ```
 # MAGIC Account Admin
 # MAGIC ├── Metastore Admin
@@ -141,9 +141,9 @@ for catalog in catalog_names[:3]:  # Limit to first 3 catalogs to avoid overwhel
 # MAGIC │   └── Data Reader/Writer
 # MAGIC └── Workspace Admin/User
 # MAGIC ```
-# MAGIC 
+# MAGIC
 # MAGIC ### Key Privileges
-# MAGIC 
+# MAGIC
 # MAGIC | Level | Privileges |
 # MAGIC |-------|------------|
 # MAGIC | **Catalog** | USE CATALOG, CREATE SCHEMA, BROWSE |
@@ -180,18 +180,18 @@ except Exception as e:
 
 # MAGIC %md
 # MAGIC ## Data Lineage and Metadata
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog automatically captures data lineage and metadata:
-# MAGIC 
+# MAGIC
 # MAGIC ### Automatic Lineage Tracking
-# MAGIC 
+# MAGIC
 # MAGIC - **Table-to-Table**: Tracks data transformations between tables
 # MAGIC - **Column-Level**: Traces individual column dependencies
 # MAGIC - **Notebook Integration**: Links code changes to data changes
 # MAGIC - **Job Lineage**: Connects scheduled jobs to data assets
-# MAGIC 
+# MAGIC
 # MAGIC ### Metadata Captured
-# MAGIC 
+# MAGIC
 # MAGIC 1. **Schema Information**: Column names, types, constraints
 # MAGIC 2. **Statistics**: Row counts, data freshness, quality metrics
 # MAGIC 3. **Access Patterns**: Usage frequency, popular queries
@@ -251,18 +251,18 @@ sales_summary.show()
 
 # MAGIC %md
 # MAGIC ## Data Classification and Tagging
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog supports data classification for governance and compliance:
-# MAGIC 
+# MAGIC
 # MAGIC ### Classification Levels
-# MAGIC 
+# MAGIC
 # MAGIC 1. **Public**: No restrictions, can be shared freely
 # MAGIC 2. **Internal**: Restricted to organization members
 # MAGIC 3. **Confidential**: Limited access, requires approval
 # MAGIC 4. **Restricted**: Highly sensitive, strict access controls
-# MAGIC 
+# MAGIC
 # MAGIC ### Tag Categories
-# MAGIC 
+# MAGIC
 # MAGIC - **Data Type**: PII, Financial, Healthcare, etc.
 # MAGIC - **Geography**: US, EU, Global, etc.
 # MAGIC - **Compliance**: GDPR, HIPAA, SOX, etc.
@@ -308,18 +308,18 @@ enhanced_sales.printSchema()
 
 # MAGIC %md
 # MAGIC ## Data Discovery and Search
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog provides powerful data discovery capabilities:
-# MAGIC 
+# MAGIC
 # MAGIC ### Discovery Features
-# MAGIC 
+# MAGIC
 # MAGIC 1. **Full-Text Search**: Search across table and column names, descriptions
 # MAGIC 2. **Tag-Based Search**: Find data by classification tags
 # MAGIC 3. **Lineage Search**: Discover upstream and downstream dependencies
 # MAGIC 4. **Usage Analytics**: Find popular and frequently accessed data
-# MAGIC 
+# MAGIC
 # MAGIC ### Search Best Practices
-# MAGIC 
+# MAGIC
 # MAGIC - **Descriptive Naming**: Use clear, business-meaningful names
 # MAGIC - **Rich Metadata**: Add detailed descriptions and tags
 # MAGIC - **Consistent Taxonomy**: Establish naming conventions
@@ -355,16 +355,16 @@ for description, query in discovery_queries:
 
 # MAGIC %md
 # MAGIC ## Volumes and External Storage
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog Volumes provide managed storage for non-tabular data:
-# MAGIC 
+# MAGIC
 # MAGIC ### Volume Types
-# MAGIC 
+# MAGIC
 # MAGIC 1. **Managed Volumes**: Databricks manages the storage lifecycle
 # MAGIC 2. **External Volumes**: References external cloud storage locations
-# MAGIC 
+# MAGIC
 # MAGIC ### Use Cases
-# MAGIC 
+# MAGIC
 # MAGIC - **Model Artifacts**: ML models, checkpoints, configurations
 # MAGIC - **Data Files**: CSV, JSON, images, documents
 # MAGIC - **Notebooks**: Shared notebook storage
@@ -390,6 +390,22 @@ try:
     except Exception as e:
         print(f"DBFS access limited: {e}")
         
+        import re
+
+        # Re-defining the course schema for write access
+        CATALOG = "databricks_course" 
+        # Get logged in user's username
+        USER_SCHEMA_RAW = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
+        # Remove latter part of email address, and replace special characters with underscore to avoid SQL parsing errors
+        USER_SCHEMA = re.sub(r'[^a-zA-Z0-9_]', '_', USER_SCHEMA_RAW.split('@')[0])
+        # If schema didn't exist before, now it is being created
+        VOLUME_NAME = "scratch"
+        spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{USER_SCHEMA}.{VOLUME_NAME}")
+
+        # The POSIX-style path for your Spark writes
+        VOLUME_PATH = f"/Volumes/{CATALOG}/{USER_SCHEMA}/{VOLUME_NAME}/"
+        print(f"Your Writable Volume Path is: {VOLUME_PATH}")
+        
 except Exception as e:
     print(f"File system exploration limited: {e}")
 
@@ -398,14 +414,14 @@ print("\nSaving data in various formats for volume storage:")
 
 # Save as Parquet (optimized for analytics)
 try:
-    sales_df.write.mode("overwrite").parquet("/tmp/sales_data.parquet")
+    sales_df.write.mode("overwrite").parquet(f"{VOLUME_PATH}sales_data.parquet")
     print("✓ Saved as Parquet format")
 except Exception as e:
     print(f"Parquet save failed: {e}")
 
 # Save as Delta (with ACID properties)
 try:
-    sales_df.write.mode("overwrite").format("delta").save("/tmp/sales_data_delta")
+    sales_df.write.mode("overwrite").format("delta").save(f"{VOLUME_PATH}sales_data_delta")
     print("✓ Saved as Delta format")
 except Exception as e:
     print(f"Delta save failed: {e}")
@@ -414,28 +430,28 @@ except Exception as e:
 
 # MAGIC %md
 # MAGIC ## Best Practices for Unity Catalog
-# MAGIC 
+# MAGIC
 # MAGIC ### Naming Conventions
-# MAGIC 
+# MAGIC
 # MAGIC ```sql
 # MAGIC -- Recommended naming pattern
 # MAGIC <environment>_<domain>_<data_type>_<granularity>
-# MAGIC 
+# MAGIC
 # MAGIC Examples:
 # MAGIC - prod_sales_transactions_daily
 # MAGIC - dev_marketing_campaigns_monthly
 # MAGIC - staging_finance_reports_quarterly
 # MAGIC ```
-# MAGIC 
+# MAGIC
 # MAGIC ### Catalog Organization Strategy
-# MAGIC 
+# MAGIC
 # MAGIC 1. **By Environment**: prod, staging, dev catalogs
 # MAGIC 2. **By Domain**: sales, marketing, finance catalogs  
 # MAGIC 3. **By Data Layer**: bronze, silver, gold catalogs
 # MAGIC 4. **Hybrid Approach**: Combine strategies as needed
-# MAGIC 
+# MAGIC
 # MAGIC ### Schema Organization
-# MAGIC 
+# MAGIC
 # MAGIC - **Raw Data**: Landing zone for ingested data
 # MAGIC - **Processed**: Cleaned and validated data
 # MAGIC - **Analytics**: Business-ready datasets
@@ -445,16 +461,16 @@ except Exception as e:
 
 # MAGIC %md
 # MAGIC ## Governance and Compliance Features
-# MAGIC 
+# MAGIC
 # MAGIC ### Data Lineage Benefits
-# MAGIC 
+# MAGIC
 # MAGIC 1. **Impact Analysis**: Understand downstream effects of changes
 # MAGIC 2. **Root Cause Analysis**: Trace data quality issues to source
 # MAGIC 3. **Compliance Reporting**: Document data processing for audits
 # MAGIC 4. **Change Management**: Assess risks before modifications
-# MAGIC 
+# MAGIC
 # MAGIC ### Audit and Monitoring
-# MAGIC 
+# MAGIC
 # MAGIC - **Access Logs**: Track who accessed what data when
 # MAGIC - **Query History**: Monitor data usage patterns
 # MAGIC - **Permission Changes**: Audit access control modifications
@@ -490,19 +506,19 @@ print(f"- Latest sale date: {performance_result['latest_sale']}")
 
 # MAGIC %md
 # MAGIC ## Integration with Other Databricks Services
-# MAGIC 
+# MAGIC
 # MAGIC Unity Catalog integrates seamlessly with:
-# MAGIC 
+# MAGIC
 # MAGIC ### Data Engineering
 # MAGIC - **Delta Live Tables**: Managed ETL pipelines with automatic lineage
 # MAGIC - **Autoloader**: Incremental data ingestion with schema evolution
 # MAGIC - **Workflows**: Orchestrated data processing jobs
-# MAGIC 
+# MAGIC
 # MAGIC ### Machine Learning
 # MAGIC - **MLflow**: Model registry with Unity Catalog integration
 # MAGIC - **Feature Store**: Centralized feature management
 # MAGIC - **AutoML**: Automated machine learning workflows
-# MAGIC 
+# MAGIC
 # MAGIC ### Analytics
 # MAGIC - **SQL Warehouses**: High-performance analytics queries
 # MAGIC - **Dashboards**: Business intelligence and reporting
@@ -527,12 +543,12 @@ print("\nNext: Continue to 02_cluster_management for compute optimization!")
 
 # MAGIC %md
 # MAGIC ## Additional Resources
-# MAGIC 
+# MAGIC
 # MAGIC ### Documentation
 # MAGIC - [Unity Catalog Official Documentation](https://docs.databricks.com/data-governance/unity-catalog/index.html)
 # MAGIC - [Best Practices Guide](https://docs.databricks.com/data-governance/unity-catalog/best-practices.html)
 # MAGIC - [Migration Guide](https://docs.databricks.com/data-governance/unity-catalog/migrate.html)
-# MAGIC 
+# MAGIC
 # MAGIC ### Training Materials
 # MAGIC - Databricks Academy Unity Catalog Course
 # MAGIC - Unity Catalog Fundamentals Certification
