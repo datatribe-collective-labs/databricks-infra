@@ -257,7 +257,7 @@ sales_with_issues = [
 # Version 2: Create data with quality issues
 sales_with_issues = [
     (2001, 201, 301, "Tablet", 1, 599.99, 599.99, date(2024, 1, 7), "Boston"),
-    (2002, 202, 302, "Charger", -5, 19.99, -99.95, date(2024, 1, -17), "Boston"),  # Negative quantity
+    (2002, 202, 302, "Charger", -5, 19.99, -99.95, date(2024, 1, 17), "Boston"),  # Negative quantity
     (2003, 203, 303, "Cable", 3, 9.99, 29.97, date(2024, 1, 17), "Boston"),
     (2004, None, 304, "Adapter", 2, 14.99, 29.98, date(2024, 1, 17), "Boston"),  # customer_id is null
 ]
