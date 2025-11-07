@@ -47,7 +47,7 @@
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, upper, length, when
+from pyspark.sql.functions import col, upper, length, when, lit
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
 
 print("=== Lazy Evaluation Demonstration ===\n")
@@ -208,52 +208,77 @@ df_wide.show()
 
 # COMMAND ----------
 
-print("=== Understanding Partitions ===\n")
+print("=== Understanding Partitions (CONCEPT) ===\n")
+
+print("⚠️  NOTE: Partition inspection using RDD operations is not supported on Databricks Serverless.")
+print("    This cell demonstrates the CONCEPT of partitioning for educational purposes.\n")
 
 # Create DataFrame with known number of partitions
 df_partitioned = spark.createDataFrame(employees_data, schema).repartition(3)
 
-print(f"Number of partitions: {df_partitioned.rdd.getNumPartitions()}")
+print("✅ DataFrame created with 3 partitions (repartition works on serverless)\n")
 
-# Show data distribution across partitions
-def show_partition_distribution(df, name):
-    print(f"\n{name}:")
-    partition_counts = df.rdd.mapPartitionsWithIndex(
-        lambda idx, it: [(idx, sum(1 for _ in it))]
-    ).collect()
-    for partition_id, count in partition_counts:
-        print(f"  Partition {partition_id}: {count} records")
+# CONCEPT: How partition distribution would work
+print("CONCEPT - Partition Distribution:")
+print("=" * 60)
+print("""
+On traditional Spark clusters, you could inspect partition distribution like this:
 
-show_partition_distribution(df_partitioned, "Original distribution (3 partitions)")
+  # df.rdd.getNumPartitions()  ← Not available on serverless
+  # Output: 3
+
+  # Show data distribution:
+  Partition 0: 2 records
+  Partition 1: 2 records
+  Partition 2: 2 records
+
+WHY THIS MATTERS:
+- Partitions determine parallelism
+- Each partition is processed by one task
+- Data is distributed across partitions using hash/range partitioning
+- Uneven partitions = data skew = slow performance
+
+SERVERLESS ALTERNATIVE:
+- Serverless manages partitioning automatically
+- Use EXPLAIN to see execution plan instead
+- Focus on logical operations, not physical partitions
+""")
 
 # COMMAND ----------
 
-print("=== Shuffle Impact ===\n")
+print("=== Shuffle Impact (CONCEPT) ===\n")
+
+print("⚠️  NOTE: Direct partition inspection not supported on serverless.")
+print("    This demonstrates shuffle concepts using execution plans.\n")
 
 # Operation WITHOUT shuffle (narrow)
 df_no_shuffle = df_partitioned.filter(col("salary") > 80000)
 print("After filter (narrow - no shuffle):")
-show_partition_distribution(df_no_shuffle, "Filtered data")
-print("  ✅ Partition count unchanged (3)")
+print("  ✅ Partition count unchanged")
 print("  ✅ No data movement")
+print("  ✅ Check with explain():")
+df_no_shuffle.explain()
 
 # Operation WITH shuffle (wide)
 df_with_shuffle = df_partitioned.groupBy("department").count()
 print("\n\nAfter groupBy (wide - with shuffle):")
-print(f"  Partition count: {df_with_shuffle.rdd.getNumPartitions()}")
-print("  ⚠️ Changed to spark.sql.shuffle.partitions (default 200)")
+print("  ⚠️ Partition count changes to spark.sql.shuffle.partitions (default 200)")
+print("  ⚠️ Look for 'Exchange' in explain plan:")
+df_with_shuffle.explain()
 
 # Set shuffle partitions to reasonable number
 spark.conf.set("spark.sql.shuffle.partitions", "3")
 df_with_shuffle_optimized = df_partitioned.groupBy("department").count()
-print(f"\n  After setting shuffle partitions to 3: {df_with_shuffle_optimized.rdd.getNumPartitions()}")
+print("\n\nAfter setting shuffle partitions to 3:")
+print("  ✅ Optimized for small dataset")
 
 df_with_shuffle_optimized.show()
 
-print("\n✅ Partition optimization:")
+print("\n✅ Partition optimization tips:")
 print("  - Too many partitions → overhead from task scheduling")
 print("  - Too few partitions → underutilized cluster resources")
 print("  - Sweet spot: 2-4x number of executor cores")
+print("  - For serverless: Use explain() to understand shuffles")
 
 # COMMAND ----------
 
@@ -410,76 +435,122 @@ print("  ⚠️ Recomputed aggregation twice!")
 
 # COMMAND ----------
 
-# WITH caching
-print("\nWITH caching:")
-df_expensive.cache()  # Mark for caching
-start = time.time()
-df_expensive.count()  # Action 1 - triggers caching
-df_expensive.show(5)  # Action 2 - uses cache
-end_with_cache = time.time() - start
-print(f"  Execution time: {end_with_cache:.3f} seconds")
-print("  ✅ Computed once, reused from cache!")
+print("=== Caching Concept (NOT SUPPORTED ON SERVERLESS) ===\n")
 
-print(f"\nPerformance improvement: {(end_no_cache / end_with_cache):.2f}x faster")
+print("⚠️  IMPORTANT: Caching (.cache(), .persist()) is NOT supported on Databricks Serverless.")
+print("    Serverless automatically optimizes query execution without manual caching.\n")
 
-# Check cache status
-print("\nCache statistics:")
-print(f"  Is cached: {df_expensive.is_cached}")
-print(f"  Storage level: {df_expensive.storageLevel}")
+print("CONCEPT - How caching would work on traditional Spark clusters:")
+print("=" * 60)
+print("""
+# df_expensive.cache()  ← Not available on serverless
+# df_expensive.count()  # Triggers caching
+# df_expensive.show(5)  # Uses cached data
 
-# COMMAND ----------
+EXPECTED BEHAVIOR:
+  First action: Compute + cache (slower)
+  Second action: Read from cache (faster)
+  Performance improvement: 2-5x faster for expensive operations
 
-print("=== Different Storage Levels ===\n")
+WHY SERVERLESS DOESN'T NEED MANUAL CACHING:
+- Serverless uses automatic query result caching
+- Intelligent query plan reuse
+- Optimized for auto-scaling workloads
+- Memory management handled automatically
 
-# Clean up previous cache
-df_expensive.unpersist()
-
-# Compare storage levels
-from pyspark import StorageLevel
-
-print("Available storage levels:\n")
-
-storage_levels = [
-    ("MEMORY_ONLY", StorageLevel.MEMORY_ONLY, "Fast, in-memory only"),
-    ("MEMORY_AND_DISK", StorageLevel.MEMORY_AND_DISK, "Spill to disk if needed"),
-    ("DISK_ONLY", StorageLevel.DISK_ONLY, "All on disk"),
-    ("MEMORY_ONLY_SER", StorageLevel.MEMORY_ONLY_SER, "Serialized in memory")
-]
-
-for name, level, description in storage_levels:
-    print(f"{name}:")
-    print(f"  Description: {description}")
-    print(f"  Use Memory: {level.useMemory}")
-    print(f"  Use Disk: {level.useDisk}")
-    print(f"  Deserialized: {level.deserialized}")
-    print()
+WHAT TO USE INSTEAD:
+- Write intermediate results to Delta tables
+- Use materialized views for frequently accessed data
+- Leverage Delta Lake's built-in caching
+- Trust serverless auto-optimization
+""")
 
 # COMMAND ----------
 
-print("=== Caching Best Practices ===\n")
+print("=== Storage Levels (CONCEPT) ===\n")
 
-# Example: ML pipeline with iterative training
-df_features = df_large \
-    .filter(col("salary") > 50000) \
-    .withColumn("salary_normalized", col("salary") / 100000)
+print("⚠️  NOTE: .unpersist() and StorageLevel are NOT supported on Databricks Serverless.\n")
 
-print("Use case: Machine learning with multiple iterations")
-print("\nBEST PRACTICE #1: Cache before iterative operations")
+print("CONCEPT - Storage Levels on Traditional Spark Clusters:")
+print("=" * 60)
+print("""
+MEMORY_ONLY:
+  Description: Fast, in-memory only
+  Use Memory: True
+  Use Disk: False
+  Deserialized: True
+  ✅ Best for: Small to medium datasets, fast access
+  ⚠️  Risk: Data lost if executor fails
 
-df_features.cache()
-df_features.count()  # Materialize cache
+MEMORY_AND_DISK:
+  Description: Spill to disk if needed
+  Use Memory: True
+  Use Disk: True
+  Deserialized: True
+  ✅ Best for: Default choice, safe and performant
+  ⚠️  Note: Disk I/O slower than memory
 
-print("  ✅ Cached before training loop")
-print("  ✅ Each iteration uses cached data")
+DISK_ONLY:
+  Description: All on disk
+  Use Memory: False
+  Use Disk: True
+  Deserialized: True
+  ✅ Best for: Very large datasets, low memory
+  ⚠️  Note: Slow - use only when necessary
+
+MEMORY_ONLY_SER:
+  Description: Serialized in memory
+  Use Memory: True
+  Use Disk: False
+  Deserialized: False
+  ✅ Best for: Save memory space, can fit more
+  ⚠️  Note: CPU overhead for deserialization
+
+SERVERLESS ALTERNATIVE:
+- No manual storage level selection needed
+- System automatically manages memory
+- Focus on writing to Delta tables for persistence
+""")
+
+# COMMAND ----------
+
+print("=== Caching Best Practices (CONCEPT) ===\n")
+
+print("⚠️  NOTE: .cache() and .unpersist() are NOT supported on Databricks Serverless.\n")
+
+print("CONCEPT - Caching Best Practices for Traditional Spark Clusters:")
+print("=" * 60)
+print("""
+BEST PRACTICE #1: Cache before iterative operations
+
+Use case: Machine learning with multiple iterations
+
+# df_features.cache()  ← Not available on serverless
+# df_features.count()  # Materialize cache
+
+  ✅ Cached before training loop
+  ✅ Each iteration uses cached data
 
 # Simulate multiple iterations
-for i in range(3):
-    result = df_features.agg({"salary_normalized": "avg"}).collect()
-    print(f"  Iteration {i+1}: avg = {result[0][0]:.4f} (from cache)")
+# for i in range(3):
+#     result = df_features.agg({"salary_normalized": "avg"}).collect()
+#     print(f"Iteration {i+1}: avg = {result[0][0]:.4f} (from cache)")
 
-print("\nBEST PRACTICE #2: Unpersist when done")
-df_features.unpersist()
-print("  ✅ Freed memory for other operations")
+BEST PRACTICE #2: Unpersist when done
+
+# df_features.unpersist()  ← Not available on serverless
+  ✅ Freed memory for other operations
+
+BEST PRACTICE #3: Cache at the right level
+- See decision tree in previous cell
+
+SERVERLESS BEST PRACTICES INSTEAD:
+✅ Write intermediate results to Delta tables
+✅ Use temp views for complex multi-step queries
+✅ Leverage automatic query result caching
+✅ Trust serverless auto-optimization
+✅ For ML: Use MLflow for model caching, not DataFrame caching
+""")
 
 # COMMAND ----------
 
@@ -580,7 +651,26 @@ print("  - Unpersist when done")
 
 # COMMAND ----------
 
-# Clean up
-spark.catalog.clearCache()
-print("=== Cleanup Complete ===")
-print("All caches cleared")
+print("=== Cleanup (NOT NEEDED ON SERVERLESS) ===\n")
+
+print("⚠️  NOTE: spark.catalog.clearCache() is NOT supported on Databricks Serverless.\n")
+
+print("CONCEPT - Cache Cleanup on Traditional Spark Clusters:")
+print("=" * 60)
+print("""
+# spark.catalog.clearCache()  ← Not available on serverless
+
+On traditional clusters, this would:
+  ✅ Clear all cached tables and DataFrames
+  ✅ Free up memory for new operations
+  ✅ Good practice at end of notebook sessions
+
+SERVERLESS:
+- No manual cache cleanup needed
+- System automatically manages memory
+- Resources freed when notebook stops
+- Focus on table management instead:
+  - DROP TABLE if no longer needed
+  - Use table/schema-level permissions
+  - Leverage Unity Catalog lifecycle management
+""")
