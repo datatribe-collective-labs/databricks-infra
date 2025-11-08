@@ -57,8 +57,12 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../utils/user_schema_setup
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, TimestampType, BooleanType
-from pyspark.sql.functions import col, current_timestamp, to_timestamp, regexp_replace, trim, upper, sum as _sum, avg, count, when
+from pyspark.sql.functions import col, current_timestamp, to_timestamp, regexp_replace, trim, upper, sum as _sum, avg, count, when, lit
 from datetime import datetime
 
 print("=== Medallion Architecture Implementation ===\n")
@@ -80,14 +84,14 @@ df_raw.show(truncate=False)
 
 print("=== BRONZE LAYER: Store Raw Data ===\n")
 
-bronze_path = "/tmp/medallion_example/bronze/orders"
+bronze_table = get_table_path("bronze", "medallion_orders")
 
 # Add metadata columns for lineage
 df_bronze = df_raw \
     .withColumn("ingestion_timestamp", current_timestamp()) \
     .withColumn("source_system", lit("order_service"))
 
-df_bronze.write.format("delta").mode("overwrite").save(bronze_path)
+df_bronze.write.format("delta").mode("overwrite").saveAsTable(bronze_table)
 
 print("✅ Bronze layer characteristics:")
 print("  - Stores data exactly as received")
@@ -114,7 +118,7 @@ silver_schema = StructType([
 ])
 
 # Read from Bronze
-df_from_bronze = spark.read.format("delta").load(bronze_path)
+df_from_bronze = spark.table(bronze_table)
 
 # Apply cleaning transformations
 df_silver = df_from_bronze \
@@ -129,8 +133,8 @@ df_silver = df_from_bronze \
     .dropDuplicates(["order_id"]) \
     .select("order_id", "customer_email", "product", "amount", "order_date", "status", "ingestion_timestamp", "is_valid")
 
-silver_path = "/tmp/medallion_example/silver/orders"
-df_silver.write.format("delta").mode("overwrite").save(silver_path)
+silver_table = get_table_path("silver", "medallion_orders")
+df_silver.write.format("delta").mode("overwrite").saveAsTable(silver_table)
 
 print("✅ Silver layer transformations:")
 print("  - Type casting (order_id → int, amount → double)")
@@ -145,7 +149,7 @@ df_silver.show(truncate=False)
 print("=== GOLD LAYER: Business Aggregations ===\n")
 
 # Read from Silver
-df_from_silver = spark.read.format("delta").load(silver_path)
+df_from_silver = spark.table(silver_table)
 
 # Create business-level aggregation
 df_gold_daily_summary = df_from_silver \
@@ -159,8 +163,8 @@ df_gold_daily_summary = df_from_silver \
     ) \
     .orderBy("order_date")
 
-gold_path = "/tmp/medallion_example/gold/daily_summary"
-df_gold_daily_summary.write.format("delta").mode("overwrite").save(gold_path)
+gold_table = get_table_path("gold", "medallion_daily_summary")
+df_gold_daily_summary.write.format("delta").mode("overwrite").saveAsTable(gold_table)
 
 print("✅ Gold layer characteristics:")
 print("  - Aggregated for business use")
@@ -241,18 +245,18 @@ events_schema = StructType([
 ])
 
 df_batch1 = spark.createDataFrame(events_batch1, events_schema)
-non_idempotent_path = "/tmp/pipeline_patterns/non_idempotent_events"
+non_idempotent_table = get_table_path("bronze", "non_idempotent_events")
 
 # Run 1: Append events
-df_batch1.write.format("delta").mode("overwrite").save(non_idempotent_path)
+df_batch1.write.format("delta").mode("overwrite").saveAsTable(non_idempotent_table)
 print("Run 1: Initial load")
-spark.read.format("delta").load(non_idempotent_path).show()
+spark.table(non_idempotent_table).show()
 
 # Run 2: Retry with same data (using append - NOT idempotent)
 print("\nRun 2: Retry with same data (append mode)")
-df_batch1.write.format("delta").mode("append").save(non_idempotent_path)
+df_batch1.write.format("delta").mode("append").saveAsTable(non_idempotent_table)
 
-result = spark.read.format("delta").load(non_idempotent_path)
+result = spark.table(non_idempotent_table)
 print(f"❌ Result: {result.count()} records (should be 3, got duplicates!)")
 result.show()
 
@@ -261,11 +265,11 @@ result.show()
 print("=== Idempotent Pipeline with MERGE (SOLUTION) ===\n")
 
 # Fresh start
-idempotent_path = "/tmp/pipeline_patterns/idempotent_events"
-df_batch1.write.format("delta").mode("overwrite").save(idempotent_path)
+idempotent_table = get_table_path("bronze", "idempotent_events")
+df_batch1.write.format("delta").mode("overwrite").saveAsTable(idempotent_table)
 
 print("Run 1: Initial load")
-spark.read.format("delta").load(idempotent_path).show()
+spark.table(idempotent_table).show()
 
 # Incoming batch (includes duplicates + new data)
 events_batch2 = [
@@ -279,7 +283,7 @@ df_batch2 = spark.createDataFrame(events_batch2, events_schema)
 
 # MERGE operation (idempotent)
 print("\nRun 2: Process batch with MERGE (idempotent)")
-delta_events = DeltaTable.forPath(spark, idempotent_path)
+delta_events = DeltaTable.forName(spark, idempotent_table)
 
 delta_events.alias("target").merge(
     df_batch2.alias("source"),
@@ -288,7 +292,7 @@ delta_events.alias("target").merge(
  .whenNotMatchedInsertAll() \
  .execute()
 
-result_idempotent = spark.read.format("delta").load(idempotent_path)
+result_idempotent = spark.table(idempotent_table)
 print(f"✅ Result: {result_idempotent.count()} records (correct!)")
 result_idempotent.orderBy("event_id").show()
 
@@ -301,7 +305,7 @@ delta_events.alias("target").merge(
  .whenNotMatchedInsertAll() \
  .execute()
 
-result_verify = spark.read.format("delta").load(idempotent_path)
+result_verify = spark.table(idempotent_table)
 print(f"✅ Result still: {result_verify.count()} records (idempotent!)")
 
 # COMMAND ----------
@@ -445,11 +449,11 @@ print(f"  WARNING: {df_warning.count()} records → Write to Silver with flag")
 print(f"  FAILED: {df_bad.count()} records → Quarantine to error table")
 
 # Write to appropriate locations
-good_path = "/tmp/pipeline_patterns/quality/good"
-bad_path = "/tmp/pipeline_patterns/quality/quarantine"
+good_table = get_table_path("silver", "quality_good_customers")
+bad_table = get_table_path("bronze", "quality_quarantine")
 
-df_good.write.format("delta").mode("overwrite").save(good_path)
-df_bad.write.format("delta").mode("overwrite").save(bad_path)
+df_good.write.format("delta").mode("overwrite").saveAsTable(good_table)
+df_bad.write.format("delta").mode("overwrite").saveAsTable(bad_table)
 
 print("\n✅ Data quality pattern applied:")
 print("  - Good data → Silver layer")
@@ -531,8 +535,8 @@ print("\nPipeline metrics:")
 df_metrics.show(truncate=False)
 
 # Write to metrics table
-metrics_path = "/tmp/pipeline_patterns/metrics/pipeline_runs"
-df_metrics.write.format("delta").mode("append").save(metrics_path)
+metrics_table = get_table_path("bronze", "pipeline_metrics")
+df_metrics.write.format("delta").mode("append").saveAsTable(metrics_table)
 
 print(f"✅ Metrics logged:")
 print(f"  Duration: {duration:.2f} seconds")
@@ -553,10 +557,10 @@ historical_runs = [
 ]
 
 df_historical = spark.createDataFrame(historical_runs, metrics_schema)
-df_historical.write.format("delta").mode("append").save(metrics_path)
+df_historical.write.format("delta").mode("append").saveAsTable(metrics_table)
 
 # Analyze quality trends
-df_all_metrics = spark.read.format("delta").load(metrics_path)
+df_all_metrics = spark.table(metrics_table)
 
 df_quality_trend = df_all_metrics \
     .withColumn("success_rate", (col("records_output") / col("records_input") * 100).cast("decimal(5,2)")) \
@@ -623,10 +627,10 @@ txn_schema = StructType([
 ])
 
 df_txn_batch1 = spark.createDataFrame(initial_transactions, txn_schema)
-txn_path = "/tmp/pipeline_patterns/transactions"
+txn_table = get_table_path("bronze", "transactions")
 
 # Process batch 1
-df_txn_batch1.write.format("delta").mode("overwrite").save(txn_path)
+df_txn_batch1.write.format("delta").mode("overwrite").saveAsTable(txn_table)
 
 # Get watermark (max timestamp processed)
 watermark = df_txn_batch1.agg({"txn_timestamp": "max"}).collect()[0][0]
@@ -636,8 +640,8 @@ print(f"Batch 1 processed. Watermark: {watermark}")
 checkpoint_data = [("transaction_pipeline", "watermark", str(watermark), datetime.now())]
 df_checkpoint = spark.createDataFrame(checkpoint_data, checkpoint_schema)
 
-checkpoint_path = "/tmp/pipeline_patterns/checkpoints"
-df_checkpoint.write.format("delta").mode("overwrite").save(checkpoint_path)
+checkpoint_table = get_table_path("bronze", "checkpoints")
+df_checkpoint.write.format("delta").mode("overwrite").saveAsTable(checkpoint_table)
 
 print("✅ Checkpoint saved")
 
@@ -656,7 +660,7 @@ new_transactions = [
 df_txn_batch2 = spark.createDataFrame(new_transactions, txn_schema)
 
 # Read checkpoint
-df_checkpoint_read = spark.read.format("delta").load(checkpoint_path)
+df_checkpoint_read = spark.table(checkpoint_table)
 last_watermark = df_checkpoint_read \
     .filter(col("pipeline_name") == "transaction_pipeline") \
     .filter(col("checkpoint_type") == "watermark") \
@@ -672,13 +676,13 @@ print(f"\nNew transactions to process: {df_new_txn.count()}")
 df_new_txn.show()
 
 # Process new data
-df_new_txn.write.format("delta").mode("append").save(txn_path)
+df_new_txn.write.format("delta").mode("append").saveAsTable(txn_table)
 
 # Update checkpoint
 new_watermark = df_txn_batch2.agg({"txn_timestamp": "max"}).collect()[0][0]
 checkpoint_update = [("transaction_pipeline", "watermark", str(new_watermark), datetime.now())]
 df_checkpoint_new = spark.createDataFrame(checkpoint_update, checkpoint_schema)
-df_checkpoint_new.write.format("delta").mode("overwrite").save(checkpoint_path)
+df_checkpoint_new.write.format("delta").mode("overwrite").saveAsTable(checkpoint_table)
 
 print(f"\n✅ New watermark saved: {new_watermark}")
 
@@ -693,7 +697,7 @@ print("  2. Reads checkpoint")
 print("  3. Determines what to reprocess")
 
 # Read checkpoint on restart
-df_checkpoint_recovery = spark.read.format("delta").load(checkpoint_path)
+df_checkpoint_recovery = spark.table(checkpoint_table)
 recovery_watermark = df_checkpoint_recovery \
     .filter(col("pipeline_name") == "transaction_pipeline") \
     .select("checkpoint_value") \
@@ -708,7 +712,7 @@ print("  - No duplicate processing")
 print("  - Efficient recovery")
 
 # Verify final state
-df_final = spark.read.format("delta").load(txn_path)
+df_final = spark.table(txn_table)
 print(f"\nFinal transaction count: {df_final.count()}")
 df_final.orderBy("txn_timestamp").show()
 
@@ -783,11 +787,14 @@ print("  - Automatic recovery on job restart")
 
 # Clean up
 print("=== Cleanup Complete ===")
-print("\nExample tables created in /tmp/pipeline_patterns/:")
-print("  - medallion_example/")
-print("  - non_idempotent_events")
-print("  - idempotent_events")
-print("  - quality/")
-print("  - metrics/")
-print("  - transactions")
-print("  - checkpoints")
+print(f"\nExample tables created in {CATALOG}.{USER_SCHEMA}:")
+print("  - bronze_medallion_orders (Medallion Bronze layer)")
+print("  - silver_medallion_orders (Medallion Silver layer)")
+print("  - gold_medallion_daily_summary (Medallion Gold layer)")
+print("  - bronze_non_idempotent_events (Idempotency problem demo)")
+print("  - bronze_idempotent_events (Idempotency solution with MERGE)")
+print("  - silver_quality_good_customers (Quality validation passed)")
+print("  - bronze_quality_quarantine (Quality validation failed)")
+print("  - bronze_pipeline_metrics (Monitoring and metrics)")
+print("  - bronze_transactions (Checkpoint watermark demo)")
+print("  - bronze_checkpoints (Checkpoint tracking)")

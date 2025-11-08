@@ -53,6 +53,10 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../utils/user_schema_setup
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, TimestampType
 from pyspark.sql.functions import current_timestamp, col, lit, from_json, to_json, struct
 from datetime import datetime, timedelta
@@ -83,11 +87,11 @@ print("Batch ingestion - Process entire day's data at once:")
 print(f"Records in batch: {df_batch.count()}")
 df_batch.show(truncate=False)
 
-# Write to Delta (batch mode)
-batch_path = "/tmp/ingestion_examples/batch_sales"
-df_batch.write.format("delta").mode("overwrite").save(batch_path)
+# Write to Delta (batch mode) - Using Unity Catalog
+batch_table = get_table_path("bronze", "batch_sales")
+df_batch.write.format("delta").mode("overwrite").saveAsTable(batch_table)
 
-print(f"✅ Batch written to: {batch_path}")
+print(f"✅ Batch written to: {batch_table}")
 print("   Characteristics: High throughput, scheduled processing, complete dataset")
 
 # COMMAND ----------
@@ -164,16 +168,17 @@ sample_json_data = [
     {"user_id": "3", "age": "invalid", "score": "92.1", "active": "true"}  # Bad data
 ]
 
-# Write to temp file
-import tempfile
-temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
-for record in sample_json_data:
-    temp_file.write(json.dumps(record) + '\n')
-temp_file.close()
+# Write JSON data to Delta table (instead of temp file)
+json_strings = [json.dumps(record) for record in sample_json_data]
+from pyspark.sql import Row
+df_json_strings = spark.createDataFrame([Row(value=js) for js in json_strings])
+
+temp_infer_table = get_table_path("bronze", "temp_schema_inference_data")
+df_json_strings.write.format("delta").mode("overwrite").saveAsTable(temp_infer_table)
 
 # Read with schema inference
 print("Reading with schema inference:")
-df_inferred = spark.read.json(temp_file.name)
+df_inferred = spark.read.json(spark.table(temp_infer_table).rdd.map(lambda row: row.value))
 
 print("\nInferred schema:")
 df_inferred.printSchema()
@@ -204,10 +209,10 @@ for field in user_schema.fields:
     nullable = "nullable" if field.nullable else "required"
     print(f"  - {field.name}: {field.dataType.simpleString()} ({nullable})")
 
-# Read with explicit schema
+# Read with explicit schema (from the same data that had bad values)
 print("\nReading with explicit schema:")
 try:
-    df_explicit = spark.read.schema(user_schema).json(temp_file.name)
+    df_explicit = spark.read.schema(user_schema).json(spark.table(temp_infer_table).rdd.map(lambda row: row.value))
     df_explicit.show()
 except Exception as e:
     print(f"✅ Schema validation caught error: {e}")
@@ -220,12 +225,14 @@ clean_json_data = [
     {"user_id": 3, "age": 28, "score": 92.1, "active": "true"}
 ]
 
-temp_clean = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
-for record in clean_json_data:
-    temp_clean.write(json.dumps(record) + '\n')
-temp_clean.close()
+# Write clean JSON data to Delta table
+json_strings_clean = [json.dumps(record) for record in clean_json_data]
+df_json_clean = spark.createDataFrame([Row(value=js) for js in json_strings_clean])
 
-df_explicit = spark.read.schema(user_schema).json(temp_clean.name)
+temp_clean_table = get_table_path("bronze", "temp_schema_clean_data")
+df_json_clean.write.format("delta").mode("overwrite").saveAsTable(temp_clean_table)
+
+df_explicit = spark.read.schema(user_schema).json(spark.table(temp_clean_table).rdd.map(lambda row: row.value))
 print("\nWith clean data and explicit schema:")
 df_explicit.printSchema()
 df_explicit.show()
@@ -268,10 +275,12 @@ mixed_quality_data = [
     {"order_id": 4, "customer_id": 1004}  # Missing amount
 ]
 
-temp_mixed = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
-for record in mixed_quality_data:
-    temp_mixed.write(json.dumps(record) + '\n')
-temp_mixed.close()
+# Write mixed quality JSON data to Delta table
+json_strings_mixed = [json.dumps(record) for record in mixed_quality_data]
+df_json_mixed = spark.createDataFrame([Row(value=js) for js in json_strings_mixed])
+
+temp_mixed_table = get_table_path("bronze", "temp_error_handling_data")
+df_json_mixed.write.format("delta").mode("overwrite").saveAsTable(temp_mixed_table)
 
 order_schema = StructType([
     StructField("order_id", IntegerType(), False),
@@ -283,7 +292,7 @@ order_schema = StructType([
 df_permissive = spark.read \
     .schema(order_schema) \
     .option("mode", "PERMISSIVE") \
-    .json(temp_mixed.name)
+    .json(spark.table(temp_mixed_table).rdd.map(lambda row: row.value))
 
 print("PERMISSIVE mode result:")
 df_permissive.show()
@@ -301,7 +310,7 @@ print("=== Error Handling Pattern 2: DROPMALFORMED Mode ===\n")
 df_dropmalformed = spark.read \
     .schema(order_schema) \
     .option("mode", "DROPMALFORMED") \
-    .json(temp_mixed.name)
+    .json(spark.table(temp_mixed_table).rdd.map(lambda row: row.value))
 
 print("DROPMALFORMED mode result:")
 df_dropmalformed.show()
@@ -319,7 +328,7 @@ print("=== Error Handling Pattern 3: Rescue Column (Recommended) ===\n")
 df_rescue = spark.read \
     .option("mode", "PERMISSIVE") \
     .option("columnNameOfCorruptRecord", "_rescued_data") \
-    .json(temp_mixed.name)
+    .json(spark.table(temp_mixed_table).rdd.map(lambda row: row.value))
 
 print("Rescue column result:")
 df_rescue.show(truncate=False)
@@ -389,19 +398,19 @@ customer_schema = StructType([
 ])
 
 df_initial = spark.createDataFrame(initial_customers, customer_schema)
-non_idempotent_path = "/tmp/ingestion_examples/non_idempotent"
+non_idempotent_table = get_table_path("bronze", "non_idempotent_customers")
 
 # First load
-df_initial.write.format("delta").mode("overwrite").save(non_idempotent_path)
+df_initial.write.format("delta").mode("overwrite").saveAsTable(non_idempotent_table)
 print("First load:")
-spark.read.format("delta").load(non_idempotent_path).show()
+spark.table(non_idempotent_table).show()
 
 # Simulated "retry" with same data (using append - BAD!)
 print("\nSimulated retry (using append - non-idempotent):")
-df_initial.write.format("delta").mode("append").save(non_idempotent_path)
+df_initial.write.format("delta").mode("append").saveAsTable(non_idempotent_table)
 
 print("Result after retry:")
-result = spark.read.format("delta").load(non_idempotent_path)
+result = spark.table(non_idempotent_table)
 result.show()
 print(f"❌ Total records: {result.count()} (should be 3, got duplicates!)")
 
@@ -409,12 +418,12 @@ print(f"❌ Total records: {result.count()} (should be 3, got duplicates!)")
 
 print("=== Idempotent Ingestion with MERGE (SOLUTION) ===\n")
 
-# Fresh start
-idempotent_path = "/tmp/ingestion_examples/idempotent"
-df_initial.write.format("delta").mode("overwrite").save(idempotent_path)
+# Fresh start - Using Unity Catalog
+idempotent_table = get_table_path("bronze", "idempotent_customers")
+df_initial.write.format("delta").mode("overwrite").saveAsTable(idempotent_table)
 
 print("Initial data:")
-spark.read.format("delta").load(idempotent_path).show()
+spark.table(idempotent_table).show()
 
 # Incoming data (same records, simulating retry)
 incoming_customers = [
@@ -427,7 +436,7 @@ incoming_customers = [
 df_incoming = spark.createDataFrame(incoming_customers, customer_schema)
 
 # MERGE operation (idempotent)
-delta_table = DeltaTable.forPath(spark, idempotent_path)
+delta_table = DeltaTable.forName(spark, idempotent_table)
 
 delta_table.alias("target").merge(
     df_incoming.alias("source"),
@@ -437,7 +446,7 @@ delta_table.alias("target").merge(
  .execute()
 
 print("\nAfter MERGE (idempotent operation):")
-result_idempotent = spark.read.format("delta").load(idempotent_path)
+result_idempotent = spark.table(idempotent_table)
 result_idempotent.orderBy("customer_id").show()
 
 print(f"✅ Total records: {result_idempotent.count()} (correct - no duplicates!)")
@@ -451,7 +460,7 @@ delta_table.alias("target").merge(
  .whenNotMatchedInsertAll() \
  .execute()
 
-result_verify = spark.read.format("delta").load(idempotent_path)
+result_verify = spark.table(idempotent_table)
 print(f"Total records: {result_verify.count()} (still 4 - idempotent!)")
 
 print("\n✅ Idempotent ingestion achieved:")
@@ -501,12 +510,12 @@ source_schema = StructType([
 ])
 
 df_day1 = spark.createDataFrame(source_data_day1, source_schema)
-incremental_path = "/tmp/ingestion_examples/incremental"
+incremental_table = get_table_path("bronze", "incremental_products")
 
-# Initial load
-df_day1.write.format("delta").mode("overwrite").save(incremental_path)
+# Initial load - Using Unity Catalog
+df_day1.write.format("delta").mode("overwrite").saveAsTable(incremental_table)
 print("Day 1 - Initial load:")
-spark.read.format("delta").load(incremental_path).show()
+spark.table(incremental_table).show()
 
 # Track watermark (last successfully loaded timestamp)
 watermark = df_day1.agg({"last_modified": "max"}).collect()[0][0]
@@ -532,7 +541,7 @@ print(f"Records to process: {df_incremental.count()}")
 df_incremental.show()
 
 # Merge incremental data
-delta_table = DeltaTable.forPath(spark, incremental_path)
+delta_table = DeltaTable.forName(spark, incremental_table)
 delta_table.alias("target").merge(
     df_incremental.alias("source"),
     "target.product_id = source.product_id"
@@ -541,7 +550,7 @@ delta_table.alias("target").merge(
  .execute()
 
 print("\nResult after incremental load:")
-spark.read.format("delta").load(incremental_path).orderBy("product_id").show()
+spark.table(incremental_table).orderBy("product_id").show()
 
 # Update watermark
 new_watermark = df_day2.agg({"last_modified": "max"}).collect()[0][0]
@@ -570,12 +579,12 @@ sequence_schema = StructType([
 ])
 
 df_batch1 = spark.createDataFrame(sequence_data_batch1, sequence_schema)
-sequence_path = "/tmp/ingestion_examples/sequence"
+sequence_table = get_table_path("bronze", "sequence_orders")
 
-# Initial load
-df_batch1.write.format("delta").mode("overwrite").save(sequence_path)
+# Initial load - Using Unity Catalog
+df_batch1.write.format("delta").mode("overwrite").saveAsTable(sequence_table)
 print("Batch 1 - Initial load:")
-spark.read.format("delta").load(sequence_path).show()
+spark.table(sequence_table).show()
 
 # Track max ID
 max_id = df_batch1.agg({"order_id": "max"}).collect()[0][0]
@@ -599,10 +608,10 @@ print(f"New records: {df_new_orders.count()}")
 df_new_orders.show()
 
 # Append new records
-df_new_orders.write.format("delta").mode("append").save(sequence_path)
+df_new_orders.write.format("delta").mode("append").saveAsTable(sequence_table)
 
 print("\nResult after incremental load:")
-spark.read.format("delta").load(sequence_path).orderBy("order_id").show()
+spark.table(sequence_table).orderBy("order_id").show()
 
 # Update max_id
 new_max_id = df_batch2.agg({"order_id": "max"}).collect()[0][0]
@@ -671,11 +680,10 @@ print("  - Doesn't capture updates (only inserts)")
 
 # Clean up
 print("=== Cleanup ===")
-print("\nExample tables created in /tmp/ingestion_examples/")
-print("  - batch_sales")
-print("  - streaming_sales")
-print("  - non_idempotent")
-print("  - idempotent")
-print("  - incremental")
-print("  - sequence")
-print("\nThese are temporary and will be cleaned up when cluster terminates")
+print(f"\nExample tables created in your Unity Catalog schema: {USER_SCHEMA}")
+print("  - bronze_batch_sales")
+print("  - bronze_non_idempotent_customers")
+print("  - bronze_idempotent_customers")
+print("  - bronze_incremental_products")
+print("  - bronze_sequence_orders")
+print("\nThese tables persist in Unity Catalog and can be accessed across sessions")
