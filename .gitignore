@@ -17,3 +17,7 @@ coverage.xml
 # VS Code and MCP configuration (may contain local paths)
 .vscode/settings.json
 .vscode/mcp.json
+
+# MkDocs
+site/
+.cache/

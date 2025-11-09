@@ -1,0 +1,83 @@
+# Databricks Infrastructure & Learning Platform
+
+A complete Databricks learning platform with Infrastructure as Code (Terraform) and a comprehensive 5-week data engineering course.
+
+## 🎯 What This Project Offers
+
+- **📚 Complete Databricks Course**: 19 hands-on notebooks covering fundamentals to production apps
+- **🏗️ Infrastructure as Code**: Terraform configuration for Unity Catalog, users, and permissions
+- **🐍 Professional Python Setup**: Poetry dependency management with CLI tools and testing
+- **🔧 Development Tools**: Pre-commit hooks, automated testing, and code quality checks
+- **🚀 CI/CD Ready**: GitHub Actions for automated deployment and validation
+
+## 🚀 Choose Your Path
+
+### 👨‍💻 I'm a Data Engineer
+*"I want to learn Databricks through hands-on notebooks and work with data"*
+
+**➡️ [Follow the Data Engineer Guide](./DataEngineer-readme.md)**
+
+- Focus on learning through 19 course notebooks
+- Work directly in Databricks workspace
+- No infrastructure complexity
+- Start learning immediately
+
+---
+
+### 🏗️ I'm a Data Platform Engineer  
+*"I want to manage Databricks infrastructure with Terraform and control the full stack"*
+
+**➡️ [Follow the Data Platform Engineer Guide](./DataPlatformEngineer-readme.md)**
+
+- Manage infrastructure with Terraform
+- Control users, groups, and permissions
+- Set up CI/CD pipelines
+- Full development environment
+
+---
+
+## 📚 Course Overview (5 Weeks + Advanced, 19 Notebooks)
+
+| Week | Focus | Notebooks | Key Skills |
+|------|-------|-----------|------------|
+| **1** | Databricks Fundamentals | 4 | Platform mastery, Unity Catalog, cluster management |
+| **2** | Data Ingestion | 4 | Files, APIs, databases, cloud storage patterns |
+| **3** | Data Transformations | 3 | Advanced Spark operations, window functions |
+| **4** | End-to-End Workflows | 2 | Complete pipeline development |
+| **5** | Production Deployment | 4 | Job orchestration, wheel packages, production patterns |
+| **Advanced** | Databricks Apps | 2 | Interactive data applications with Streamlit |
+
+## 🏗️ Current Infrastructure
+
+This repository is configured for production deployment:
+
+- **Workspace**: Free Edition with Unity Catalog
+- **Authentication**: PAT (Personal Access Token) based
+- **CI/CD**: Automated deployments via GitHub Actions
+- **Users**: 8 active users (7 admins, 1 student)
+- **Groups**: 2 workspace-level groups (platform_admins, platform_students)
+- **Catalogs**: 5 Unity Catalogs total
+  - 4 shared reference catalogs (sales_dev, sales_prod, marketing_dev, marketing_prod)
+  - 1 course catalog (databricks_course) with user-specific schemas
+- **Schemas**: 24 total schemas
+  - 13 shared reference schemas (bronze, silver, gold, experiments)
+  - 3 course shared schemas (shared_bronze, shared_silver, shared_gold)
+  - 8 user personal schemas (one per user)
+- **Course Content**: 21 notebooks automatically deployed
+- **Permissions**: Group-based access control with workspace-level groups
+
+**Important**: For platform engineers managing infrastructure, workspace admin access and PAT authentication are required for full Terraform automation (user/group management, SCIM API access).
+
+## 📞 Support
+
+- **🐛 Issues**: Use GitHub Issues for bugs and feature requests
+- **📖 Technical Docs**: See [CLAUDE.md](./CLAUDE.md) for detailed technical guidance
+- **💬 Questions**: Check notebook troubleshooting sections
+
+## 📈 Project Status
+
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/datatribe-collective-labs/databricks-infra/deploy.yml?branch=main)
+![Poetry](https://img.shields.io/badge/dependency%20manager-poetry-blue)
+![Terraform](https://img.shields.io/badge/infrastructure-terraform-purple)
+
+**Choose your path above and start your Databricks journey!** 🚀
