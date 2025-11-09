@@ -4,7 +4,7 @@ A complete Databricks learning platform with Infrastructure as Code (Terraform) 
 
 ## 🎯 What This Project Offers
 
-- **📚 Complete Databricks Course**: 16 hands-on notebooks covering fundamentals to advanced job orchestration
+- **📚 Complete Databricks Course**: 19 hands-on notebooks covering fundamentals to production apps
 - **🏗️ Infrastructure as Code**: Terraform configuration for Unity Catalog, users, and permissions
 - **🐍 Professional Python Setup**: Poetry dependency management with CLI tools and testing
 - **🔧 Development Tools**: Pre-commit hooks, automated testing, and code quality checks
@@ -17,7 +17,7 @@ A complete Databricks learning platform with Infrastructure as Code (Terraform) 
 
 **➡️ [Follow the Data Engineer Guide](./DataEngineer-readme.md)**
 
-- Focus on learning through 16 course notebooks
+- Focus on learning through 19 course notebooks
 - Work directly in Databricks workspace
 - No infrastructure complexity
 - Start learning immediately
@@ -36,15 +36,16 @@ A complete Databricks learning platform with Infrastructure as Code (Terraform) 
 
 ---
 
-## 📚 Course Overview (5 Weeks, 16 Notebooks)
+## 📚 Course Overview (5 Weeks + Advanced, 19 Notebooks)
 
 | Week | Focus | Notebooks | Key Skills |
 |------|-------|-----------|------------|
 | **1** | Databricks Fundamentals | 4 | Platform mastery, Unity Catalog, cluster management |
-| **2** | Data Ingestion | 4 | Files, APIs, databases, cloud storage patterns |  
+| **2** | Data Ingestion | 4 | Files, APIs, databases, cloud storage patterns |
 | **3** | Data Transformations | 3 | Advanced Spark operations, window functions |
 | **4** | End-to-End Workflows | 2 | Complete pipeline development |
-| **5** | Job Orchestration | 3 | Production automation and monitoring |
+| **5** | Production Deployment | 4 | Job orchestration, wheel packages, production patterns |
+| **Advanced** | Databricks Apps | 2 | Interactive data applications with Streamlit |
 
 ## 🏗️ Current Infrastructure
 

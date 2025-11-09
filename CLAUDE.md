@@ -7,7 +7,7 @@ This file provides comprehensive technical guidance for Claude Code (claude.ai/c
 This is a **production-deployed** Databricks Infrastructure as Code (IaC) project combining:
 - **Terraform**: Unity Catalog, users, permissions management (currently managing 8 users, 4 catalogs, 13 schemas)
 - **Python Package**: Professional tooling with Poetry, CLI, validation
-- **Databricks Course**: 21 notebooks across 5 weeks (fundamentals to job orchestration)
+- **Databricks Course**: 17 core notebooks across 5 weeks + 2 advanced modules (fundamentals to production apps)
 - **CI/CD Pipeline**: GitHub Actions with automated deployment to Premium Edition workspace
 
 ### Current Production State
@@ -49,14 +49,15 @@ databricks-infra/
 │   ├── utils.py                 # Data generation and utilities
 │   └── user_schema.py           # User schema management (alternative to %run)
 ├── course/                      # Learning materials
-│   ├── notebooks/               # 21 Databricks notebooks (5 weeks)
+│   ├── notebooks/               # Databricks course notebooks
 │   │   ├── utils/               # Shared utility notebooks
 │   │   │   └── user_schema_setup.py  # User schema config (used via %run)
-│   │   ├── 01_week/             # Week 1: Platform fundamentals
-│   │   ├── 02_week/             # Week 2: Data ingestion (updated with user schemas)
-│   │   ├── 03_week/             # Week 3: Transformations (updated with user schemas)
-│   │   ├── 04_week/             # Week 4: Pipelines (updated with user schemas)
-│   │   └── 05_week/             # Week 5: Job orchestration
+│   │   ├── 01_week/             # Week 1: Platform fundamentals (4 notebooks)
+│   │   ├── 02_week/             # Week 2: Data ingestion (4 notebooks, updated with user schemas)
+│   │   ├── 03_week/             # Week 3: Transformations (3 notebooks, updated with user schemas)
+│   │   ├── 04_week/             # Week 4: Pipelines (2 notebooks, updated with user schemas)
+│   │   ├── 05_week/             # Week 5: Job orchestration (4 notebooks)
+│   │   └── advanced/            # Advanced: Databricks Apps (2 notebooks)
 │   └── datasets/                # Sample data (CSV, JSON, Parquet)
 ├── docs/                        # Documentation
 │   ├── USER_SCHEMA_GUIDE.md     # Complete user schema usage guide
@@ -388,11 +389,72 @@ Focus: End-to-end pipeline development
 - **11_file_to_aggregation.py**: Complete ETL pipeline with monitoring
 - **12_api_to_aggregation.py**: Real-time data processing to insights
 
-### Week 5: Automation (3 notebooks)
-Focus: Job orchestration and production deployment
-- **13_create_job_with_notebook.py**: Databricks Jobs API, scheduling, monitoring
-- **14_create_job_with_wheel.py**: Python package deployment, dependency management
-- **15_orchestrate_tasks_in_job.py**: Multi-task workflows, task dependencies
+### Week 5: Production Deployment (4 notebooks)
+Focus: Job orchestration, wheel packages, and production deployment
+
+**Restructured: 2025-11-09** - Complete Week 5 overhaul for production-ready workflows
+
+- **18_job_orchestration_concepts_explained.py**: Comprehensive orchestration guide
+  - Part 1: DAG concepts, retry logic, scheduling, parameterization fundamentals
+  - Part 2: UI approach with step-by-step job creation instructions
+  - Part 3: SDK approach with programmatic job automation
+  - Includes working code examples for both UI and SDK workflows
+
+- **19_create_multi_task_ingestion_job.py**: Multi-task job orchestration
+  - Orchestrates notebooks 06-09 (file, API, database, S3 ingestion) in parallel
+  - Part 1: Detailed UI workflow guide for visual job creation
+  - Part 2: SDK automation with real-time monitoring and error handling
+  - Demonstrates task dependencies, retry logic, and job management
+
+- **20_wheel_creation_with_poetry.py**: Professional Python packaging
+  - Complete Poetry project setup and configuration
+  - Writing reusable modules (ingestion, transformations, validators)
+  - Building, testing, and deploying wheels to Databricks
+  - Using wheels in notebooks and jobs with Unity Catalog Volumes
+  - Full working example with medallion architecture pipeline
+
+- **21_stock_market_wheel_deployment.py**: Production capstone project
+  - Complete wheel package for stock market data (`stock_market_utils-1.0.0`)
+  - Yahoo Finance integration for real market data (AAPL, GOOGL, MSFT, AMZN, NVDA)
+  - Financial calculations (daily returns, cumulative returns, volatility, risk metrics)
+  - Full medallion architecture: Bronze (raw data) → Silver (returns) → Gold (insights)
+  - Part 4: UI job creation guide with detailed steps
+  - Part 5: SDK job automation with real-time monitoring
+  - Production deployment checklist and best practices
+
+**Learning Progression**:
+1. **Learn concepts** (Notebook 18) → Understand orchestration fundamentals
+2. **Apply with existing code** (Notebook 19) → Practice with familiar notebooks
+3. **Create reusable packages** (Notebook 20) → Professional Python development
+4. **Build production pipeline** (Notebook 21) → Real-world deployment with real data
+
+### Advanced: Databricks Apps (2 notebooks)
+Focus: Interactive data applications with Streamlit
+
+**Added: 2025-11-09** - Building production data apps on Databricks
+
+- **01_databricks_apps_guide.py**: Comprehensive Databricks Apps education
+  - What Databricks Apps are and when to use them (vs. notebooks vs. dashboards)
+  - Architecture and lifecycle management
+  - Streamlit fundamentals (session state, caching, components)
+  - Unity Catalog integration patterns
+  - Security and access control best practices
+  - Deployment options (UI, Git repository, SDK automation)
+  - Performance optimization strategies
+
+- **02_stock_market_analyzer_app.py**: Production Streamlit application
+  - Interactive stock market analysis using gold layer tables from Notebook 21
+  - Features:
+    - Market Overview: Key metrics and performance comparison
+    - Risk-Return Analysis: Interactive scatter plots with performance tiers
+    - Detailed Stock Analysis: Price history, returns distribution, volatility
+    - Portfolio Simulator: Build and analyze hypothetical portfolios
+  - Queries Unity Catalog tables with proper caching
+  - Includes deployment guide for all three methods (notebook, Git, SDK)
+  - Production-ready with error handling and user feedback
+
+**Real-World Application**:
+The Stock Market Analyzer demonstrates how to transform gold layer analytics into interactive applications for business stakeholders who don't write code. This pattern applies to any domain: sales dashboards, marketing analytics, operations monitoring, or ML model demos.
 
 ## Working with This Repository
 

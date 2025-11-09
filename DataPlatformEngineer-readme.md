@@ -328,9 +328,13 @@ terraform apply   # Deploy to students
 /Shared/terraform-managed/
 ├── course/
 │   ├── notebooks/          # All course content (auto-deployed)
-│   │   ├── 01_week/        # Week 1 fundamentals
-│   │   ├── 02_week/        # Week 2 data ingestion
-│   │   └── ...
+│   │   ├── utils/          # Shared utility notebooks
+│   │   ├── 01_week/        # Week 1: Platform fundamentals (4 notebooks)
+│   │   ├── 02_week/        # Week 2: Data ingestion (4 notebooks)
+│   │   ├── 03_week/        # Week 3: Transformations (3 notebooks)
+│   │   ├── 04_week/        # Week 4: Production workflows (2 notebooks)
+│   │   ├── 05_week/        # Week 5: Job orchestration (4 notebooks)
+│   │   └── advanced/       # Advanced: Databricks Apps (2 notebooks)
 │   └── datasets/           # Sample data files
 ├── users/                  # Student personal folders (auto-created)
 └── shared-resources/       # Team shared resources

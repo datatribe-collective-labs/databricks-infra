@@ -30,7 +30,7 @@ variable "create_users" {
 
 variable "notebook_subdirs" {
   type    = list(string)
-  default = ["utils", "01_week", "02_week", "03_week", "04_week", "05_week"]
+  default = ["utils", "01_week", "02_week", "03_week", "04_week", "05_week", "advanced"]
 }
 
 variable "notebooks" {
@@ -64,10 +64,14 @@ variable "notebooks" {
     "04_week/16_api_to_aggregation.py"          = "PYTHON"
     "04_week/17_pipeline_patterns_explained.py" = "PYTHON"
 
-    # Week 5: Job Orchestration (18-21)
-    "05_week/18_create_job_with_notebook.py"         = "PYTHON"
-    "05_week/19_create_job_with_wheel.py"            = "PYTHON"
-    "05_week/20_orchestrate_tasks_in_job.py"         = "PYTHON"
-    "05_week/21_orchestration_concepts_explained.py" = "PYTHON"
+    # Week 5: Production Deployment (18-21)
+    "05_week/18_job_orchestration_concepts_explained.py" = "PYTHON"
+    "05_week/19_create_multi_task_ingestion_job.py"      = "PYTHON"
+    "05_week/20_wheel_creation_with_poetry.py"           = "PYTHON"
+    "05_week/21_stock_market_wheel_deployment.py"        = "PYTHON"
+
+    # Advanced: Databricks Apps (01-02)
+    "advanced/01_databricks_apps_guide.py"        = "PYTHON"
+    "advanced/02_stock_market_analyzer_app.py"    = "PYTHON"
   }
 }
