@@ -12,8 +12,13 @@
 
 **Option B: Your Own Free Trial**
 - Sign up at [databricks.com/try-databricks](https://databricks.com/try-databricks)
+- **Choose your edition:**
+  - **Free Edition**: Serverless compute, free forever, no credit card required
+    - This repository is designed for serverless compute (notebooks work out-of-the-box)
+  - **Classic Trial**: 14-day trial with $200 credits, full cluster management features
+    - Provides deeper hands-on experience with cluster configuration
 - Complete workspace setup (2 minutes)
-- No credit card required
+- **Note**: For in-depth understanding of clusters and warehouses, see Week 1 notebooks
 
 ### Step 2: Find the Course Content
 ```bash
@@ -31,28 +36,38 @@
 # 3. Edit, experiment, and learn!
 ```
 
-## 📚 Course Structure (5 Weeks, 16 Notebooks)
+## 📚 Course Structure (5 Weeks + Advanced, 19 Notebooks)
 
 | Week | Focus | Notebooks | What You'll Learn |
 |------|-------|-----------|-------------------|
 | **1** | Databricks Fundamentals | 4 | Platform mastery, Unity Catalog, cluster management |
-| **2** | Data Ingestion | 4 | Files, APIs, databases, cloud storage patterns |  
+| **2** | Data Ingestion | 4 | Files, APIs, databases, cloud storage patterns |
 | **3** | Data Transformations | 3 | Advanced Spark operations, window functions |
 | **4** | End-to-End Workflows | 2 | Complete pipeline development |
-| **5** | Job Orchestration | 3 | Production automation and monitoring |
+| **5** | Production Deployment | 4 | Job orchestration, wheel packages, production patterns |
+| **Advanced** | Databricks Apps | 2 | Interactive data applications with Streamlit |
 
 ## 🎯 Learning Paths
 
-### 🟢 New to Databricks (2-3 weeks)
-- Week 1: Complete all notebooks to understand platform
-- Week 2: Focus on file ingestion with sample datasets
+### 🟢 New to Databricks (3-4 weeks)
+- **Weeks 1-2**: Complete all notebooks to understand platform and data ingestion
+- **Week 3**: Master transformations and analytics
+- **Week 4**: Build complete end-to-end pipelines
 
-### 🟡 Know Spark/Data Engineering (2 weeks)  
-- Week 3: Master complex transformations and analytics
-- Week 4: Build complete end-to-end pipelines
+### 🟡 Know Spark/Data Engineering (2-3 weeks)
+- **Week 3-4**: Master complex transformations and complete pipelines
+- **Week 5**: Production deployment with wheels and job orchestration
 
-### 🔴 Production Ready (1 week)
-- Week 5: Job orchestration and workflow automation
+### 🔴 Production Ready (1-2 weeks)
+- **Week 5**: Job orchestration, wheel packages, and production patterns
+- **Advanced**: Build interactive data applications with Streamlit
+
+### ⭐ Complete Journey (4-6 weeks)
+Follow all weeks sequentially for comprehensive mastery:
+1. Databricks fundamentals and platform features
+2. Data engineering patterns (ingestion, transformations, pipelines)
+3. Production deployment with professional Python packaging
+4. Interactive applications for stakeholders (no-code UX)
 
 ## 🗂️ Course Content Details
 
@@ -62,25 +77,30 @@
 - `02_cluster_management.py` - Compute optimization and cost management
 - `03_spark_on_databricks.py` - Distributed computing and performance
 
-### Week 2: Data Ingestion Mastery  
-- `04_file_ingestion.py` - CSV, JSON, Parquet with Delta Lake integration
-- `05_api_ingest.py` - REST APIs, authentication, real-time streaming
-- `06_database_ingest.py` - JDBC connections and database integration
-- `07_s3_ingest.py` - Cloud storage patterns and data lakehouse
+### Week 2: Data Ingestion Mastery
+- `06_file_ingestion.py` - CSV, JSON, Parquet with Delta Lake integration
+- `07_api_ingest.py` - REST APIs, authentication, retry logic
+- `08_database_ingest.py` - JDBC connections and database integration
+- `09_s3_ingest.py` - Cloud storage patterns and data lakehouse
 
 ### Week 3: Advanced Transformations
-- `08_simple_transformations.py` - Data cleaning and basic operations
-- `09_window_transformations.py` - Advanced analytics with window functions  
-- `10_aggregations.py` - Complex grouping and statistical operations
+- `11_simple_transformations.py` - Data cleaning and basic operations
+- `12_window_transformations.py` - Advanced analytics with window functions
+- `13_aggregations.py` - Complex grouping and statistical operations
 
 ### Week 4: Production Workflows
-- `11_file_to_aggregation.py` - Complete file processing pipeline
-- `12_api_to_aggregation.py` - Real-time API data to insights
+- `15_file_to_aggregation.py` - Complete file processing pipeline
+- `16_api_to_aggregation.py` - Real-time API data to insights
 
-### Week 5: Automation & Orchestration
-- `13_create_job_with_notebook.py` - Scheduled notebook execution
-- `14_create_job_with_wheel.py` - Python package deployment
-- `15_orchestrate_tasks_in_job.py` - Multi-task workflow orchestration
+### Week 5: Production Deployment
+- `18_job_orchestration_concepts_explained.py` - Orchestration fundamentals (UI + SDK)
+- `19_create_multi_task_ingestion_job.py` - Multi-task job with real-time monitoring
+- `20_wheel_creation_with_poetry.py` - Professional Python packaging with Poetry
+- `21_stock_market_wheel_deployment.py` - Production pipeline with real stock market data
+
+### Advanced: Databricks Apps
+- `01_databricks_apps_guide.py` - Complete guide to building data applications
+- `02_stock_market_analyzer_app.py` - Interactive Streamlit app using gold layer data
 
 ## 📊 Working with Sample Data
 

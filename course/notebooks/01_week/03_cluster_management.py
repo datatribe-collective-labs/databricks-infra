@@ -59,13 +59,294 @@
 # MAGIC ├── Dashboard Queries
 # MAGIC ├── Ad-hoc SQL Queries
 # MAGIC └── Data Visualization
-# MAGIC 
+# MAGIC
 # MAGIC Characteristics:
 # MAGIC ├── Optimized for SQL workloads
 # MAGIC ├── Serverless compute option
 # MAGIC ├── Auto-suspend capability
 # MAGIC └── Multi-user concurrent access
 # MAGIC ```
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Deep Dive: Databricks Compute Options
+# MAGIC
+# MAGIC ### 1. All-Purpose Clusters (Interactive Development)
+# MAGIC
+# MAGIC **What They Are:**
+# MAGIC - Traditional Apache Spark clusters that you manually create and manage
+# MAGIC - Persistent compute resources that stay running until explicitly terminated
+# MAGIC - Ideal for interactive data exploration and notebook development
+# MAGIC
+# MAGIC **Key Features:**
+# MAGIC - **Multi-user Support**: Multiple users can attach notebooks to the same cluster
+# MAGIC - **Manual Lifecycle Management**: You control when clusters start and stop
+# MAGIC - **Full Customization**: Configure driver/worker types, auto-scaling, Spark configs
+# MAGIC - **Always Available**: Stays running for quick notebook execution
+# MAGIC - **Cost Model**: Charged per DBU while cluster is running (even if idle)
+# MAGIC
+# MAGIC **Best For:**
+# MAGIC - Data exploration and ad-hoc analysis
+# MAGIC - Notebook development and prototyping
+# MAGIC - Model training experiments
+# MAGIC - Collaborative team development
+# MAGIC
+# MAGIC **Configuration Example:**
+# MAGIC ```python
+# MAGIC {
+# MAGIC   "cluster_name": "data-exploration-cluster",
+# MAGIC   "spark_version": "13.3.x-scala2.12",
+# MAGIC   "node_type_id": "i3.xlarge",
+# MAGIC   "driver_node_type_id": "i3.xlarge",
+# MAGIC   "autoscale": {
+# MAGIC     "min_workers": 1,
+# MAGIC     "max_workers": 8
+# MAGIC   },
+# MAGIC   "auto_termination_minutes": 120
+# MAGIC }
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### 2. Job Clusters (Production Workloads)
+# MAGIC
+# MAGIC **What They Are:**
+# MAGIC - Ephemeral clusters created automatically when a Databricks Job runs
+# MAGIC - Automatically terminated when the job completes
+# MAGIC - Optimized for scheduled production workloads
+# MAGIC
+# MAGIC **Key Features:**
+# MAGIC - **Automatic Lifecycle**: Created at job start, terminated at job end
+# MAGIC - **Isolated Execution**: Each job runs on its own dedicated cluster
+# MAGIC - **Lower Cost**: ~30-40% cheaper than all-purpose clusters per DBU
+# MAGIC - **Reproducibility**: Same cluster config every time
+# MAGIC - **No Idle Time**: Only pay for actual job execution
+# MAGIC
+# MAGIC **Best For:**
+# MAGIC - Scheduled ETL pipelines
+# MAGIC - Production data processing workflows
+# MAGIC - Automated ML model training
+# MAGIC - Batch data transformations
+# MAGIC
+# MAGIC **Job Cluster vs All-Purpose Cost Comparison:**
+# MAGIC ```
+# MAGIC All-Purpose Cluster: $0.40/DBU  (24/7 availability)
+# MAGIC Job Cluster:        $0.15/DBU  (only during execution)
+# MAGIC
+# MAGIC For a 4-hour daily ETL job:
+# MAGIC All-Purpose: 24 hours × $0.40 = $9.60/day
+# MAGIC Job Cluster:  4 hours × $0.15 = $0.60/day
+# MAGIC Savings: ~94% cost reduction
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### 3. SQL Warehouses (Analytics & BI)
+# MAGIC
+# MAGIC **What They Are:**
+# MAGIC - Specialized compute engines optimized for SQL queries
+# MAGIC - Support both classic (provisioned) and serverless modes
+# MAGIC - Built for concurrent user access and fast query performance
+# MAGIC
+# MAGIC **Key Features:**
+# MAGIC - **SQL-Optimized**: Photon engine for accelerated query performance
+# MAGIC - **Auto-Suspend/Resume**: Automatically stops after inactivity
+# MAGIC - **Concurrent Queries**: Handle multiple users simultaneously
+# MAGIC - **Query Caching**: Intelligent result caching for repeated queries
+# MAGIC - **BI Tool Integration**: Native connectors for Tableau, Power BI, Looker
+# MAGIC
+# MAGIC **Warehouse Types:**
+# MAGIC
+# MAGIC **Classic SQL Warehouse:**
+# MAGIC - Traditional cluster-based compute
+# MAGIC - You manage size (X-Small to 4X-Large)
+# MAGIC - Predictable performance and cost
+# MAGIC
+# MAGIC **Serverless SQL Warehouse:**
+# MAGIC - Instant startup (no cluster provisioning wait)
+# MAGIC - Auto-scaling compute managed by Databricks
+# MAGIC - Pay only for query execution time
+# MAGIC - Ideal for variable/unpredictable workloads
+# MAGIC
+# MAGIC **Best For:**
+# MAGIC - BI dashboards and reporting
+# MAGIC - Ad-hoc SQL analytics
+# MAGIC - Data analyst self-service queries
+# MAGIC - Real-time data exploration
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### 4. Serverless Compute (Databricks Free Edition)
+# MAGIC
+# MAGIC **What It Is:**
+# MAGIC - Fully managed compute where Databricks handles all infrastructure
+# MAGIC - Available for both notebooks and SQL warehouses
+# MAGIC - The ONLY compute option available in Databricks Free Edition
+# MAGIC
+# MAGIC **Key Characteristics:**
+# MAGIC - **Zero Configuration**: No cluster sizing or instance type selection
+# MAGIC - **Instant Start**: No cluster startup wait time (notebooks start immediately)
+# MAGIC - **Automatic Scaling**: Databricks manages all resource allocation
+# MAGIC - **Simplified Experience**: No cluster management UI or options
+# MAGIC - **Usage-Based Billing**: Pay only for actual compute time (not available in Free Edition)
+# MAGIC
+# MAGIC **Free Edition Limitations:**
+# MAGIC - Cannot create all-purpose clusters (serverless notebooks only)
+# MAGIC - Cannot create job clusters (serverless jobs only)
+# MAGIC - Limited to serverless SQL warehouses
+# MAGIC - No cluster configuration or customization options
+# MAGIC
+# MAGIC **Important for This Course:**
+# MAGIC ```
+# MAGIC ✅ Free Edition Users:
+# MAGIC   - All notebooks in this course work on serverless compute
+# MAGIC   - No cluster configuration required
+# MAGIC   - Just open notebook and run
+# MAGIC
+# MAGIC ✅ Classic Trial Users:
+# MAGIC   - Can create all-purpose clusters for deeper learning
+# MAGIC   - Explore cluster sizing and auto-scaling concepts
+# MAGIC   - Hands-on experience with cluster configuration
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### 5. Photon Engine (Query Acceleration)
+# MAGIC
+# MAGIC **What It Is:**
+# MAGIC - Databricks' native vectorized query engine written in C++
+# MAGIC - Replaces parts of Apache Spark engine for significant performance gains
+# MAGIC - Available on SQL Warehouses and certain cluster types
+# MAGIC
+# MAGIC **Performance Benefits:**
+# MAGIC - **3-10x faster** queries compared to standard Spark
+# MAGIC - **Vectorized Execution**: Processes data in columnar batches
+# MAGIC - **Reduced Costs**: Faster execution = less compute time
+# MAGIC - **Automatic Optimization**: No code changes required
+# MAGIC
+# MAGIC **How It Works:**
+# MAGIC ```
+# MAGIC Standard Spark:
+# MAGIC Row 1 → Process → Result 1
+# MAGIC Row 2 → Process → Result 2
+# MAGIC Row 3 → Process → Result 3
+# MAGIC (One row at a time)
+# MAGIC
+# MAGIC Photon Engine:
+# MAGIC [Row 1, Row 2, Row 3, ..., Row 1024]
+# MAGIC → Process batch in parallel →
+# MAGIC [Result 1, Result 2, Result 3, ..., Result 1024]
+# MAGIC (Vectorized batch processing)
+# MAGIC ```
+# MAGIC
+# MAGIC **Best For:**
+# MAGIC - SQL-heavy workloads (SELECT, JOIN, GROUP BY)
+# MAGIC - Large-scale aggregations
+# MAGIC - Delta Lake table scans
+# MAGIC - Analytics and reporting queries
+# MAGIC
+# MAGIC **Where Available:**
+# MAGIC - ✅ SQL Warehouses (always enabled)
+# MAGIC - ✅ Serverless compute (automatically enabled)
+# MAGIC - ✅ All-purpose clusters (enable via runtime selection: "Photon" runtime)
+# MAGIC - ✅ Job clusters (enable via configuration)
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### 6. Delta Live Tables (DLT) Compute
+# MAGIC
+# MAGIC **What It Is:**
+# MAGIC - Declarative framework for building reliable data pipelines
+# MAGIC - Automatically manages underlying compute infrastructure
+# MAGIC - Uses dedicated DLT clusters optimized for streaming and batch ETL
+# MAGIC
+# MAGIC **Cluster Architecture:**
+# MAGIC ```
+# MAGIC DLT Pipeline:
+# MAGIC ├── Dedicated DLT Cluster (auto-managed)
+# MAGIC │   ├── Driver node (pipeline orchestration)
+# MAGIC │   └── Worker nodes (data processing)
+# MAGIC ├── Photon enabled by default
+# MAGIC ├── Auto-scaling based on workload
+# MAGIC └── Auto-recovery on failures
+# MAGIC ```
+# MAGIC
+# MAGIC **Key Features:**
+# MAGIC - **Automatic Cluster Management**: DLT creates and manages clusters for you
+# MAGIC - **Enhanced Autoscaling**: Scales based on streaming data velocity
+# MAGIC - **Pipeline Isolation**: Each DLT pipeline gets its own compute
+# MAGIC - **Built-in Monitoring**: Data quality and pipeline health metrics
+# MAGIC - **Automatic Retries**: Fault tolerance and error recovery
+# MAGIC
+# MAGIC **Compute Modes:**
+# MAGIC
+# MAGIC **1. Triggered (Batch) Mode:**
+# MAGIC - Cluster starts when pipeline is triggered
+# MAGIC - Processes all data and terminates
+# MAGIC - Like job clusters but DLT-optimized
+# MAGIC
+# MAGIC **2. Continuous (Streaming) Mode:**
+# MAGIC - Cluster stays running continuously
+# MAGIC - Processes streaming data in real-time
+# MAGIC - Auto-scales based on incoming data rate
+# MAGIC
+# MAGIC **DLT Cluster vs Traditional Cluster:**
+# MAGIC ```
+# MAGIC Traditional Cluster:
+# MAGIC - You write complex retry logic
+# MAGIC - You manage checkpoints
+# MAGIC - You monitor data quality manually
+# MAGIC - You configure auto-scaling
+# MAGIC
+# MAGIC DLT Cluster:
+# MAGIC - Automatic retry and recovery
+# MAGIC - Automatic checkpoint management
+# MAGIC - Built-in data quality checks
+# MAGIC - Intelligent auto-scaling for streaming
+# MAGIC ```
+# MAGIC
+# MAGIC **Best For:**
+# MAGIC - Medallion architecture (Bronze → Silver → Gold)
+# MAGIC - Streaming data pipelines
+# MAGIC - CDC (Change Data Capture) workflows
+# MAGIC - Complex ETL with data quality requirements
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Compute Options Comparison Table
+# MAGIC
+# MAGIC | Feature | All-Purpose | Job Cluster | SQL Warehouse | Serverless | DLT |
+# MAGIC |---------|-------------|-------------|---------------|------------|-----|
+# MAGIC | **Use Case** | Development | Production Jobs | Analytics | Free Edition | ETL Pipelines |
+# MAGIC | **Startup Time** | 5-7 minutes | 5-7 minutes | 1-2 minutes | Instant | Auto-managed |
+# MAGIC | **Cost** | $$$ | $$ | $$ | Pay-per-use | $$ |
+# MAGIC | **Auto-Terminate** | Manual/Timer | Automatic | Auto-suspend | N/A | Pipeline-based |
+# MAGIC | **Photon** | Optional | Optional | Always | Always | Always |
+# MAGIC | **Multi-User** | ✅ Yes | ❌ No | ✅ Yes | ✅ Yes | ❌ No |
+# MAGIC | **Customization** | Full | Full | Limited | None | Limited |
+# MAGIC | **Free Edition** | ❌ No | ❌ No | ✅ Yes (serverless) | ✅ Yes | ❌ No |
+# MAGIC | **Best For** | Exploration | Automation | SQL/BI | Learning | Data Engineering |
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Choosing the Right Compute
+# MAGIC
+# MAGIC **Development Phase:**
+# MAGIC - Free Edition → Serverless notebooks (zero config)
+# MAGIC - Classic Trial → All-purpose clusters (learn configuration)
+# MAGIC
+# MAGIC **Production Phase:**
+# MAGIC - Scheduled Workloads → Job clusters (cost-effective)
+# MAGIC - Analytics/Dashboards → SQL Warehouses with Photon
+# MAGIC - ETL Pipelines → Delta Live Tables (reliability + automation)
+# MAGIC - Real-time Streaming → DLT continuous mode
+# MAGIC
+# MAGIC **Cost Optimization:**
+# MAGIC - Replace all-purpose with job clusters for scheduled work (-60% cost)
+# MAGIC - Use serverless SQL for variable workloads (pay only for queries)
+# MAGIC - Enable Photon for faster queries (less compute time = lower cost)
+# MAGIC - Use DLT for complex pipelines (reduce development + maintenance time)
 
 # COMMAND ----------
 
