@@ -357,7 +357,7 @@ import os
 import json
 
 # Cluster metadata
-cluster_id = os.getenv('DATABRICKS_CLUSTER_ID', 'Not available')
+cluster_id = os.getenv('DATABRICKS_CLUSTER_ID', 'Not available in serverless compute')
 print(f"Cluster ID: {cluster_id}")
 
 # Spark configuration
@@ -397,6 +397,10 @@ print(f"\nSpark Version: {spark.version}")
 # MAGIC | **Analytics** | Standard | Standard | 2-8 |
 
 # COMMAND ----------
+
+"""
+COMMENT: This cell should be replaced with theory, since 'not enabled' is not conveying anything meaningful here.
+"""
 
 # Analyze current cluster resource utilization
 print("=== Resource Utilization Analysis ===")
@@ -954,7 +958,7 @@ print("2. Implement auto-scaling and cost optimization strategies")
 print("3. Monitor performance and troubleshoot systematically")
 print("4. Use cluster policies for governance and compliance")
 print("5. Optimize data partitioning and memory usage")
-print("\nNext: Continue to 03_spark_on_databricks for distributed computing!")
+print("\nNext: Continue to 04_spark_on_databricks for distributed computing!")
 
 # COMMAND ----------
 
