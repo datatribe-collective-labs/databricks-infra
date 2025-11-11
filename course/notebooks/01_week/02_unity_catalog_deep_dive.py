@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Unity Catalog Deep Dive - Week 0x
+# MAGIC # Unity Catalog Deep Dive - Week 01
 # MAGIC
 # MAGIC Unity Catalog is Databricks' unified governance solution for data and AI assets. This notebook provides comprehensive coverage of Unity Catalog architecture, features, and best practices.
 # MAGIC

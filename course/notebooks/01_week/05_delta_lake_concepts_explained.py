@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Delta Lake Concepts Explained - Week 1
+# MAGIC # Delta Lake Concepts Explained - Week 01
 # MAGIC
 # MAGIC This notebook provides a practical, concept-focused exploration of Delta Lake fundamentals.
 # MAGIC Each section pairs a logical concept with hands-on examples to build solid understanding.
