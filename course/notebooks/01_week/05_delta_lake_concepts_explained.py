@@ -79,35 +79,29 @@ print("Sample customer data:")
 df_customers.show(truncate=False)
 
 # Write as Delta table
+
+import re
+
+# Re-defining the course schema for write access
+CATALOG = "databricks_course" 
+# Get logged in user's username
+USER_SCHEMA_RAW = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
+# Remove latter part of email address, and replace special characters with underscore to avoid SQL parsing errors
+USER_SCHEMA = re.sub(r'[^a-zA-Z0-9_]', '_', USER_SCHEMA_RAW.split('@')[0])
+# If schema didn't exist before, now it is being created
+VOLUME_NAME = "scratch"
+spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{USER_SCHEMA}.{VOLUME_NAME}")
+
+# The POSIX-style path for your Spark writes
+VOLUME_PATH = f"/Volumes/{CATALOG}/{USER_SCHEMA}/{VOLUME_NAME}/"
+print(f"Your Writable Volume Path is: {VOLUME_PATH}")
+
 try:
-    delta_path = "/tmp/delta_customers/customers"
-    df_customers.write.format("delta").mode("overwrite").save(delta_path)
-
-except Exception as e:
-    print(f"Writing to Delta table at {delta_path} not supported: {e}")
-
-    import re
-
-    # Re-defining the course schema for write access
-    CATALOG = "databricks_course" 
-    # Get logged in user's username
-    USER_SCHEMA_RAW = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
-    # Remove latter part of email address, and replace special characters with underscore to avoid SQL parsing errors
-    USER_SCHEMA = re.sub(r'[^a-zA-Z0-9_]', '_', USER_SCHEMA_RAW.split('@')[0])
-    # If schema didn't exist before, now it is being created
-    VOLUME_NAME = "scratch"
-    spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{USER_SCHEMA}.{VOLUME_NAME}")
-
-    # The POSIX-style path for your Spark writes
-    VOLUME_PATH = f"/Volumes/{CATALOG}/{USER_SCHEMA}/{VOLUME_NAME}/"
-    print(f"Your Writable Volume Path is: {VOLUME_PATH}")
-
     delta_path = f"{VOLUME_PATH}delta_customers/customers"
     df_customers.write.format("delta").mode("overwrite").save(delta_path)  
 
-    
-print(f"✅ Delta table created at: {delta_path}")
-print(f"✅ This creates both data files AND transaction log")
+except Exception as e:
+    print(f"Writing to Delta table at {delta_path} not supported: {e}")
 
 # COMMAND ----------
 
