@@ -49,6 +49,10 @@
 
 # COMMAND ----------
 
+%run "../utils/user_schema_setup.py"
+
+# COMMAND ----------
+
 
 # Let's create our first Delta table and examine its structure
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, TimestampType
