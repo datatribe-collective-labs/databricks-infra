@@ -296,5 +296,5 @@ print("   - Consider spot instances for cost optimization")
 
 # COMMAND ----------
 
-# Clean up resources
-print("Resources cleaned up. Ready for the next notebook!")
+# Move on to the next notebook
+print("Ready for the next notebook!")
