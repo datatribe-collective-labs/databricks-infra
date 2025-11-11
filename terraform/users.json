@@ -1,49 +1,24 @@
 {
   "users": [
     {
-      "user_name": "chanukya.pekala@gmail.com",
-      "display_name": "Chanukya Pekala",
+      "user_name": "admin@example.com",
+      "display_name": "Admin User",
       "groups": ["admins"]
     },
     {
-      "user_name": "komal.azram@gmail.com",
-      "display_name": "Komal Azram",
+      "user_name": "instructor@example.com",
+      "display_name": "Lead Instructor",
       "groups": ["admins"]
     },
     {
-      "user_name": "yangtuomailbox@gmail.com",
-      "display_name": "Yang Tuo",
+      "user_name": "student1@example.com",
+      "display_name": "Student One",
       "groups": ["students"]
     },
     {
-      "user_name": "joonas.f.koskinen@gmail.com",
-      "display_name": "Joonas Koskinen",
-      "groups": ["admins"]
-    },
-    {
-      "user_name": "rafaela.kschroeder@gmail.com",
-      "display_name": "Rafaela Kschroeder",
-      "groups": ["admins"]
-    },
-    {
-      "user_name": "amydn16@gmail.com",
-      "display_name": "Amy Ngo",
-      "groups": ["admins"]
-    },
-    {
-      "user_name": "oiivantsov@outlook.com",
-      "display_name": "Oleg Tsov",
-      "groups": ["admins"]
-    },
-    {
-      "user_name": "tishchuk167@gmail.com",
-      "display_name": "Grigori",
-      "groups": ["admins"]
-    },
-    {
-      "user_name": "eveliina.ves@gmail.com",
-      "display_name": "Eveliina Vesala",
-      "groups": ["admins"]
+      "user_name": "student2@example.com",
+      "display_name": "Student Two",
+      "groups": ["students"]
     }
   ]
 }
