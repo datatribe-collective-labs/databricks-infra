@@ -554,6 +554,9 @@ print("   All committed transactions survive system failures")
 # MAGIC ## 5. Practical Exercise: Complete ACID Workflow
 
 # COMMAND ----------
+%run "../utils/user_schema_setup.py"
+
+# COMMAND ----------
 
 print("=== Complete ACID Workflow Example ===")
 print("Scenario: E-commerce order processing system\n")
