@@ -389,6 +389,23 @@ try:
         print("DBFS root directory accessible")
     except Exception as e:
         print(f"DBFS access limited: {e}")
+
+    # The Free Edition of Databricks doesn't allow access on DBFS system with dbutils.fs.ls. Normally that is the correct method,\
+    # but we can print same information via Python os module as follows:
+    print("\nListing file systems using the 'os' module:")
+
+    # The DBFS root (/) is mounted at /dbfs/ on the driver node's local filesystem
+    dbfs_mount_path = "/dbfs/"
+
+    try:
+        # List the contents of the /dbfs/ directory
+        contents = os.listdir(dbfs_mount_path)
+        print(f"DBFS root directory accessible via {dbfs_mount_path}")
+        print(f"First 5 entries: {contents[:5]}")
+    except FileNotFoundError:
+        print(f"Error: Directory not found: {dbfs_mount_path}")
+    except Exception as e:
+        print(f"An error occurred while accessing {dbfs_mount_path}: {e}")
         
         import re
 
@@ -537,7 +554,7 @@ print("2. Three-level namespace: Catalog → Schema → Objects")
 print("3. Automatic lineage tracking and metadata management")
 print("4. Fine-grained access control and permissions")
 print("5. Integration with all Databricks services")
-print("\nNext: Continue to 02_cluster_management for compute optimization!")
+print("\nNext: Continue to 03_cluster_management for compute optimization!")
 
 # COMMAND ----------
 
