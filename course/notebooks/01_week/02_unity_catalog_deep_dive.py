@@ -418,13 +418,6 @@ except Exception as e:
 # Demonstrate saving data in different formats
 print("\nSaving data in various formats for volume storage:")
 
-VOLUME_NAME = "scratch"
-spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{USER_SCHEMA}.{VOLUME_NAME}")
-
-# The POSIX-style path for your Spark writes
-VOLUME_PATH = f"/Volumes/{CATALOG}/{USER_SCHEMA}/{VOLUME_NAME}/"
-print(f"Your Writable Volume Path is: {VOLUME_PATH}")
-
 # Save as Parquet (optimized for analytics)
 try:
     sales_df.write.mode("overwrite").parquet(f"{VOLUME_PATH}sales_data.parquet")
