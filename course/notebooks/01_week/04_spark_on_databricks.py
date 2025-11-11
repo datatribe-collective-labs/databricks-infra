@@ -693,7 +693,7 @@ print("3. Catalyst optimizer and AQE provide automatic query optimization")
 print("4. Proper partitioning and caching strategies improve performance")
 print("5. Built-in functions are preferred over UDFs for performance")
 print("6. Monitor and debug using partition analysis and execution plans")
-print("\nNext: Continue to 05_delta_lake_concepts_explained for schema management and CRUD operations with Delta Lake.")
+print("\nNext: Continue to 05_delta_lake_concepts_explained for schema management and ACID operations with Delta Lake.")
 
 # COMMAND ----------
 

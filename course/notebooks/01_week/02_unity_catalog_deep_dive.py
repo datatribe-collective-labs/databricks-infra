@@ -372,6 +372,10 @@ for description, query in discovery_queries:
 
 # COMMAND ----------
 
+%run "../utils/user_schema_setup.py"
+
+# COMMAND ----------
+
 # Demonstrate file operations and volume concepts
 print("=== File Operations and Volume Concepts ===")
 
@@ -407,27 +411,19 @@ try:
     except Exception as e:
         print(f"An error occurred while accessing {dbfs_mount_path}: {e}")
         
-        import re
-
-        # Re-defining the course schema for write access
-        CATALOG = "databricks_course" 
-        # Get logged in user's username
-        USER_SCHEMA_RAW = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
-        # Remove latter part of email address, and replace special characters with underscore to avoid SQL parsing errors
-        USER_SCHEMA = re.sub(r'[^a-zA-Z0-9_]', '_', USER_SCHEMA_RAW.split('@')[0])
-        # If schema didn't exist before, now it is being created
-        VOLUME_NAME = "scratch"
-        spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{USER_SCHEMA}.{VOLUME_NAME}")
-
-        # The POSIX-style path for your Spark writes
-        VOLUME_PATH = f"/Volumes/{CATALOG}/{USER_SCHEMA}/{VOLUME_NAME}/"
-        print(f"Your Writable Volume Path is: {VOLUME_PATH}")
         
 except Exception as e:
     print(f"File system exploration limited: {e}")
 
 # Demonstrate saving data in different formats
 print("\nSaving data in various formats for volume storage:")
+
+VOLUME_NAME = "scratch"
+spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{USER_SCHEMA}.{VOLUME_NAME}")
+
+# The POSIX-style path for your Spark writes
+VOLUME_PATH = f"/Volumes/{CATALOG}/{USER_SCHEMA}/{VOLUME_NAME}/"
+print(f"Your Writable Volume Path is: {VOLUME_PATH}")
 
 # Save as Parquet (optimized for analytics)
 try:
