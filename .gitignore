@@ -8,6 +8,9 @@ terraform.tfstate.backup
 tfplan
 .idea
 *.backup
+
+# Local user data (contains real email addresses - not committed)
+terraform/users.local.json
 htmlcov
 node_modules
 coverage.xml
@@ -17,3 +20,16 @@ coverage.xml
 # VS Code and MCP configuration (may contain local paths)
 .vscode/settings.json
 .vscode/mcp.json
+
+# MkDocs (removed - using custom web UI now)
+site/
+.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+dist/
+build/
+*.egg-info/

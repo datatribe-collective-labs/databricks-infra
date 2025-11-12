@@ -1,6 +1,8 @@
 locals {
   # Users configuration
-  users_raw = jsondecode(file("${path.module}/users.json"))
+  # Use users.local.json if it exists (for real deployments), otherwise use users.json (example data)
+  users_file = fileexists("${path.module}/users.local.json") ? "${path.module}/users.local.json" : "${path.module}/users.json"
+  users_raw = jsondecode(file(local.users_file))
   users_config = {
     for user in local.users_raw.users : user.user_name => {
       user_name      = user.user_name

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Guide - DataTribe Learning Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo-section">
+                <img src="../docs/assets/DataTribe_logo.png" alt="DataTribe Logo" class="datatribe-logo">
+                <span class="logo-text">DataTribe Collective</span>
+                <img src="../docs/assets/databricks-logo.png" alt="Databricks" class="databricks-logo">
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="curriculum.html">Curriculum</a></li>
+                <li><a href="data-engineer.html">For Data Engineers</a></li>
+                <li><a href="platform-engineer.html" class="active">For Data Platform Engineers</a></li>
+            </ul>
+            <div class="nav-icons">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Day/Night Mode">
+                    <span id="themeIcon">☀️</span>
+                </button>
+                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="page-hero">
+        <h1>⚙️ Admin Guide</h1>
+        <p>Deploy complete Databricks infrastructure in 15 minutes</p>
+    </section>
+
+    <!-- Content -->
+    <div class="content-container">
+        <!-- What You'll Deploy -->
+        <section class="content-section">
+            <h2>🎯 What You'll Accomplish</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 2rem;">Set up a complete Databricks learning environment where students get instant access to course content, new content automatically deploys, and everything is reproducible.</p>
+
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon">👥</div>
+                    <p><strong>8 Users</strong><br>Role-based permissions configured automatically</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">🗄️</div>
+                    <p><strong>5 Catalogs</strong><br>Complete Unity Catalog structure</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">📚</div>
+                    <p><strong>24 Schemas</strong><br>Medallion architecture (bronze, silver, gold)</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">📓</div>
+                    <p><strong>19 Notebooks</strong><br>Deployed to shared workspace</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Start -->
+        <section class="content-section">
+            <h2>🚀 Quick Start (15 minutes)</h2>
+
+            <div class="deployment-steps">
+                <div class="deployment-step">
+                    <h3><span class="step-badge">Step 1</span> Get the Infrastructure Code</h3>
+                    <div class="command-box">
+<span class="comment"># Clone the repository</span>
+git clone https://github.com/chanukyapekala/databricks-infra
+cd databricks-infra
+
+<span class="comment"># Install Python dependencies</span>
+poetry install
+                    </div>
+                </div>
+
+                <div class="deployment-step">
+                    <h3><span class="step-badge">Step 2</span> Configure Authentication</h3>
+                    <p><strong>Generate Personal Access Token (PAT):</strong></p>
+                    <ol>
+                        <li>Log into your Databricks workspace as admin</li>
+                        <li>Navigate to: Settings → Developer → Access Tokens</li>
+                        <li>Click "Generate New Token" (90 days recommended)</li>
+                        <li>Copy and save the token securely</li>
+                    </ol>
+
+                    <p style="margin-top: 1rem;"><strong>Configure Databricks CLI:</strong></p>
+                    <div class="command-box">
+<span class="comment"># Interactive setup</span>
+databricks configure --token --profile datatribe
+
+<span class="comment"># Enter your workspace URL and PAT when prompted</span>
+                    </div>
+                </div>
+
+                <div class="deployment-step">
+                    <h3><span class="step-badge">Step 3</span> Customize for Your Organization</h3>
+                    <p>Edit <code>terraform/users.json</code> with your team:</p>
+                    <div class="command-box">
+{
+  "users": [
+    {
+      "user_name": "instructor@yourcompany.com",
+      "display_name": "Lead Instructor",
+      "groups": ["admins"]
+    },
+    {
+      "user_name": "student@yourcompany.com",
+      "display_name": "Student Name",
+      "groups": ["students"]
+    }
+  ]
+}
+                    </div>
+                </div>
+
+                <div class="deployment-step">
+                    <h3><span class="step-badge">Step 4</span> Create Catalogs</h3>
+                    <p>In Databricks UI, create these catalogs (use default storage):</p>
+                    <ul>
+                        <li><code>sales_dev</code></li>
+                        <li><code>sales_prod</code></li>
+                        <li><code>marketing_dev</code></li>
+                        <li><code>marketing_prod</code></li>
+                    </ul>
+            <div class="nav-icons">
+                <a href="index.html" class="nav-icon-link" title="Home">
+                    🏠
+                </a>
+                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+                </div>
+
+                <div class="deployment-step">
+                    <h3><span class="step-badge">Step 5</span> Deploy Infrastructure</h3>
+                    <div class="command-box">
+cd terraform
+
+<span class="comment"># Initialize Terraform</span>
+terraform init
+
+<span class="comment"># Import the manually created catalogs</span>
+terraform import 'databricks_catalog.custom_catalogs["sales_dev"]' sales_dev
+terraform import 'databricks_catalog.custom_catalogs["sales_prod"]' sales_prod
+terraform import 'databricks_catalog.custom_catalogs["marketing_dev"]' marketing_dev
+terraform import 'databricks_catalog.custom_catalogs["marketing_prod"]' marketing_prod
+
+<span class="comment"># Review what will be created</span>
+terraform plan
+
+<span class="comment"># Deploy everything</span>
+terraform apply
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What Gets Created -->
+        <section class="content-section">
+            <h2>✅ What Gets Created</h2>
+            <div class="learning-paths">
+                <div class="path-box">
+                    <h3>👥 Users & Groups</h3>
+                    <ul>
+                        <li>User accounts for all students</li>
+                        <li>Groups with appropriate permissions</li>
+                        <li>RBAC configured automatically</li>
+                    </ul>
+            <div class="nav-icons">
+                <a href="index.html" class="nav-icon-link" title="Home">
+                    🏠
+                </a>
+                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+                </div>
+
+                <div class="path-box">
+                    <h3>🗄️ Catalogs & Schemas</h3>
+                    <ul>
+                        <li>Reference catalogs (sales, marketing)</li>
+                        <li>Course catalog for student work</li>
+                        <li>Medallion architecture schemas</li>
+                    </ul>
+            <div class="nav-icons">
+                <a href="index.html" class="nav-icon-link" title="Home">
+                    🏠
+                </a>
+                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+                </div>
+
+                <div class="path-box">
+                    <h3>📚 Course Content</h3>
+                    <ul>
+                        <li>19 notebooks deployed</li>
+                        <li>Sample datasets in shared location</li>
+                        <li>Utility notebooks for user isolation</li>
+                    </ul>
+            <div class="nav-icons">
+                <a href="index.html" class="nav-icon-link" title="Home">
+                    🏠
+                </a>
+                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+                </div>
+
+                <div class="path-box">
+                    <h3>🔒 Permissions</h3>
+                    <ul>
+                        <li>User-specific data isolation</li>
+                        <li>Read-only access to shared catalogs</li>
+                        <li>Write access to personal schemas</li>
+                    </ul>
+            <div class="nav-icons">
+                <a href="index.html" class="nav-icon-link" title="Home">
+                    🏠
+                </a>
+                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Managing Users -->
+        <section class="content-section">
+            <h2>👥 Managing Users</h2>
+
+            <div class="deployment-step">
+                <h3>Adding New Students</h3>
+                <p>Add entry to <code>terraform/users.json</code>:</p>
+                <div class="command-box">
+{
+  "user_name": "newstudent@yourcompany.com",
+  "display_name": "New Student",
+  "groups": ["students"]
+}
+                </div>
+                <p style="margin-top: 1rem;">Then run:</p>
+                <div class="command-box">
+cd terraform
+terraform apply
+                </div>
+                <p style="margin-top: 1rem;"><strong>What Happens Automatically:</strong></p>
+                <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                    <li>User account created in Databricks</li>
+                    <li>Added to workspace group (platform_students)</li>
+                    <li>Personal schema created: <code>databricks_course.newstudent</code></li>
+                    <li>Permissions configured based on group membership</li>
+                    <li>Data isolation: all table writes go to isolated schema</li>
+                </ul>
+            <div class="nav-icons">
+                <a href="index.html" class="nav-icon-link" title="Home">
+                    🏠
+                </a>
+                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+            </div>
+
+            <div class="deployment-step" style="margin-top: 1.5rem;">
+                <h3>Removing Users</h3>
+                <p><strong>⚠️ Warning:</strong> User account, personal schema, and ALL data will be permanently deleted.</p>
+                <p style="margin-top: 1rem;">To preserve data before removal:</p>
+                <div class="command-box">
+<span class="comment"># Transfer schema ownership first</span>
+ALTER SCHEMA databricks_course.student_name
+OWNER TO `admin@yourcompany.com`;
+                </div>
+                <p style="margin-top: 1rem;">Then remove user from <code>terraform/users.json</code> and apply.</p>
+            </div>
+        </section>
+
+        <!-- Ongoing Updates -->
+        <section class="content-section">
+            <h2>🔄 Getting Course Updates</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 2rem;">When new course content is released, updating is automatic:</p>
+
+            <div class="command-box">
+<span class="comment"># 1. Pull latest changes</span>
+git pull origin main
+
+<span class="comment"># 2. Review what's new (optional)</span>
+git log --oneline --since="1 week ago" course/notebooks/
+
+<span class="comment"># 3. Deploy updates to student workspace</span>
+cd terraform
+terraform plan    <span class="comment"># Review new content</span>
+terraform apply   <span class="comment"># Deploy to students</span>
+
+<span class="comment"># Users automatically see new notebooks in shared workspace!</span>
+            </div>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section class="content-section">
+            <h2>🚨 Common Issues</h2>
+
+            <div class="deployment-steps">
+                <div class="deployment-step">
+                    <h3>"Only accessible by admins" Error</h3>
+                    <p><strong>Root Cause:</strong> PAT lacks workspace admin privileges</p>
+                    <p><strong>Solution:</strong></p>
+                    <ol>
+                        <li>Verify you're in admins group in Databricks UI</li>
+                        <li>Regenerate PAT after confirming admin access</li>
+                        <li>Update <code>~/.databrickscfg</code> with new token</li>
+                        <li>Retry Terraform</li>
+                    </ol>
+                </div>
+
+                <div class="deployment-step">
+                    <h3>Catalog Creation Errors</h3>
+                    <p><strong>Solution:</strong> Create catalogs manually in UI first, then import to Terraform</p>
+                    <div class="command-box">
+terraform import 'databricks_catalog.custom_catalogs["catalog_name"]' catalog_name
+                    </div>
+                </div>
+
+                <div class="deployment-step">
+                    <h3>Students Can't Access Notebooks</h3>
+                    <div class="command-box">
+<span class="comment"># Check permissions</span>
+databricks workspace get-status /Shared/terraform-managed/course/notebooks
+
+<span class="comment"># Verify user exists</span>
+databricks users list | grep student@company.com
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <h2>Ready to Deploy?</h2>
+            <p>View the complete technical documentation for advanced configuration</p>
+            <a href="CLAUDE.md" class="cta-button-large">View Technical Docs →</a>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p><strong>DataTribe Collective Labs</strong></p>
+        <p style="margin-top: 0.5rem;">Databricks Infrastructure as Code | 2024-2025</p>
+        <p style="margin-top: 1rem;"><a href="DataPlatformEngineer-readme.md">Complete Setup Guide</a></p>
+    </footer>
+
+    <script>
+        // Change header background on scroll
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 10) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Theme Toggle (Day/Night Mode)
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+
+            body.classList.toggle('light-mode');
+
+            if (body.classList.contains('light-mode')) {
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Load saved theme on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                themeIcon.textContent = '🌙';
+            }
+        });
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
