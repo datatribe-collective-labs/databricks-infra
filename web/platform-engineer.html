@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Guide - DataTribe Learning Platform</title>
+    <title>Data Platform Engineer Guide - DataTribe Learning Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -26,6 +26,11 @@
                 <li><a href="platform-engineer.html" class="active">For Data Platform Engineers</a></li>
             </ul>
             <div class="nav-icons">
+                <a href="index.html" class="nav-icon-link" title="Home">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.1L1 12h3v9h6v-6h4v6h6v-9h3L12 2.1zm0 2.691l6 5.4V19h-2v-6H8v6H6v-8.809l6-5.4z"/>
+                    </svg>
+                </a>
                 <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Day/Night Mode">
                     <span id="themeIcon">☀️</span>
                 </button>
@@ -40,7 +45,7 @@
 
     <!-- Hero -->
     <section class="page-hero">
-        <h1>⚙️ Admin Guide</h1>
+        <h1>⚙️ Data Platform Engineer Guide</h1>
         <p>Deploy complete Databricks infrastructure in 15 minutes</p>
     </section>
 
@@ -370,7 +375,7 @@ databricks users list | grep student@company.com
         <section class="cta-section">
             <h2>Ready to Deploy?</h2>
             <p>View the complete technical documentation for advanced configuration</p>
-            <a href="CLAUDE.md" class="cta-button-large">View Technical Docs →</a>
+            <a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/CLAUDE.md" class="cta-button-large" target="_blank">View Technical Docs →</a>
         </section>
     </div>
 
@@ -378,7 +383,7 @@ databricks users list | grep student@company.com
     <footer>
         <p><strong>DataTribe Collective Labs</strong></p>
         <p style="margin-top: 0.5rem;">Databricks Infrastructure as Code | 2024-2025</p>
-        <p style="margin-top: 1rem;"><a href="DataPlatformEngineer-readme.md">Complete Setup Guide</a></p>
+        <p style="margin-top: 1rem;"><a href="../docs/DataPlatformEngineer-readme.md" target="_blank">Complete Setup Guide</a></p>
     </footer>
 
     <script>
