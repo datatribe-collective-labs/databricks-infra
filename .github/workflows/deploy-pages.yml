@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feat/web-ui
+      - fix/webui-bug
   workflow_dispatch:
 
 permissions:
