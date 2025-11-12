@@ -11,12 +11,16 @@ A complete Databricks learning platform combining:
 
 ## 🌐 Get Started
 
-**👉 Visit the Web UI: [Open index.html](./web/index.html)**
+**👉 Visit the Web UI:**
+- **🌍 Live Site**: [https://datatribe-collective-labs.github.io/databricks-infra](https://datatribe-collective-labs.github.io/databricks-infra) (GitHub Pages)
+- **📁 Local**: [Open index.html](./web/index.html)
 
 The web UI provides:
 - **Student Guide** - Get workspace access and start learning in 3 steps
 - **Admin Guide** - Deploy complete infrastructure in 15 minutes
-- **Course Curriculum** - Browse all 19 notebooks organized by week
+- **Course Curriculum** - Browse all 21 notebooks organized by week
+- **🌙 Day/Night Mode** - Toggle theme for comfortable viewing
+- **📱 Mobile-Friendly** - Responsive design with hamburger menu
 
 ---
 
