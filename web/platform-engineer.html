@@ -33,7 +33,7 @@
                 <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Day/Night Mode">
                     <span id="themeIcon">☀️</span>
                 </button>
-                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
+                <a href="https://github.com/datatribe-collective-labs/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
                     <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                     </svg>
@@ -70,7 +70,7 @@
                 </div>
                 <div class="tip-card">
                     <div class="tip-icon">📓</div>
-                    <p><strong>21 Notebooks</strong><br>Deployed to shared workspace</p>
+                    <p><strong>19 Notebooks</strong><br>Deployed to shared workspace</p>
                 </div>
             </div>
         </section>
@@ -84,11 +84,8 @@
                     <h3><span class="step-badge">Step 1</span> Get the Infrastructure Code</h3>
                     <div class="command-box">
 <span class="comment"># Clone the repository</span>
-git clone https://github.com/chanukyapekala/databricks-infra
-cd databricks-infra
-
-<span class="comment"># Install Python dependencies</span>
-poetry install
+git clone https://github.com/datatribe-collective-labs/databricks-infra
+&& cd databricks-infra
                     </div>
                 </div>
 
@@ -105,7 +102,7 @@ poetry install
                     <p style="margin-top: 1rem;"><strong>Configure Databricks CLI:</strong></p>
                     <div class="command-box">
 <span class="comment"># Interactive setup</span>
-databricks configure --token --profile datatribe
+databricks configure --token --profile &lt;profile_name&gt;
 
 <span class="comment"># Enter your workspace URL and PAT when prompted</span>
                     </div>
@@ -141,16 +138,6 @@ databricks configure --token --profile datatribe
                         <li><code>marketing_dev</code></li>
                         <li><code>marketing_prod</code></li>
                     </ul>
-            <div class="nav-icons">
-                <a href="index.html" class="nav-icon-link" title="Home">
-                    🏠
-                </a>
-                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
-                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                </a>
-            </div>
                 </div>
 
                 <div class="deployment-step">
@@ -163,9 +150,6 @@ terraform init
 
 <span class="comment"># Import the manually created catalogs</span>
 terraform import 'databricks_catalog.custom_catalogs["sales_dev"]' sales_dev
-terraform import 'databricks_catalog.custom_catalogs["sales_prod"]' sales_prod
-terraform import 'databricks_catalog.custom_catalogs["marketing_dev"]' marketing_dev
-terraform import 'databricks_catalog.custom_catalogs["marketing_prod"]' marketing_prod
 
 <span class="comment"># Review what will be created</span>
 terraform plan
@@ -188,16 +172,6 @@ terraform apply
                         <li>Groups with appropriate permissions</li>
                         <li>RBAC configured automatically</li>
                     </ul>
-            <div class="nav-icons">
-                <a href="index.html" class="nav-icon-link" title="Home">
-                    🏠
-                </a>
-                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
-                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                </a>
-            </div>
                 </div>
 
                 <div class="path-box">
@@ -207,16 +181,6 @@ terraform apply
                         <li>Course catalog for student work</li>
                         <li>Medallion architecture schemas</li>
                     </ul>
-            <div class="nav-icons">
-                <a href="index.html" class="nav-icon-link" title="Home">
-                    🏠
-                </a>
-                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
-                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                </a>
-            </div>
                 </div>
 
                 <div class="path-box">
@@ -226,16 +190,6 @@ terraform apply
                         <li>Sample datasets in shared location</li>
                         <li>Utility notebooks for user isolation</li>
                     </ul>
-            <div class="nav-icons">
-                <a href="index.html" class="nav-icon-link" title="Home">
-                    🏠
-                </a>
-                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
-                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                </a>
-            </div>
                 </div>
 
                 <div class="path-box">
@@ -245,16 +199,6 @@ terraform apply
                         <li>Read-only access to shared catalogs</li>
                         <li>Write access to personal schemas</li>
                     </ul>
-            <div class="nav-icons">
-                <a href="index.html" class="nav-icon-link" title="Home">
-                    🏠
-                </a>
-                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
-                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                </a>
-            </div>
                 </div>
             </div>
         </section>
@@ -286,16 +230,6 @@ terraform apply
                     <li>Permissions configured based on group membership</li>
                     <li>Data isolation: all table writes go to isolated schema</li>
                 </ul>
-            <div class="nav-icons">
-                <a href="index.html" class="nav-icon-link" title="Home">
-                    🏠
-                </a>
-                <a href="https://github.com/chanukyapekala/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
-                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                </a>
-            </div>
             </div>
 
             <div class="deployment-step" style="margin-top: 1.5rem;">
@@ -381,8 +315,7 @@ databricks users list | grep student@company.com
     <!-- Footer -->
     <footer>
         <p><strong>DataTribe Collective Labs</strong></p>
-        <p style="margin-top: 0.5rem;">Databricks Infrastructure as Code | 2024-2025</p>
-        <p style="margin-top: 1rem;"><a href="../docs/DataPlatformEngineer-readme.md" target="_blank">Complete Setup Guide</a></p>
+        <p style="margin-top: 0.5rem;">Databricks Infrastructure as Code | 2025</p>
     </footer>
 
     <script>
