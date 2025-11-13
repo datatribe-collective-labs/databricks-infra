@@ -225,5 +225,5 @@ print(f" Written to: {customers_table}")
 # MAGIC ## Summary
 # MAGIC
 # MAGIC ### Tables Created
-# MAGIC - `bronze.api_products`
-# MAGIC - `bronze.api_customers`
+# MAGIC - `bronze_api_products`
+# MAGIC - `bronze_api_customers`

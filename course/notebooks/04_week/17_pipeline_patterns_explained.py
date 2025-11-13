@@ -151,6 +151,10 @@ df_silver.show(truncate=False)
 
 # COMMAND ----------
 
+from pyspark.sql.functions import (
+    col, to_date, count, sum as _sum, avg
+)
+
 print("=== GOLD LAYER: Business Aggregations ===\n")
 
 # Read from Silver
@@ -180,7 +184,7 @@ df_gold_daily_summary.show(truncate=False)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import lit, to_date
+from pyspark.sql.functions import lit
 
 print("=== Medallion Flow Summary ===\n")
 
@@ -790,8 +794,8 @@ print("  - Automatic recovery on job restart")
 
 # COMMAND ----------
 
-# Clean up
-print("=== Cleanup Complete ===")
+# Final
+print("=== Tables Created ===")
 print(f"\nExample tables created in {CATALOG}.{USER_SCHEMA}:")
 print("  - bronze_medallion_orders (Medallion Bronze layer)")
 print("  - silver_medallion_orders (Medallion Silver layer)")
