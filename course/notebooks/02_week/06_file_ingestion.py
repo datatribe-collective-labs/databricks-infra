@@ -398,13 +398,13 @@ print(f"✅ Written to: {marketing_table}")
 # MAGIC `databricks_course.<your_schema_name>.<table_name>`.
 # MAGIC
 # MAGIC **Bronze Layer Tables Created:**
-# MAGIC - `bronze_sales_transactions` (from CSV)
-# MAGIC - `bronze_customer_events` (from JSON)
-# MAGIC - `bronze_product_inventory` (from Parquet, partitioned)
+# MAGIC - `bronze_sales_transactions` (CSV ingestion)
+# MAGIC - `bronze_customer_events` (JSON ingestion)
+# MAGIC - `bronze_product_inventory` (Parquet with partitioning)
 # MAGIC - `bronze_sales_validated` (quality-checked data)
 # MAGIC - `bronze_sales_quarantine` (rejected records)
-# MAGIC - `bronze_sales_incremental` (for incremental loads)
-# MAGIC - `bronze_campaigns` (from marketing)
+# MAGIC - `bronze_sales_incremental` (incremental loads)
+# MAGIC - `bronze_campaigns` (marketing data)
 # MAGIC
 # MAGIC ### Next Steps
 # MAGIC
