@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Spark on Databricks Deep Dive - Week 0x
+# MAGIC # Spark on Databricks Deep Dive - Week 1
 # MAGIC 
 # MAGIC This notebook provides comprehensive coverage of Apache Spark fundamentals within the Databricks environment, including distributed computing concepts, Spark APIs, optimization techniques, and best practices.
 # MAGIC 
@@ -55,8 +55,17 @@
 
 print("=== Spark Environment Analysis ===")
 
-# Get SparkContext and SparkSession information
+# Get SparkSession information
 print(f"Spark Version: {spark.version}")
+print(f"SparkSession: {spark}")
+
+
+# Accessing Spark JVM driver with SparkContext is not possible with serverless compute, 
+# but only with Databricks Runtime on a cluster.
+
+# print(f"SparkContext App Name: {spark.sparkContext.appName}")
+# print(f"SparkContext Master: {spark.sparkContext.master}")
+# print(f"SparkContext: {spark.sparkContext}")
 
 # COMMAND ----------
 
@@ -403,6 +412,14 @@ def categorize_amount(amount):
 categorize_udf = udf(categorize_amount, StringType())
 
 # 2. Pandas UDF (vectorized - better performance)
+
+# Key features:
+#  - Pandas UDF is vectorized: Instead of processing one row at a time, it processes
+#    a batch of rows as a pandas.Series (or pandas.DataFrame for multiple cols).
+#  - Use of Apache Arrow: Arrow is the high-speed, in-memory columnar data 
+#    format used to move that pandas.Series between Spark (JVM) and this 
+#    Python function without expensive serialization/deserialization.
+
 import pandas as pd
 from pyspark.sql.functions import pandas_udf
 
@@ -676,7 +693,7 @@ print("3. Catalyst optimizer and AQE provide automatic query optimization")
 print("4. Proper partitioning and caching strategies improve performance")
 print("5. Built-in functions are preferred over UDFs for performance")
 print("6. Monitor and debug using partition analysis and execution plans")
-print("\nNext: Continue to 04_data_lakehouse_patterns for architecture patterns!")
+print("\nNext: Continue to 05_delta_lake_concepts_explained for schema management and ACID operations with Delta Lake.")
 
 # COMMAND ----------
 

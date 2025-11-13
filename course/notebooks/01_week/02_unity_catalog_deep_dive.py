@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Unity Catalog Deep Dive - Week 0x
+# MAGIC # Unity Catalog Deep Dive - Week 1
 # MAGIC
 # MAGIC Unity Catalog is Databricks' unified governance solution for data and AI assets. This notebook provides comprehensive coverage of Unity Catalog architecture, features, and best practices.
 # MAGIC
@@ -372,6 +372,10 @@ for description, query in discovery_queries:
 
 # COMMAND ----------
 
+%run ../utils/user_schema_setup.py
+
+# COMMAND ----------
+
 # Demonstrate file operations and volume concepts
 print("=== File Operations and Volume Concepts ===")
 
@@ -389,22 +393,24 @@ try:
         print("DBFS root directory accessible")
     except Exception as e:
         print(f"DBFS access limited: {e}")
+
+    # The Free Edition of Databricks doesn't allow access on DBFS system with dbutils.fs.ls. Normally that is the correct method,\
+    # but we can print same information via Python os module as follows:
+    print("\nListing file systems using the 'os' module:")
+
+    # The DBFS root (/) is mounted at /dbfs/ on the driver node's local filesystem
+    dbfs_mount_path = "/dbfs/"
+
+    try:
+        # List the contents of the /dbfs/ directory
+        contents = os.listdir(dbfs_mount_path)
+        print(f"DBFS root directory accessible via {dbfs_mount_path}")
+        print(f"First 5 entries: {contents[:5]}")
+    except FileNotFoundError:
+        print(f"Error: Directory not found: {dbfs_mount_path}")
+    except Exception as e:
+        print(f"An error occurred while accessing {dbfs_mount_path}: {e}")
         
-        import re
-
-        # Re-defining the course schema for write access
-        CATALOG = "databricks_course" 
-        # Get logged in user's username
-        USER_SCHEMA_RAW = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
-        # Remove latter part of email address, and replace special characters with underscore to avoid SQL parsing errors
-        USER_SCHEMA = re.sub(r'[^a-zA-Z0-9_]', '_', USER_SCHEMA_RAW.split('@')[0])
-        # If schema didn't exist before, now it is being created
-        VOLUME_NAME = "scratch"
-        spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{USER_SCHEMA}.{VOLUME_NAME}")
-
-        # The POSIX-style path for your Spark writes
-        VOLUME_PATH = f"/Volumes/{CATALOG}/{USER_SCHEMA}/{VOLUME_NAME}/"
-        print(f"Your Writable Volume Path is: {VOLUME_PATH}")
         
 except Exception as e:
     print(f"File system exploration limited: {e}")
@@ -537,7 +543,7 @@ print("2. Three-level namespace: Catalog → Schema → Objects")
 print("3. Automatic lineage tracking and metadata management")
 print("4. Fine-grained access control and permissions")
 print("5. Integration with all Databricks services")
-print("\nNext: Continue to 02_cluster_management for compute optimization!")
+print("\nNext: Continue to 03_cluster_management for compute optimization!")
 
 # COMMAND ----------
 

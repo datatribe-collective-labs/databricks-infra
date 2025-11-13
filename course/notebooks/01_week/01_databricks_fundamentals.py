@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Databricks Fundamentals - Week 01
+# MAGIC # Databricks Fundamentals - Week 1
 # MAGIC 
 # MAGIC Welcome to the comprehensive Databricks fundamentals course! This notebook series provides in-depth coverage of Databricks concepts, architecture, and practical usage patterns.
 # MAGIC 
@@ -296,5 +296,5 @@ print("   - Consider spot instances for cost optimization")
 
 # COMMAND ----------
 
-# Clean up resources
-print("Resources cleaned up. Ready for the next notebook!")
+# Move on to the next notebook
+print("Ready for the next notebook!")
