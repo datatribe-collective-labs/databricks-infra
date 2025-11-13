@@ -57,12 +57,12 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/user_schema_setup
+# MAGIC %run ../utils/user_schema_setup.py
 
 # COMMAND ----------
 
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, TimestampType, BooleanType
-from pyspark.sql.functions import col, current_timestamp, to_timestamp, regexp_replace, trim, upper, sum as _sum, avg, count, when, lit
+from pyspark.sql.functions import col, current_timestamp, to_timestamp, regexp_replace, trim, upper, sum as _sum, avg, count, when, lit, try_cast
 from datetime import datetime
 
 print("=== Medallion Architecture Implementation ===\n")
@@ -121,17 +121,22 @@ silver_schema = StructType([
 df_from_bronze = spark.table(bronze_table)
 
 # Apply cleaning transformations
-df_silver = df_from_bronze \
-    .withColumn("order_id", col("order_id").cast("int")) \
-    .withColumn("customer_email", trim(upper(col("customer_email")))) \
-    .withColumn("amount", col("amount").cast("double")) \
-    .withColumn("order_date", to_timestamp(col("order_date"))) \
+df_silver = (
+    df_from_bronze
+    .withColumn("order_id", col("order_id").cast("int")) 
+    .withColumn("customer_email", trim(upper(col("customer_email"))))  
+    # Replace non-numeric characters before casting 
+    .withColumn("amount", 
+        when(col("amount").rlike("^[0-9]*\\.?[0-9]+$"), col("amount").cast("double"))
+        .otherwise(None)
+    ) \
+    .withColumn("order_date", to_timestamp(col("order_date"))) 
     .withColumn("is_valid",
         when(col("amount").isNull() | (col("amount") <= 0), False)
         .otherwise(True)
     ) \
-    .dropDuplicates(["order_id"]) \
-    .select("order_id", "customer_email", "product", "amount", "order_date", "status", "ingestion_timestamp", "is_valid")
+    .dropDuplicates(["order_id"]) 
+    .select("order_id", "customer_email", "product", "amount", "order_date", "status", "ingestion_timestamp", "is_valid"))
 
 silver_table = get_table_path("silver", "medallion_orders")
 df_silver.write.format("delta").mode("overwrite").saveAsTable(silver_table)
