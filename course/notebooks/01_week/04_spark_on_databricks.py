@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Spark on Databricks Deep Dive - Week 01
+# MAGIC # Spark on Databricks Deep Dive - Week 1
 # MAGIC 
 # MAGIC This notebook provides comprehensive coverage of Apache Spark fundamentals within the Databricks environment, including distributed computing concepts, Spark APIs, optimization techniques, and best practices.
 # MAGIC 

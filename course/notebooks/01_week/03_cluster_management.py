@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Cluster Management and Optimization - Week 01
+# MAGIC # Cluster Management and Optimization - Week 1
 # MAGIC 
 # MAGIC This notebook provides comprehensive coverage of Databricks cluster management, including cluster types, optimization strategies, cost management, and performance tuning.
 # MAGIC 
