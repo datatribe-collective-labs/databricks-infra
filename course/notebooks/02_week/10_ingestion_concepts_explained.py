@@ -53,7 +53,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/user_schema_setup
+# MAGIC %run ../utils/user_schema_setup.py
 
 # COMMAND ----------
 
@@ -178,7 +178,26 @@ df_json_strings.write.format("delta").mode("overwrite").saveAsTable(temp_infer_t
 
 # Read with schema inference
 print("Reading with schema inference:")
-df_inferred = spark.read.json(spark.table(temp_infer_table).rdd.map(lambda row: row.value))
+# Serverless compute restricts RDD operations on PySpark..
+# df_inferred = spark.read.json(spark.table(temp_infer_table).rdd.map(lambda row: row.value))
+# .. but similar operation can be defined as a DataFrame operation
+
+# Define schema for JSON
+json_schema = StructType([
+    StructField("user_id", StringType()),
+    StructField("age", StringType()),
+    StructField("score", StringType()),
+    StructField("active", StringType())
+])
+
+# Read Delta table
+df_json_strings = spark.table(temp_infer_table)
+
+# Parse JSON strings using from_json
+df_inferred = df_json_strings.withColumn(
+    "parsed",
+    from_json(col("value"), json_schema)
+).select("parsed.*")
 
 print("\nInferred schema:")
 df_inferred.printSchema()
@@ -232,7 +251,12 @@ df_json_clean = spark.createDataFrame([Row(value=js) for js in json_strings_clea
 temp_clean_table = get_table_path("bronze", "temp_schema_clean_data")
 df_json_clean.write.format("delta").mode("overwrite").saveAsTable(temp_clean_table)
 
-df_explicit = spark.read.schema(user_schema).json(spark.table(temp_clean_table).rdd.map(lambda row: row.value))
+# df_explicit = spark.read.schema(user_schema).json(spark.table(temp_clean_table).rdd.map(lambda row: row.value))
+
+# Read clean data with explicit schema
+df_json_clean_read = spark.table(temp_clean_table).select("value")
+df_explicit_clean = spark.read.schema(user_schema).json(df_json_clean_read)
+
 print("\nWith clean data and explicit schema:")
 df_explicit.printSchema()
 df_explicit.show()
@@ -289,10 +313,18 @@ order_schema = StructType([
 ])
 
 # PERMISSIVE mode (default): null out bad values
+"""
 df_permissive = spark.read \
     .schema(order_schema) \
     .option("mode", "PERMISSIVE") \
     .json(spark.table(temp_mixed_table).rdd.map(lambda row: row.value))
+"""
+# Read Delta table and parse JSON using from_json
+df_json = spark.table(temp_mixed_table)
+df_permissive = df_json.withColumn(
+    "parsed",
+    from_json(col("value"), order_schema)
+).select("parsed.*")
 
 print("PERMISSIVE mode result:")
 df_permissive.show()
@@ -307,10 +339,23 @@ print("  - Silent data quality issues possible")
 print("=== Error Handling Pattern 2: DROPMALFORMED Mode ===\n")
 
 # DROPMALFORMED: Skip bad records entirely
+"""
 df_dropmalformed = spark.read \
     .schema(order_schema) \
     .option("mode", "DROPMALFORMED") \
     .json(spark.table(temp_mixed_table).rdd.map(lambda row: row.value))
+"""
+
+# To use DROPMALFORMED mode with the DataFrame API, we can write the parsed JSON strings to a file
+# and then read it back. This is a workaround for environments where RDDs are restricted.
+# DROPMALFORMED: Skip bad records entirely using from_json
+temp_json_path = f"{VOLUME_PATH}temp_json_for_dropmalformed"
+spark.table(temp_mixed_table).select("value").write.format("text").mode("overwrite").save(temp_json_path)
+
+df_dropmalformed = spark.table(temp_mixed_table) \
+    .select(from_json(col("value"), order_schema).alias("parsed_json")) \
+    .select("parsed_json.*") \
+    .na.drop()
 
 print("DROPMALFORMED mode result:")
 df_dropmalformed.show()
@@ -325,10 +370,22 @@ print("  - Data loss possible (track separately)")
 print("=== Error Handling Pattern 3: Rescue Column (Recommended) ===\n")
 
 # Use _rescued_data column to capture malformed records
+"""
 df_rescue = spark.read \
     .option("mode", "PERMISSIVE") \
     .option("columnNameOfCorruptRecord", "_rescued_data") \
     .json(spark.table(temp_mixed_table).rdd.map(lambda row: row.value))
+"""
+
+# Parse JSON and capture malformed records in a rescue column
+df = spark.table(temp_mixed_table)
+df_rescue = df.withColumn(
+    "parsed",
+    from_json(col("value"), order_schema)
+).withColumn(
+    "_rescued_data",
+    col("value")
+).where(col("parsed").isNotNull() | col("parsed").isNull())
 
 print("Rescue column result:")
 df_rescue.show(truncate=False)
@@ -678,8 +735,8 @@ print("  - Doesn't capture updates (only inserts)")
 
 # COMMAND ----------
 
-# Clean up
-print("=== Cleanup ===")
+# Final
+print("=== Tables Created ===")
 print(f"\nExample tables created in your Unity Catalog schema: {USER_SCHEMA}")
 print("  - bronze_batch_sales")
 print("  - bronze_non_idempotent_customers")
