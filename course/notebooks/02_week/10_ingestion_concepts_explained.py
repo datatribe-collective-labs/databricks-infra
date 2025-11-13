@@ -370,10 +370,22 @@ print("  - Data loss possible (track separately)")
 print("=== Error Handling Pattern 3: Rescue Column (Recommended) ===\n")
 
 # Use _rescued_data column to capture malformed records
+"""
 df_rescue = spark.read \
     .option("mode", "PERMISSIVE") \
     .option("columnNameOfCorruptRecord", "_rescued_data") \
     .json(spark.table(temp_mixed_table).rdd.map(lambda row: row.value))
+"""
+
+# Parse JSON and capture malformed records in a rescue column
+df = spark.table(temp_mixed_table)
+df_rescue = df.withColumn(
+    "parsed",
+    from_json(col("value"), order_schema)
+).withColumn(
+    "_rescued_data",
+    col("value")
+).where(col("parsed").isNotNull() | col("parsed").isNull())
 
 print("Rescue column result:")
 df_rescue.show(truncate=False)
@@ -723,8 +735,8 @@ print("  - Doesn't capture updates (only inserts)")
 
 # COMMAND ----------
 
-# Clean up
-print("=== Cleanup ===")
+# Final
+print("=== Tables Created ===")
 print(f"\nExample tables created in your Unity Catalog schema: {USER_SCHEMA}")
 print("  - bronze_batch_sales")
 print("  - bronze_non_idempotent_customers")
