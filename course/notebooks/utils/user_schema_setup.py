@@ -22,6 +22,7 @@
 # MAGIC - `get_table_path(layer, table_name)`: Helper function to build table paths
 # MAGIC - `get_schema_path()`: Get user's full schema path
 # MAGIC - `print_user_config()`: Display current configuration
+# MAGIC - `VOLUME_PATH`: Users writable volume path
 
 # COMMAND ----------
 
@@ -39,6 +40,14 @@ USER_SCHEMA = re.sub(r'[^a-zA-Z0-9_]', '_', USER_EMAIL.split('@')[0]).lower()
 
 # Create user's schema if it doesn't exist
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {CATALOG}.{USER_SCHEMA}")
+
+
+# Hardcoded volume name, can be changed
+VOLUME_NAME = "scratch"
+spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{USER_SCHEMA}.{VOLUME_NAME}")
+
+# The POSIX-style path for your Spark writes
+VOLUME_PATH = f"/Volumes/{CATALOG}/{USER_SCHEMA}/{VOLUME_NAME}/"
 
 # COMMAND ----------
 

@@ -4,15 +4,6 @@
     box-sizing: border-box;
 }
 
-html {
-    overflow-x: hidden;
-}
-
-body {
-    overflow-x: hidden;
-    width: 100%;
-}
-
 :root {
     /* Dark theme (night mode - default) */
     --bg-primary: #0f0f1e;

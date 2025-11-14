@@ -28,7 +28,7 @@ The web UI provides:
 
 ```
 databricks-infra/
-├── web/                            # 🌐 Web UI (START HERE)
+├── web/                            # Web UI (START HERE)
 │   ├── index.html                  # Main landing page
 │   ├── data-engineer.html          # Student guide
 │   ├── platform-engineer.html      # Admin guide
@@ -95,14 +95,14 @@ databricks-infra/
 
 ## 🚀 Quick Start Commands
 
-### Students
+### Data Engineers
 ```bash
 # Open the web UI to get workspace access
 open web/index.html
 # Then navigate to: /Shared/terraform-managed/course/notebooks/ in Databricks
 ```
 
-### Admins
+### Data Platform Engineers
 ```bash
 # Clone and setup
 git clone https://github.com/chanukyapekala/databricks-infra
@@ -122,23 +122,19 @@ terraform apply
 
 ## 📞 Support
 
-- **🌐 Web UI**: Start with [web/index.html](./web/index.html) for guided setup
-- **🐛 Issues**: Use [GitHub Issues](https://github.com/chanukyapekala/databricks-infra/issues)
+- **🐛 Issues**: Use [GitHub Issues](https://github.com/datatribe-collective-labs/databricks-infra/issues)
 - **📖 Technical Docs**: See [CLAUDE.md](./CLAUDE.md) for AI-assisted development
 - **🔍 Troubleshooting**: Check guides in [docs/](./docs/)
+- **💬 Contact**: Reach out via Discord data-engg channel here: [DataTribe Discord](https://discord.gg/rmzqksHy)
 
 ---
 
 ## 🏷️ Project Status
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/chanukyapekala/databricks-infra/deploy.yml?branch=main)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/datatribe-collective-labs/databricks-infra/deploy.yml?branch=main)
 ![Poetry](https://img.shields.io/badge/dependency%20manager-poetry-blue)
 ![Terraform](https://img.shields.io/badge/infrastructure-terraform-purple)
 
 ---
 
-**🎓 Ready to learn? 🏗️ Ready to deploy? Start with the [Web UI](./web/index.html)!**
-
-<div align="center">
-  <sub>Built by <a href="https://github.com/chanukyapekala">DataTribe Collective Labs</a> | 2025</sub>
-</div>
+**🎓 Ready to learn? 🏗️ Ready to deploy? Start your Databricks journey with DataTribe today! 🚀**

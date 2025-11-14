@@ -12,7 +12,7 @@
 # MAGIC - Implement error handling and data quality checks
 # MAGIC - Use partition strategies for performance
 # MAGIC
-# MAGIC ## Example Unity Catalog Structure
+# MAGIC ## Theoritical Example Unity Catalog Structure
 # MAGIC
 # MAGIC ```
 # MAGIC sales_dev.bronze.*      - Raw sales data (development)
@@ -27,21 +27,16 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../utils/user_schema_setup.py
+
+# COMMAND ----------
+
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, TimestampType, DateType
 from pyspark.sql.functions import current_timestamp, col, lit
 from datetime import date, datetime
 
-# Configuration
-CATALOG = "databricks_course"  # We will use the course catalog here instead
-BRONZE_SCHEMA = "bronze"
-SILVER_SCHEMA = "silver"
-
 print(f"Target Catalog: {CATALOG}")
-print(f"Bronze Schema: {CATALOG}.{BRONZE_SCHEMA}")
-
-# COMMAND ----------
-
-# MAGIC %run ../utils/user_schema_setup.py
+print(f"Bronze Schema: {CATALOG}.{USER_SCHEMA}")
 
 # COMMAND ----------
 
@@ -399,16 +394,17 @@ print(f"✅ Written to: {marketing_table}")
 # MAGIC
 # MAGIC ### Tables Created
 # MAGIC
-# MAGIC **Sales Catalog (sales_dev):**
-# MAGIC - `sales_dev.bronze.sales_transactions` (CSV ingestion)
-# MAGIC - `sales_dev.bronze.customer_events` (JSON ingestion)
-# MAGIC - `sales_dev.bronze.product_inventory` (Parquet with partitioning)
-# MAGIC - `sales_dev.bronze.sales_validated` (quality-checked data)
-# MAGIC - `sales_dev.bronze.sales_quarantine` (rejected records)
-# MAGIC - `sales_dev.bronze.sales_incremental` (incremental loads)
+# MAGIC All tables are created within the `databricks_course` catalog and a user-specific schema, following the pattern:
+# MAGIC `databricks_course.<your_schema_name>.<table_name>`.
 # MAGIC
-# MAGIC **Marketing Catalog (marketing_dev):**
-# MAGIC - `marketing_dev.bronze.campaigns` (marketing data)
+# MAGIC **Bronze Layer Tables Created:**
+# MAGIC - `bronze_sales_transactions` (CSV ingestion)
+# MAGIC - `bronze_customer_events` (JSON ingestion)
+# MAGIC - `bronze_product_inventory` (Parquet with partitioning)
+# MAGIC - `bronze_sales_validated` (quality-checked data)
+# MAGIC - `bronze_sales_quarantine` (rejected records)
+# MAGIC - `bronze_sales_incremental` (incremental loads)
+# MAGIC - `bronze_campaigns` (marketing data)
 # MAGIC
 # MAGIC ### Next Steps
 # MAGIC
