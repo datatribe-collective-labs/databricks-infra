@@ -1,83 +1,140 @@
-# Databricks Infrastructure & Learning Platform
+# DataTribe - Databricks Learning Platform
 
-A complete Databricks learning platform with Infrastructure as Code (Terraform) and a comprehensive 5-week data engineering course.
+> **Production-Ready Infrastructure as Code + Comprehensive Data Engineering Course**
 
-## 🎯 What This Project Offers
-
-- **📚 Complete Databricks Course**: 19 hands-on notebooks covering fundamentals to production apps
-- **🏗️ Infrastructure as Code**: Terraform configuration for Unity Catalog, users, and permissions
-- **🐍 Professional Python Setup**: Poetry dependency management with CLI tools and testing
-- **🔧 Development Tools**: Pre-commit hooks, automated testing, and code quality checks
-- **🚀 CI/CD Ready**: GitHub Actions for automated deployment and validation
-
-## 🚀 Choose Your Path
-
-### 👨‍💻 I'm a Data Engineer
-*"I want to learn Databricks through hands-on notebooks and work with data"*
-
-**➡️ [Follow the Data Engineer Guide](./DataEngineer-readme.md)**
-
-- Focus on learning through 19 course notebooks
-- Work directly in Databricks workspace
-- No infrastructure complexity
-- Start learning immediately
+A complete Databricks learning platform combining:
+- 🎓 **21 hands-on notebooks** across 5 weeks (fundamentals to production apps)
+- 🏗️ **Terraform automation** for Unity Catalog, users, permissions, and RBAC
+- 🚀 **Zero-setup learning** for students + 15-minute deployment for admins
 
 ---
 
-### 🏗️ I'm a Data Platform Engineer  
-*"I want to manage Databricks infrastructure with Terraform and control the full stack"*
+## 🌐 Get Started
 
-**➡️ [Follow the Data Platform Engineer Guide](./DataPlatformEngineer-readme.md)**
+**👉 Visit the Web UI:**
+- **🌍 Live Site**: [https://datatribe-collective-labs.github.io/databricks-infra](https://datatribe-collective-labs.github.io/databricks-infra) (GitHub Pages)
+- **📁 Local**: [Open index.html](./web/index.html)
 
-- Manage infrastructure with Terraform
-- Control users, groups, and permissions
-- Set up CI/CD pipelines
-- Full development environment
+The web UI provides:
+- **Student Guide** - Get workspace access and start learning in 3 steps
+- **Admin Guide** - Deploy complete infrastructure in 15 minutes
+- **Course Curriculum** - Browse all 21 notebooks organized by week
+- **🌙 Day/Night Mode** - Toggle theme for comfortable viewing
+- **📱 Mobile-Friendly** - Responsive design with hamburger menu
 
 ---
 
-## 📚 Course Overview (5 Weeks + Advanced, 19 Notebooks)
+## 📁 Repository Structure
 
-| Week | Focus | Notebooks | Key Skills |
-|------|-------|-----------|------------|
-| **1** | Databricks Fundamentals | 4 | Platform mastery, Unity Catalog, cluster management |
-| **2** | Data Ingestion | 4 | Files, APIs, databases, cloud storage patterns |
-| **3** | Data Transformations | 3 | Advanced Spark operations, window functions |
-| **4** | End-to-End Workflows | 2 | Complete pipeline development |
-| **5** | Production Deployment | 4 | Job orchestration, wheel packages, production patterns |
-| **Advanced** | Databricks Apps | 2 | Interactive data applications with Streamlit |
+```
+databricks-infra/
+├── web/                            # Web UI (START HERE)
+│   ├── index.html                  # Main landing page
+│   ├── data-engineer.html          # Student guide
+│   ├── platform-engineer.html      # Admin guide
+│   ├── curriculum.html             # Course curriculum
+│   └── styles.css                  # Shared styles
+├── README.md                       # This file
+├── CLAUDE.md                       # Technical docs for AI assistance
+├── docs/                           # Reference documentation
+│   ├── DataEngineer-readme.md      # Detailed student guide
+│   ├── DataPlatformEngineer-readme.md  # Detailed admin guide
+│   ├── USER_SCHEMA_GUIDE.md        # User isolation technical guide
+│   └── assets/                     # Logo and images
+├── course/                         # Course content
+│   ├── notebooks/                  # 19 Databricks notebooks
+│   └── datasets/                   # Sample data files
+├── terraform/                      # Infrastructure as Code
+│   ├── main.tf, groups.tf, catalogs.tf
+│   ├── users.json                  # User configuration
+│   └── versions.tf                 # Provider config
+├── src/                            # Python package
+│   ├── cli.py                      # CLI tools
+│   └── utils.py                    # Utilities
+└── tests/                          # Test suite
+```
 
-## 🏗️ Current Infrastructure
+---
 
-This repository is configured for production deployment:
+## 🎯 Quick Links
 
-- **Workspace**: Free Edition with Unity Catalog
-- **Authentication**: PAT (Personal Access Token) based
-- **CI/CD**: Automated deployments via GitHub Actions
-- **Users**: 8 active users (7 admins, 1 student)
-- **Groups**: 2 workspace-level groups (platform_admins, platform_students)
-- **Catalogs**: 5 Unity Catalogs total
-  - 4 shared reference catalogs (sales_dev, sales_prod, marketing_dev, marketing_prod)
-  - 1 course catalog (databricks_course) with user-specific schemas
-- **Schemas**: 24 total schemas
-  - 13 shared reference schemas (bronze, silver, gold, experiments)
-  - 3 course shared schemas (shared_bronze, shared_silver, shared_gold)
-  - 8 user personal schemas (one per user)
-- **Course Content**: 21 notebooks automatically deployed
-- **Permissions**: Group-based access control with workspace-level groups
+### For Students
+- 🌐 **Web Guide**: [web/data-engineer.html](./web/data-engineer.html)
+- 📖 **Detailed Docs**: [docs/DataEngineer-readme.md](./docs/DataEngineer-readme.md)
+- 🔗 **Workspace**: https://dbc-d8111651-e8b1.cloud.databricks.com
 
-**Important**: For platform engineers managing infrastructure, workspace admin access and PAT authentication are required for full Terraform automation (user/group management, SCIM API access).
+### For Admins
+- 🌐 **Web Guide**: [web/platform-engineer.html](./web/platform-engineer.html)
+- 📖 **Detailed Docs**: [docs/DataPlatformEngineer-readme.md](./docs/DataPlatformEngineer-readme.md)
+- 🔧 **Technical Reference**: [CLAUDE.md](./CLAUDE.md)
+
+### Course Content
+- 🌐 **Curriculum**: [web/curriculum.html](./web/curriculum.html)
+- 📁 **Notebooks**: [course/notebooks/](./course/notebooks/)
+
+---
+
+## 📊 What's Included
+
+### Course (5 Weeks + Advanced)
+- **Week 1**: Databricks Fundamentals (5 notebooks)
+- **Week 2**: Data Ingestion (5 notebooks)
+- **Week 3**: Advanced Transformations (4 notebooks)
+- **Week 4**: End-to-End Workflows (3 notebooks)
+- **Week 5**: Production Deployment (4 notebooks)
+- **Advanced**: Databricks Apps with Streamlit (2 notebooks)
+
+### Infrastructure
+- **8 users** with role-based access control
+- **5 Unity Catalogs** (sales, marketing, course)
+- **24 schemas** (medallion architecture: bronze, silver, gold)
+- **User isolation** - each student gets personal workspace
+- **CI/CD pipeline** - automated deployment via GitHub Actions
+
+---
+
+## 🚀 Quick Start Commands
+
+### Data Engineers
+```bash
+# Open the web UI to get workspace access
+open web/index.html
+# Then navigate to: /Shared/terraform-managed/course/notebooks/ in Databricks
+```
+
+### Data Platform Engineers
+```bash
+# Clone and setup
+git clone https://github.com/chanukyapekala/databricks-infra
+cd databricks-infra
+poetry install
+
+# Configure authentication (requires workspace admin)
+databricks configure --token --profile datatribe
+
+# Deploy infrastructure
+cd terraform
+terraform init
+terraform apply
+```
+
+---
 
 ## 📞 Support
 
-- **🐛 Issues**: Use GitHub Issues for bugs and feature requests
-- **📖 Technical Docs**: See [CLAUDE.md](./CLAUDE.md) for detailed technical guidance
-- **💬 Questions**: Check notebook troubleshooting sections
+- **🐛 Issues**: Use [GitHub Issues](https://github.com/datatribe-collective-labs/databricks-infra/issues)
+- **📖 Technical Docs**: See [CLAUDE.md](./CLAUDE.md) for AI-assisted development
+- **🔍 Troubleshooting**: Check guides in [docs/](./docs/)
+- **💬 Contact**: Reach out via Discord data-engg channel here: [DataTribe Discord](https://discord.gg/rmzqksHy)
 
-## 📈 Project Status
+---
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/chanukyapekala/databricks-infra/deploy.yml?branch=main)
+## 🏷️ Project Status
+
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/datatribe-collective-labs/databricks-infra/deploy.yml?branch=main)
 ![Poetry](https://img.shields.io/badge/dependency%20manager-poetry-blue)
 ![Terraform](https://img.shields.io/badge/infrastructure-terraform-purple)
 
-**Choose your path above and start your Databricks journey!** 🚀
+---
+
+**🎓 Ready to learn? 🏗️ Ready to deploy? Start your Databricks journey with DataTribe today! 🚀**

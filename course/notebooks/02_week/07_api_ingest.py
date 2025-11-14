@@ -13,7 +13,7 @@
 # MAGIC - Write API data to Unity Catalog bronze layer
 # MAGIC - Handle pagination and incremental API loads
 # MAGIC
-# MAGIC ## Unity Catalog Target
+# MAGIC ## Theoretical Unity Catalog Target
 # MAGIC
 # MAGIC ```
 # MAGIC sales_dev.bronze.api_*        - Sales API data
@@ -225,5 +225,5 @@ print(f" Written to: {customers_table}")
 # MAGIC ## Summary
 # MAGIC
 # MAGIC ### Tables Created
-# MAGIC - `sales_dev.bronze.api_products`
-# MAGIC - `sales_dev.bronze.api_customers`
+# MAGIC - `bronze_api_products`
+# MAGIC - `bronze_api_customers`

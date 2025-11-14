@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Curriculum - DataTribe Learning Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo-section">
+                <img src="./assets/DataTribe_logo.png" alt="DataTribe Logo" class="datatribe-logo">
+                <span class="logo-text">DataTribe Collective</span>
+            </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="curriculum.html" class="active">Curriculum</a></li>
+                <li><a href="data-engineer.html">For Data Engineers</a></li>
+                <li><a href="platform-engineer.html">For Data Platform Engineers</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="index.html" class="nav-icon-link" title="Home">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.1L1 12h3v9h6v-6h4v6h6v-9h3L12 2.1zm0 2.691l6 5.4V19h-2v-6H8v6H6v-8.809l6-5.4z"/>
+                    </svg>
+                </a>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Day/Night Mode">
+                    <span id="themeIcon">☀️</span>
+                </button>
+                <a href="https://github.com/datatribe-collective-labs/databricks-infra" target="_blank" class="nav-icon-link" title="View on GitHub">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="page-hero">
+        <h1>📚 Course Curriculum</h1>
+        <p>21 comprehensive notebooks across 5 weeks + advanced modules</p>
+    </section>
+
+    <!-- Content -->
+    <div class="content-container">
+        <!-- Overview -->
+        <section class="content-section">
+            <h2>📊 Course Overview</h2>
+            <div class="learning-paths">
+                <div class="path-box">
+                    <div class="path-badge purple">Duration</div>
+                    <h3>4-6 Weeks</h3>
+                    <p>Complete journey from fundamentals to production deployment</p>
+                </div>
+                <div class="path-box">
+                    <div class="path-badge green">Notebooks</div>
+                    <h3>21 Total</h3>
+                    <p>Hands-on practice with real-world patterns</p>
+                </div>
+                <div class="path-box">
+                    <div class="path-badge yellow">Time Investment</div>
+                    <h3>30-45 Hours</h3>
+                    <p>Comprehensive learning experience</p>
+                </div>
+                <div class="path-box">
+                    <div class="path-badge red">Level</div>
+                    <h3>All Levels</h3>
+                    <p>From beginners to advanced practitioners</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Week 1 -->
+        <section class="content-section">
+            <h2><a href="https://github.com/datatribe-collective-labs/databricks-infra/tree/main/course/notebooks/01_week">Week 1: Databricks Fundamentals</a></h2>
+            <p class="week-meta">5 notebooks | ~8-10 hours</p>
+            <p style="margin-bottom: 2rem;">Master the Databricks platform, Unity Catalog governance, cluster management, and Spark optimization techniques.</p>
+
+            <div class="weeks-grid">
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/01_week/01_databricks_fundamentals.py">01_databricks_fundamentals.py</a></h3>
+                    <p>Platform architecture, runtime environments, workspace organization, and best practices for production data engineering.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Platform Architecture</span>
+                        <span class="topic-tag">Workspace Management</span>
+                        <span class="topic-tag">Best Practices</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/01_week/02_unity_catalog_deep_dive.py">02_unity_catalog_deep_dive.py</a></h3>
+                    <p>Data governance fundamentals, three-level namespace (catalog.schema.table), permissions, and secure data sharing.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Unity Catalog</span>
+                        <span class="topic-tag">Data Governance</span>
+                        <span class="topic-tag">Permissions</span>
+                        <span class="topic-tag">RBAC</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/01_week/03_cluster_management.py">03_cluster_management.py</a></h3>
+                    <p>Autoscaling strategies, instance types, cost optimization, and cluster configuration for different workloads.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Cluster Config</span>
+                        <span class="topic-tag">Autoscaling</span>
+                        <span class="topic-tag">Cost Optimization</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/01_week/04_spark_on_databricks.py">04_spark_on_databricks.py</a></h3>
+                    <p>Distributed computing, DataFrame operations, RDD transformations, and performance tuning for large-scale data processing.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Spark DataFrames</span>
+                        <span class="topic-tag">RDD Operations</span>
+                        <span class="topic-tag">Performance Tuning</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/01_week/05_delta_lake_concepts_explained.py">05_delta_lake_concepts_explained.py</a></h3>
+                    <p>Delta Lake fundamentals, ACID properties, Delta transaction logs, and how ACID properties map to Delta log transactions.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Delta Lakes</span>
+                        <span class="topic-tag">ACID</span>
+                        <span class="topic-tag">Delta transaction logs</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Week 2 -->
+        <section class="content-section">
+            <h2><a href="https://github.com/datatribe-collective-labs/databricks-infra/tree/main/course/notebooks/02_week">Week 2: Data Ingestion Mastery</a></h2>
+            <p class="week-meta">5 notebooks | ~8-10 hours</p>
+            <p style="margin-bottom: 2rem;">Production-grade ingestion patterns from files, APIs, databases, and cloud storage with error handling and retry logic.</p>
+
+            <div class="weeks-grid">
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/02_week/06_file_ingestion.py">06_file_ingestion.py</a></h3>
+                    <p>CSV, JSON, Parquet ingestion with explicit schemas, data quality validation, and Delta Lake integration.</p>
+                    <div class="topics">
+                        <span class="topic-tag">CSV/JSON/Parquet</span>
+                        <span class="topic-tag">Schema Enforcement</span>
+                        <span class="topic-tag">Data Validation</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/02_week/07_api_ingest.py">07_api_ingest.py</a></h3>
+                    <p>REST API integration, authentication patterns, retry logic, rate limiting, and error handling for production systems.</p>
+                    <div class="topics">
+                        <span class="topic-tag">REST APIs</span>
+                        <span class="topic-tag">Authentication</span>
+                        <span class="topic-tag">Retry Logic</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/02_week/08_database_ingest.py">08_database_ingest.py</a></h3>
+                    <p>JDBC connections, incremental loading, change data capture (CDC), and database integration patterns.</p>
+                    <div class="topics">
+                        <span class="topic-tag">JDBC</span>
+                        <span class="topic-tag">Incremental Load</span>
+                        <span class="topic-tag">CDC Patterns</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/02_week/09_s3_ingest.py">09_s3_ingest.py</a></h3>
+                    <p>Cloud storage patterns, partitioning strategies, data lakehouse architecture, and efficient file organization.</p>
+                    <div class="topics">
+                        <span class="topic-tag">S3/Cloud Storage</span>
+                        <span class="topic-tag">Partitioning</span>
+                        <span class="topic-tag">Lakehouse</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/02_week/10_ingestion_concepts_explained.py">10_ingestion_concepts_explained.py</a></h3>
+                    <p>Batch and streaming ingestion, inference and explicit schema handling, error handling patterns, idempotent ingestion, and incremental loading.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Ingestion</span>
+                        <span class="topic-tag">Schema/Error Handling</span>
+                        <span class="topic-tag">Incremental Loading</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Week 3 -->
+        <section class="content-section">
+            <h2><a href="https://github.com/datatribe-collective-labs/databricks-infra/tree/main/course/notebooks/03_week">Week 3: Advanced Transformations</a></h2>
+            <p class="week-meta">4 notebooks | ~6-8 hours</p>
+            <p style="margin-bottom: 2rem;">Complex Spark operations including window functions, advanced analytics, and medallion architecture transformations.</p>
+
+            <div class="weeks-grid">
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/03_week/11_simple_transformations.py">11_simple_transformations.py</a></h3>
+                    <p>Data cleaning, type conversions, business logic implementation, and Bronze to Silver layer transformations.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Data Cleaning</span>
+                        <span class="topic-tag">Type Conversions</span>
+                        <span class="topic-tag">Business Logic</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/03_week/12_window_transformations.py">12_window_transformations.py</a></h3>
+                    <p>Ranking functions, moving averages, lead/lag operations, and time-series analytics with window functions.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Window Functions</span>
+                        <span class="topic-tag">Ranking</span>
+                        <span class="topic-tag">Time-Series</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/03_week/13_aggregations.py">13_aggregations.py</a></h3>
+                    <p>Complex grouping operations, CUBE/ROLLUP, statistical functions, and Silver to Gold layer transformations.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Aggregations</span>
+                        <span class="topic-tag">CUBE/ROLLUP</span>
+                        <span class="topic-tag">Statistics</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/03_week/14_transformation_concepts_explained.py">14_transformation_concepts_explained.py</a></h3>
+                    <p>Lazy evaluation, narrow and wide transformations, partitioning and shuffling, Catalyst optimizer, and caching and persistence strategies.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Transformations</span>
+                        <span class="topic-tag">Partitioning/Shuffling</span>
+                        <span class="topic-tag">Caching</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Week 4 -->
+        <section class="content-section">
+            <h2><a href="https://github.com/datatribe-collective-labs/databricks-infra/tree/main/course/notebooks/04_week">Week 4: End-to-End Workflows</a></h2>
+            <p class="week-meta">3 notebooks | ~4-6 hours</p>
+            <p style="margin-bottom: 2rem;">Build complete production pipelines from data ingestion through transformations to final insights.</p>
+
+            <div class="weeks-grid">
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/04_week/15_file_to_aggregation.py">15_file_to_aggregation.py</a></h3>
+                    <p>Complete ETL pipeline from file ingestion through all medallion layers (Bronze → Silver → Gold) with monitoring.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Full Pipeline</span>
+                        <span class="topic-tag">ETL</span>
+                        <span class="topic-tag">Monitoring</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/04_week/16_api_to_aggregation.py">16_api_to_aggregation.py</a></h3>
+                    <p>Real-time data processing pipeline from API ingestion to final insights with error handling and recovery.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Real-Time</span>
+                        <span class="topic-tag">API Pipeline</span>
+                        <span class="topic-tag">Error Handling</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/04_week/17_pipeline_patterns_explained.py">17_pipeline_patterns_explained.py</a></h3>
+                    <p>Medallion Architecture, idempotency and exactly-once processing, data quality and validation patterns, monitoring and observability strategies, and checkpointing and recovery patterns.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Medallion Architecture</span>
+                        <span class="topic-tag">Data Quality</span>
+                        <span class="topic-tag">Monitoring</span>
+                        <span class="topic-tag">Recovery Patterns</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Week 5 -->
+        <section class="content-section">
+            <h2><a href="https://github.com/datatribe-collective-labs/databricks-infra/tree/main/course/notebooks/05_week">Week 5: Production Deployment</a></h2>
+            <p class="week-meta">4 notebooks | ~8-10 hours</p>
+            <p style="margin-bottom: 2rem;">Professional Python packaging with Poetry, job orchestration, and production deployment with real stock market data.</p>
+
+            <div class="weeks-grid">
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/05_week/18_job_orchestration_concepts_explained.py">18_job_orchestration_concepts_explained.py</a></h3>
+                    <p>Comprehensive guide to DAG concepts, retry logic, scheduling, and job orchestration fundamentals with both UI and SDK approaches.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Job Orchestration</span>
+                        <span class="topic-tag">DAGs</span>
+                        <span class="topic-tag">Scheduling</span>
+                        <span class="topic-tag">UI & SDK</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/05_week/19_create_multi_task_ingestion_job.py">19_create_multi_task_ingestion_job.py</a></h3>
+                    <p>Multi-task job orchestration with parallel execution, dependency management, and real-time monitoring.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Multi-Task Jobs</span>
+                        <span class="topic-tag">Parallel Execution</span>
+                        <span class="topic-tag">Monitoring</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/05_week/20_wheel_creation_with_poetry.py">20_wheel_creation_with_poetry.py</a></h3>
+                    <p>Professional Python packaging with Poetry, building reusable modules, testing, and deploying wheels to Databricks.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Poetry</span>
+                        <span class="topic-tag">Wheel Packages</span>
+                        <span class="topic-tag">Testing</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/05_week/21_stock_market_wheel_deployment.py">21_stock_market_wheel_deployment.py</a></h3>
+                    <p>Production capstone project with real stock market data (AAPL, GOOGL, MSFT, AMZN, NVDA) using Yahoo Finance. Complete medallion architecture pipeline with financial calculations and deployment automation.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Real Market Data</span>
+                        <span class="topic-tag">Yahoo Finance</span>
+                        <span class="topic-tag">Production Pipeline</span>
+                        <span class="topic-tag">Financial Analytics</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced -->
+        <section class="content-section">
+            <h2><a href="https://github.com/datatribe-collective-labs/databricks-infra/tree/main/course/notebooks/advanced">Advanced: Databricks Apps</a></h2>
+            <p class="week-meta">2 notebooks | ~4-6 hours</p>
+            <p style="margin-bottom: 2rem;">Build interactive data applications with Streamlit, including a production stock market analyzer querying gold layer tables.</p>
+
+            <div class="weeks-grid">
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/advanced/01_databricks_apps_guide.py">01_databricks_apps_guide.py</a></h3>
+                    <p>Complete guide to building data applications on Databricks: architecture, Streamlit fundamentals, Unity Catalog integration, and deployment strategies.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Databricks Apps</span>
+                        <span class="topic-tag">Streamlit</span>
+                        <span class="topic-tag">App Architecture</span>
+                        <span class="topic-tag">Deployment</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/advanced/02_stock_market_analyzer_app.py">02_stock_market_analyzer_app.py</a></h3>
+                    <p>Production Streamlit application with interactive stock market analysis: market overview, risk-return analysis, detailed stock analysis, and portfolio simulator using gold layer data.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Interactive Dashboard</span>
+                        <span class="topic-tag">Financial Analysis</span>
+                        <span class="topic-tag">Portfolio Sim</span>
+                        <span class="topic-tag">Production App</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Learning Outcomes -->
+        <section class="content-section">
+            <h2>🎓 What You'll Learn</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon">⚡</div>
+                    <p><strong>Databricks Platform</strong><br>Master workspace, Unity Catalog, and cluster management</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">📊</div>
+                    <p><strong>Data Engineering</strong><br>Build production pipelines with medallion architecture</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">🔄</div>
+                    <p><strong>ETL/ELT Patterns</strong><br>Implement ingestion, transformation, and loading workflows</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">🚀</div>
+                    <p><strong>Production Deployment</strong><br>Package, orchestrate, and deploy professional solutions</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">📦</div>
+                    <p><strong>Python Packaging</strong><br>Create reusable wheel packages with Poetry</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">📱</div>
+                    <p><strong>Data Applications</strong><br>Build interactive dashboards with Streamlit</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <h2>Ready to Start?</h2>
+            <p>Choose your path and begin your Databricks journey</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="data-engineer.html" class="cta-button-large">Get Started as Data Engineer →</a>
+                <a href="platform-engineer.html" class="cta-button-large" style="background: linear-gradient(135deg, #1e3a8a, #4c1d95);">Deploy Infrastructure →</a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p><strong>DataTribe Collective Labs</strong></p>
+        <p style="margin-top: 0.5rem;">Databricks Infrastructure as Code | 2025</p>
+    </footer>
+
+    <script>
+        // Change header background on scroll
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 10) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Theme Toggle (Day/Night Mode)
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+
+            body.classList.toggle('light-mode');
+
+            if (body.classList.contains('light-mode')) {
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Load saved theme on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                themeIcon.textContent = '🌙';
+            }
+        });
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

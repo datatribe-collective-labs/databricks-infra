@@ -35,7 +35,15 @@ This is a **production-deployed** Databricks Infrastructure as Code (IaC) projec
 
 ```
 databricks-infra/
-├── terraform/                    # Infrastructure as Code
+├── web/                         # 🌐 Web UI (START HERE for users)
+│   ├── index.html               # Main landing page
+│   ├── data-engineer.html       # Student guide
+│   ├── platform-engineer.html   # Admin guide
+│   ├── curriculum.html          # Course curriculum
+│   └── styles.css               # Shared web UI styles
+├── README.md                    # GitHub landing page
+├── CLAUDE.md                    # This file - AI assistant technical context
+├── terraform/                   # Infrastructure as Code
 │   ├── versions.tf              # Provider configuration (Databricks)
 │   ├── variables.tf             # Input variables and notebook definitions
 │   ├── locals.tf                # Dynamic configuration and schema generation
@@ -46,10 +54,11 @@ databricks-infra/
 │   └── users.json               # User definitions and group assignments
 ├── src/                         # Python package
 │   ├── __init__.py              # Package initialization
+│   ├── cli.py                   # CLI tools for project management
 │   ├── utils.py                 # Data generation and utilities
 │   └── user_schema.py           # User schema management (alternative to %run)
 ├── course/                      # Learning materials
-│   ├── notebooks/               # Databricks course notebooks
+│   ├── notebooks/               # Databricks course notebooks (19 total)
 │   │   ├── utils/               # Shared utility notebooks
 │   │   │   └── user_schema_setup.py  # User schema config (used via %run)
 │   │   ├── 01_week/             # Week 1: Platform fundamentals (4 notebooks)
@@ -59,15 +68,57 @@ databricks-infra/
 │   │   ├── 05_week/             # Week 5: Job orchestration (4 notebooks)
 │   │   └── advanced/            # Advanced: Databricks Apps (2 notebooks)
 │   └── datasets/                # Sample data (CSV, JSON, Parquet)
-├── docs/                        # Documentation
+├── docs/                        # Reference documentation
+│   ├── DataEngineer-readme.md   # Detailed student guide (markdown)
+│   ├── DataPlatformEngineer-readme.md  # Detailed admin guide (markdown)
 │   ├── USER_SCHEMA_GUIDE.md     # Complete user schema usage guide
-│   └── USER_SCHEMA_IMPLEMENTATION_SUMMARY.md  # Implementation overview
+│   └── assets/                  # Logo and images (DataTribe_logo.png)
 ├── tests/                       # Test suite
 ├── pyproject.toml               # Poetry configuration and tool settings
 ├── .pre-commit-config.yaml      # Code quality automation
 ├── .github/workflows/deploy.yml # CI/CD pipeline
-└── README.md + CLAUDE.md        # Documentation
+└── .gitignore                   # Git ignore patterns
 ```
+
+## Web UI Documentation Structure
+
+**Primary User Interface**: This project uses a modern web UI (not MkDocs) for user-facing documentation:
+
+- **index.html** - Landing page with two paths:
+  - "Data Engineer Learning Track" → links to data-engineer.html
+  - "Data Platform Engineer Learning Track" → links to platform-engineer.html
+  - Stats section showing: 19 notebooks, 5 weeks, 100% automated, 0 manual setup
+
+- **data-engineer.html** - Student guide:
+  - 3-step getting started (workspace access, find content, start learning)
+  - Learning path selection (new to Databricks, know Spark, production ready, complete journey)
+  - Tips for success
+  - Direct workspace URL: https://dbc-d8111651-e8b1.cloud.databricks.com
+
+- **platform-engineer.html** - Admin guide:
+  - 5-step deployment guide (clone, authenticate, customize, create catalogs, deploy)
+  - What gets created overview
+  - User management instructions (adding/removing users)
+  - Troubleshooting common issues
+
+- **curriculum.html** - Complete course curriculum:
+  - All 19 notebooks organized by week with descriptions
+  - Topics and learning outcomes
+  - Time estimates for each week
+  - Interactive topic tags
+
+**Markdown Documentation** (in docs/ for reference):
+- `DataEngineer-readme.md` - Detailed markdown version of student guide
+- `DataPlatformEngineer-readme.md` - Detailed markdown version of admin guide
+- `USER_SCHEMA_GUIDE.md` - Technical reference for user schema implementation
+
+**Content Update Strategy**:
+To update documentation, edit these key files:
+1. **Web UI content**: Edit files in `web/` folder (`index.html`, `data-engineer.html`, `platform-engineer.html`, `curriculum.html`)
+2. **Web UI styling**: Edit `web/styles.css` (shared across all pages)
+3. **Markdown references**: Edit files in `docs/` folder
+4. **GitHub landing**: Edit `README.md`
+5. **AI assistant context**: Edit `CLAUDE.md` (this file)
 
 ## Development Workflow
 

@@ -17,6 +17,7 @@ pandas = "^2.0.0"
 ruff = "^0.6.0"
 pytest = "^8.2.2"
 pre-commit = "^3.7.1"
+mkdocs-material = "^9.6.23"
 
 [tool.poetry.scripts]
 databricks-setup = "src.cli:setup_databricks"
