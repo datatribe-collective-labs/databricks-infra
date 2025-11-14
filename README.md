@@ -3,7 +3,7 @@
 > **Production-Ready Infrastructure as Code + Comprehensive Data Engineering Course**
 
 A complete Databricks learning platform combining:
-- 🎓 **19 hands-on notebooks** across 5 weeks (fundamentals to production apps)
+- 🎓 **21 hands-on notebooks** across 5 weeks (fundamentals to production apps)
 - 🏗️ **Terraform automation** for Unity Catalog, users, permissions, and RBAC
 - 🚀 **Zero-setup learning** for students + 15-minute deployment for admins
 
@@ -77,10 +77,10 @@ databricks-infra/
 ## 📊 What's Included
 
 ### Course (5 Weeks + Advanced)
-- **Week 1**: Databricks Fundamentals (4 notebooks)
-- **Week 2**: Data Ingestion (4 notebooks)
-- **Week 3**: Advanced Transformations (3 notebooks)
-- **Week 4**: End-to-End Workflows (2 notebooks)
+- **Week 1**: Databricks Fundamentals (5 notebooks)
+- **Week 2**: Data Ingestion (5 notebooks)
+- **Week 3**: Advanced Transformations (4 notebooks)
+- **Week 4**: End-to-End Workflows (3 notebooks)
 - **Week 5**: Production Deployment (4 notebooks)
 - **Advanced**: Databricks Apps with Streamlit (2 notebooks)
 
