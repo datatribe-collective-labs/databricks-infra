@@ -61,7 +61,6 @@ databricks-infra/
 ### For Students
 - 🌐 **Web Guide**: [web/data-engineer.html](./web/data-engineer.html)
 - 📖 **Detailed Docs**: [docs/DataEngineer-readme.md](./docs/DataEngineer-readme.md)
-- 🔗 **Workspace**: https://dbc-d8111651-e8b1.cloud.databricks.com
 
 ### For Admins
 - 🌐 **Web Guide**: [web/platform-engineer.html](./web/platform-engineer.html)
