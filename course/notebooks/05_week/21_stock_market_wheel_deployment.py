@@ -273,7 +273,7 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Module 2: Financial Transformations - Returns
+## Module 2: Financial Transformations - Returns
 # MAGIC
 # MAGIC **File**: `src/stock_market_utils/transformations/returns.py`
 # MAGIC
@@ -281,73 +281,73 @@
 # MAGIC """Financial return calculations."""
 # MAGIC
 # MAGIC from pyspark.sql import DataFrame
-# MAGIC from pyspark.sql.functions import col, lag, round as spark_round
+# MAGIC from pyspark.sql.functions import col, lag, round as spark_round, first
 # MAGIC from pyspark.sql.window import Window
 # MAGIC
 # MAGIC
 # MAGIC def calculate_daily_returns(df: DataFrame) -> DataFrame:
-# MAGIC     """
-# MAGIC     Calculate daily returns for each stock.
+# MAGIC    """
+# MAGIC    Calculate daily returns for each stock.
 # MAGIC
-# MAGIC     Formula: (Close_today - Close_yesterday) / Close_yesterday
+# MAGIC    Formula: (Close_today - Close_yesterday) / Close_yesterday
 # MAGIC
-# MAGIC     Args:
-# MAGIC         df: DataFrame with columns [symbol, date, close]
+# MAGIC    Args:
+# MAGIC        df: DataFrame with columns [symbol, date, close]
 # MAGIC
-# MAGIC     Returns:
-# MAGIC         DataFrame with additional daily_return column
-# MAGIC     """
-# MAGIC     window_spec = Window.partitionBy("symbol").orderBy("date")
+# MAGIC    Returns:
+# MAGIC        DataFrame with additional daily_return column
+# MAGIC    """
+# MAGIC    window_spec = Window.partitionBy("symbol").orderBy("date")
 # MAGIC
-# MAGIC     df_with_returns = df.withColumn(
-# MAGIC         "previous_close",
-# MAGIC         lag("close", 1).over(window_spec)
-# MAGIC     )
+# MAGIC    df_with_returns = df.withColumn(
+# MAGIC        "previous_close",
+# MAGIC        lag("close", 1).over(window_spec)
+# MAGIC    )
 # MAGIC
-# MAGIC     df_with_returns = df_with_returns.withColumn(
-# MAGIC         "daily_return",
-# MAGIC         spark_round(
-# MAGIC             ((col("close") - col("previous_close")) / col("previous_close")) * 100,
-# MAGIC             4
-# MAGIC         )
-# MAGIC     )
+# MAGIC    df_with_returns = df_with_returns.withColumn(
+# MAGIC        "daily_return",
+# MAGIC        spark_round(
+# MAGIC            ((col("close") - col("previous_close")) / col("previous_close")) * 100,
+# MAGIC            4
+# MAGIC        )
+# MAGIC    )
 # MAGIC
-# MAGIC     # Drop intermediate column
-# MAGIC     df_with_returns = df_with_returns.drop("previous_close")
+# MAGIC    # Drop intermediate column
+# MAGIC    df_with_returns = df_with_returns.drop("previous_close")
 # MAGIC
-# MAGIC     return df_with_returns
+# MAGIC    return df_with_returns
 # MAGIC
 # MAGIC
 # MAGIC def calculate_cumulative_returns(df: DataFrame) -> DataFrame:
-# MAGIC     """
-# MAGIC     Calculate cumulative returns from start date.
+# MAGIC    """
+# MAGIC    Calculate cumulative returns from start date.
 # MAGIC
-# MAGIC     Args:
-# MAGIC         df: DataFrame with columns [symbol, date, close]
+# MAGIC    Args:
+# MAGIC        df: DataFrame with columns [symbol, date, close]
 # MAGIC
-# MAGIC     Returns:
-# MAGIC         DataFrame with cumulative_return column
-# MAGIC     """
-# MAGIC     window_spec = Window.partitionBy("symbol").orderBy("date")
+# MAGIC    Returns:
+# MAGIC        DataFrame with cumulative_return column
+# MAGIC    """
+# MAGIC    window_spec = Window.partitionBy("symbol").orderBy("date")
 # MAGIC
-# MAGIC     # Get first close price for each symbol
-# MAGIC     df_with_first = df.withColumn(
-# MAGIC         "first_close",
-# MAGIC         lag("close", 0).over(window_spec.rowsBetween(Window.unboundedPreceding, Window.unboundedPreceding))
-# MAGIC     )
+# MAGIC    # Get first close price for each symbol
+# MAGIC    df_with_first = df.withColumn(
+# MAGIC        "first_close",
+# MAGIC        first("close").over(window_spec)
+# MAGIC    )
 # MAGIC
-# MAGIC     # Calculate cumulative return
-# MAGIC     df_with_cumulative = df_with_first.withColumn(
-# MAGIC         "cumulative_return",
-# MAGIC         spark_round(
-# MAGIC             ((col("close") - col("first_close")) / col("first_close")) * 100,
-# MAGIC             4
-# MAGIC         )
-# MAGIC     )
+# MAGIC    # Calculate cumulative return
+# MAGIC    df_with_cumulative = df_with_first.withColumn(
+# MAGIC        "cumulative_return",
+# MAGIC        spark_round(
+# MAGIC            ((col("close") - col("first_close")) / col("first_close")) * 100,
+# MAGIC            4
+# MAGIC        )
+# MAGIC    )
 # MAGIC
-# MAGIC     df_with_cumulative = df_with_cumulative.drop("first_close")
+# MAGIC    df_with_cumulative = df_with_cumulative.drop("first_close")
 # MAGIC
-# MAGIC     return df_with_cumulative
+# MAGIC    return df_with_cumulative
 # MAGIC ```
 
 # COMMAND ----------
@@ -637,7 +637,7 @@ dbutils.library.restartPython()
 # COMMAND ----------
 
 # Import required libraries
-from pyspark.sql.functions import col, round as spark_round, lag, stddev, avg, min as spark_min, max as spark_max, count, when, current_timestamp
+from pyspark.sql.functions import col, round as spark_round, lag, stddev, avg, min as spark_min, max as spark_max, count, when, current_timestamp, sum as spark_sum, round as spark_round, first
 from pyspark.sql.window import Window
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, TimestampType, LongType
 from datetime import datetime, timedelta
@@ -781,12 +781,15 @@ df_silver = df_silver.withColumn(
     lag("close", 1).over(window_spec)
 )
 
+# Calculate daily returns (simulating wheel utility)
 df_silver = df_silver.withColumn(
     "daily_return",
-    spark_round(
-        ((col("close") - col("previous_close")) / col("previous_close")) * 100,
-        4
-    )
+    when(col("previous_close").isNotNull() & (col("previous_close") != 0),
+        spark_round(
+            ((col("close") - col("previous_close")) / col("previous_close")) * 100,
+            4
+        )
+    ).otherwise(None)
 )
 
 df_silver = df_silver.drop("previous_close")
@@ -796,11 +799,14 @@ print("✅ Calculated daily returns")
 # COMMAND ----------
 
 # Calculate cumulative returns (from start date)
-window_first = Window.partitionBy("symbol").orderBy("date").rowsBetween(Window.unboundedPreceding, Window.unboundedPreceding)
+# The original implementation with lag and a specific rowsBetween window frame was causing an integer overflow error.
+# Using first() over a window is a more robust and clearer way to get the first value in a partition.
+# Calculate cumulative returns (from start date)
+window_first = Window.partitionBy("symbol").orderBy("date")
 
 df_silver = df_silver.withColumn(
     "first_close",
-    lag("close", 0).over(window_first)
+    first("close").over(window_first)
 )
 
 df_silver = df_silver.withColumn(
@@ -941,51 +947,79 @@ display(df_summary.orderBy(col("total_return_pct").desc()))
 # COMMAND ----------
 
 # Create volume for production libraries
-spark.sql("""
-CREATE VOLUME IF NOT EXISTS databricks_course.shared_bronze.production_libraries
+# This volume will be created in the user's personal schema to ensure write access.
+volume_prod = "production_libraries"
+spark.sql(f"""
+CREATE VOLUME IF NOT EXISTS {CATALOG}.{USER_SCHEMA}.{volume_prod}
 COMMENT 'Production Python wheels for stock market pipeline'
 """)
 
-print("✅ Volume created: databricks_course.shared_bronze.production_libraries")
+volume_prod_path = f"/Volumes/{CATALOG}/{USER_SCHEMA}/{volume_prod}/"
+print(f"✅ Volume created: {CATALOG}.{USER_SCHEMA}.{volume_prod}")
 
 # List current files
-print("\n📦 Current files in production libraries:")
+print(f"\n📦 Current files in {volume_prod_path}:")
 try:
-    files = dbutils.fs.ls("/Volumes/databricks_course/shared_bronze/production_libraries/")
+    files = dbutils.fs.ls(volume_prod_path)
+    if not files:
+        print("   (Volume is empty)")
     for file in files:
         print(f"   {file.name}")
 except Exception as e:
-    print("   (Volume is empty or newly created)")
+    print(f"   (Volume is empty or newly created)")
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Step 2: Upload Wheel to Volume
+## Step 2: Upload Wheel to Volume
+# MAGIC %md
 # MAGIC
-# MAGIC **Local Development Workflow**:
+# MAGIC**Local Development Workflow**:
+# MAGIC %md
+# MAGIC Use the `volume_path` variable printed in the previous step as your destination.
 # MAGIC
 # MAGIC ```bash
-# MAGIC # After building the wheel locally with: poetry build
-# MAGIC # Upload to Databricks using CLI:
+# After building the wheel locally with: poetry build
+# Upload to Databricks using CLI.
+# IMPORTANT: Replace the destination path with the `volume_path` from the previous command's output.
 # MAGIC
 # MAGIC databricks fs cp \
-# MAGIC   dist/stock_market_utils-1.0.0-py3-none-any.whl \
-# MAGIC   /Volumes/databricks_course/shared_bronze/production_libraries/stock_market_utils-1.0.0-py3-none-any.whl
+# MAGIC  dist/stock_market_utils-1.0.0-py3-none-any.whl \
+# MAGIC  /Volumes/<your_catalog>/<your_schema>/production_libraries/stock_market_utils-1.0.0-py3-none-any.whl
 # MAGIC
-# MAGIC # Verify upload
-# MAGIC databricks fs ls /Volumes/databricks_course/shared_bronze/production_libraries/
+# Verify upload
+# MAGIC databricks fs ls /Volumes/<your_catalog>/<your_schema>/production_libraries/
 # MAGIC ```
 # MAGIC
 # MAGIC **Alternative: UI Upload**:
 # MAGIC 1. Navigate to Catalog Explorer
-# MAGIC 2. Browse to: `databricks_course` → `shared_bronze` → `production_libraries`
+# MAGIC 2. Browse to your personal schema: `<your_catalog>` → `<your_schema>` → `production_libraries`
 # MAGIC 3. Click **Upload**
 # MAGIC 4. Select `stock_market_utils-1.0.0-py3-none-any.whl` from your local `dist/` directory
 # MAGIC
-# MAGIC **Result**: Wheel is now available at:
+# MAGIC **Result**: The wheel is now available in your personal volume, ready for use in jobs.
+# MAGIC
+# MAGIC
+# MAGIC ```bash
+# After building the wheel locally with: poetry build
+# Upload to Databricks using CLI.
+# IMPORTANT: Replace the destination path with the `volume_path` from the previous command's output.
+# MAGIC
+# MAGIC databricks fs cp \
+# MAGIC  dist/stock_market_utils-1.0.0-py3-none-any.whl \
+# MAGIC  /Volumes/<your_catalog>/<your_schema>/production_libraries/stock_market_utils-1.0.0-py3-none-any.whl
+# MAGIC
+# Verify upload
+# MAGIC databricks fs ls /Volumes/<your_catalog>/<your_schema>/production_libraries/
 # MAGIC ```
-# MAGIC /Volumes/databricks_course/shared_bronze/production_libraries/stock_market_utils-1.0.0-py3-none-any.whl
-# MAGIC ```
+# MAGIC
+# MAGIC **Alternative: UI Upload**:
+# MAGIC 1. Navigate to Catalog Explorer
+# MAGIC 2. Browse to your personal schema: `<your_catalog>` → `<your_schema>` → `production_libraries`
+# MAGIC 3. Click **Upload**
+# MAGIC 4. Select `stock_market_utils-1.0.0-py3-none-any.whl` from your local `dist/` directory
+# MAGIC
+# MAGIC **Result**: The wheel is now available in your personal volume, ready for use in jobs.
 
 # COMMAND ----------
 
@@ -1015,7 +1049,7 @@ except Exception as e:
 # MAGIC    - **Workers**: 2
 # MAGIC 8. **Libraries**:
 # MAGIC    - Click **Add** → **Python Whl**
-# MAGIC    - Path: `/Volumes/databricks_course/shared_bronze/production_libraries/stock_market_utils-1.0.0-py3-none-any.whl`
+# MAGIC    - **Path**: Use the path to the wheel in your personal volume, e.g., `/Volumes/<your_catalog>/<your_schema>/production_libraries/stock_market_utils-1.0.0-py3-none-any.whl`
 # MAGIC    - Click **Add** → **PyPI**
 # MAGIC    - Package: `yfinance`
 # MAGIC 9. **Parameters**:
@@ -1110,7 +1144,7 @@ except Exception as e:
 # Import Databricks SDK
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service import jobs
-from databricks.sdk.service.jobs import Task, NotebookTask, Source, RunNowInput
+from databricks.sdk.service.jobs import Task, NotebookTask, Source
 
 # Initialize client
 w = WorkspaceClient()
@@ -1122,7 +1156,7 @@ print("✅ Databricks SDK initialized")
 # Job configuration
 JOB_NAME = "Stock Market Pipeline - Production (SDK)"
 NOTEBOOK_PATH = "/Workspace/course/notebooks/05_week/21_stock_market_wheel_deployment"
-WHEEL_PATH = "/Volumes/databricks_course/shared_bronze/production_libraries/stock_market_utils-1.0.0-py3-none-any.whl"
+WHEEL_PATH = f"/Volumes/{CATALOG}/{USER_SCHEMA}/production_libraries/stock_market_utils-1.0.0-py3-none-any.whl"
 
 # Stock symbols and date range
 SYMBOLS_PARAM = "AAPL,GOOGL,MSFT,AMZN,NVDA"
@@ -1139,19 +1173,19 @@ print(f"   Date Range: {START_DATE_PARAM} to {END_DATE_PARAM}")
 # COMMAND ----------
 
 # Define cluster configuration
-cluster_config = jobs.ClusterSpec(
-    spark_version="14.3.x-scala2.12",
-    node_type_id="i3.xlarge",
-    num_workers=2,
-    spark_conf={
+cluster_config = {
+    "spark_version": "14.3.x-scala2.12",
+    "node_type_id": "i3.xlarge",
+    "num_workers": 2,
+    "spark_conf": {
         "spark.databricks.delta.preview.enabled": "true"
     }
-)
+}
 
 # Define shared libraries for all tasks
 shared_libraries = [
-    jobs.Library(whl=WHEEL_PATH),
-    jobs.Library(pypi=jobs.PythonPyPiLibrary(package="yfinance"))
+    {"whl": WHEEL_PATH},
+    {"pypi": {"package": "yfinance"}}
 ]
 
 print("✅ Cluster configuration defined")
