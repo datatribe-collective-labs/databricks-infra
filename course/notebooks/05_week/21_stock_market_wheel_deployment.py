@@ -1172,23 +1172,7 @@ print(f"   Date Range: {START_DATE_PARAM} to {END_DATE_PARAM}")
 
 # COMMAND ----------
 
-# Define cluster configuration
-cluster_config = {
-    "spark_version": "14.3.x-scala2.12",
-    "node_type_id": "i3.xlarge",
-    "num_workers": 2,
-    "spark_conf": {
-        "spark.databricks.delta.preview.enabled": "true"
-    }
-}
-
-# Define shared libraries for all tasks
-shared_libraries = [
-    {"whl": WHEEL_PATH},
-    {"pypi": {"package": "yfinance"}}
-]
-
-print("✅ Cluster configuration defined")# Define cluster configuration
+# Define cluster configuration 
 cluster_config = jobs.ClusterSpec(
     spark_version="14.3.x-scala2.12",
     node_type_id="i3.xlarge",
