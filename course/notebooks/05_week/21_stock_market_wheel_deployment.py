@@ -273,7 +273,7 @@
 # COMMAND ----------
 
 # MAGIC %md
-## Module 2: Financial Transformations - Returns
+# MAGIC ## Module 2: Financial Transformations - Returns
 # MAGIC
 # MAGIC **File**: `src/stock_market_utils/transformations/returns.py`
 # MAGIC
@@ -1186,6 +1186,22 @@ cluster_config = {
 shared_libraries = [
     {"whl": WHEEL_PATH},
     {"pypi": {"package": "yfinance"}}
+]
+
+print("✅ Cluster configuration defined")# Define cluster configuration
+cluster_config = jobs.ClusterSpec(
+    spark_version="14.3.x-scala2.12",
+    node_type_id="i3.xlarge",
+    num_workers=2,
+    spark_conf={
+        "spark.databricks.delta.preview.enabled": "true"
+    }
+)
+
+# Define shared libraries for all tasks
+shared_libraries = [
+    jobs.Library(whl=WHEEL_PATH),
+    jobs.Library(pypi=jobs.PythonPyPiLibrary(package="yfinance"))
 ]
 
 print("✅ Cluster configuration defined")
