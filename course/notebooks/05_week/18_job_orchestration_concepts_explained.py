@@ -1038,7 +1038,7 @@ print("=== Updating Job Configuration ===\n")
 
 try:
     # Update job with schedule
-    from databricks.sdk.service.jobs import CronSchedule
+    from databricks.sdk.service.jobs import CronSchedule, PauseStatus
 
     w.jobs.update(
         job_id=demo_job_id,
@@ -1047,9 +1047,9 @@ try:
             tasks=tasks,
             #job_clusters=[job_cluster],
             schedule=CronSchedule(
-                quartz_cron_expression="0 2 * * *",  # Daily at 2 AM
+                quartz_cron_expression="0 0 2 * * ?",  # Daily at 2AM, quartz style is different from traditionalcron
                 timezone_id="America/New_York",
-                pause_status="PAUSED"  # Start paused
+                pause_status=PauseStatus.PAUSED  # Start paused
             ),
             tags={
                 "environment": "dev",
