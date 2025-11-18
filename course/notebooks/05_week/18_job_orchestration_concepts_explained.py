@@ -484,7 +484,7 @@ print("  - One job, multiple use cases")
 # MAGIC Type: Notebook
 # MAGIC Source: Workspace
 # MAGIC Path: /Workspace/course/notebooks/02_week/06_file_ingestion
-# MAGIC Cluster: [Select or create cluster]
+# MAGIC Cluster: [Select or create cluster. Remember that serverless is fully managed.]
 # MAGIC ```
 # MAGIC
 # MAGIC **Cluster Options:**
@@ -517,7 +517,7 @@ print("  - One job, multiple use cases")
 # MAGIC **Parameters Section:**
 # MAGIC ```
 # MAGIC Key: catalog          Value: databricks_course
-# MAGIC Key: schema           Value: chanukya_pekala
+# MAGIC Key: schema           Value: your_schema_name
 # MAGIC Key: process_date     Value: {{job.start_time.date}}
 # MAGIC ```
 # MAGIC
@@ -743,6 +743,10 @@ print("""
 # MAGIC # On your local machine or in notebook
 # MAGIC %pip install databricks-sdk
 # MAGIC ```
+# MAGIC ```python
+# MAGIC # On poetry managed environment
+# MAGIC %poetry add databricks-sdk
+# MAGIC ```
 # MAGIC
 # MAGIC **Authentication Options:**
 # MAGIC
@@ -817,8 +821,8 @@ try:
                     notebook_path=notebook_path,
                     source=Source.WORKSPACE,
                     base_parameters={
-                        "catalog": "databricks_course",
-                        "schema": "your_schema_name"
+                        "catalog": "{CATALOG}", # defaults to databricks_course
+                        "schema": "{USER_SCHEMA}" # defaults to your_schema_name
                     }
                 ),
                 timeout_seconds=3600,  # 1 hour timeout
@@ -856,31 +860,33 @@ print("=== Creating Multi-Task Ingestion Job ===\n")
 
 multi_task_job_name = "SDK_Demo_Multi_Source_Ingestion"
 
-# Define shared cluster configuration
-job_cluster = JobCluster(
-    job_cluster_key="ingestion_cluster",
-    new_cluster=ClusterSpec(
-        spark_version="14.3.x-scala2.13",
-        node_type_id="i3.xlarge",  # Adjust based on your workspace
-        autoscale=AutoScale(min_workers=2, max_workers=8),
-        spark_conf={
-            "spark.databricks.cluster.profile": "serverless",
-            "spark.databricks.repl.allowedLanguages": "python,sql"
-        }
-    )
-)
+# Define shared cluster configuration. This is not needed for serverless.
+# job_cluster = JobCluster(
+#     job_cluster_key="ingestion_cluster",
+#     new_cluster=ClusterSpec(
+#         spark_version="14.3.x-scala2.13",
+#         node_type_id="i3.xlarge",  # Adjust based on your workspace
+#         autoscale=AutoScale(min_workers=2, max_workers=8),
+#         spark_conf={
+#             "spark.databricks.cluster.profile": "serverless",
+#             "spark.databricks.repl.allowedLanguages": "python,sql"
+#         }
+#     )
+# )
 
 # Define tasks
+# Note: Uncomment job_cluster_key to use serverless cluster
+# Important: Replace notebook_path with your actual notebook path, and verify that file ends with .py
 tasks = [
     Task(
         task_key="ingest_files",
         description="Ingest CSV/JSON/Parquet files",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/06_file_ingestion",
+            notebook_path="/Workspace/course/notebooks/02_week/06_file_ingestion.py",
             source=Source.WORKSPACE,
             base_parameters={"catalog": "databricks_course"}
         ),
-        job_cluster_key="ingestion_cluster",
+        #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
         max_retries=2
     ),
@@ -888,11 +894,11 @@ tasks = [
         task_key="ingest_api",
         description="Ingest data from REST APIs",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/07_api_ingest",
+            notebook_path="/Workspace/course/notebooks/02_week/07_api_ingest.py",
             source=Source.WORKSPACE,
             base_parameters={"catalog": "databricks_course"}
         ),
-        job_cluster_key="ingestion_cluster",
+        #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
         max_retries=2
     ),
@@ -900,11 +906,11 @@ tasks = [
         task_key="ingest_database",
         description="Ingest data from databases",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/08_database_ingest",
+            notebook_path="/Workspace/course/notebooks/02_week/08_database_ingest.py",
             source=Source.WORKSPACE,
             base_parameters={"catalog": "databricks_course"}
         ),
-        job_cluster_key="ingestion_cluster",
+        #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
         max_retries=2
     ),
@@ -912,11 +918,11 @@ tasks = [
         task_key="ingest_s3",
         description="Ingest data from S3/cloud storage",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/09_s3_ingest",
+            notebook_path="/Workspace/course/notebooks/02_week/09_s3_ingest.py",
             source=Source.WORKSPACE,
             base_parameters={"catalog": "databricks_course"}
         ),
-        job_cluster_key="ingestion_cluster",
+        #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
         max_retries=2
     )
@@ -927,7 +933,7 @@ try:
     created_multi_job = w.jobs.create(
         name=multi_task_job_name,
         tasks=tasks,
-        job_clusters=[job_cluster],
+        #job_clusters=[job_cluster],
         tags={
             "environment": "dev",
             "pipeline": "bronze_ingestion",
@@ -1039,7 +1045,7 @@ try:
         new_settings=jobs.JobSettings(
             name=multi_task_job_name,
             tasks=tasks,
-            job_clusters=[job_cluster],
+            #job_clusters=[job_cluster],
             schedule=CronSchedule(
                 quartz_cron_expression="0 2 * * *",  # Daily at 2 AM
                 timezone_id="America/New_York",
