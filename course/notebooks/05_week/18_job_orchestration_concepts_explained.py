@@ -483,7 +483,7 @@ print("  - One job, multiple use cases")
 # MAGIC Task name: bronze_file_ingestion
 # MAGIC Type: Notebook
 # MAGIC Source: Workspace
-# MAGIC Path: /Workspace/course/notebooks/02_week/06_file_ingestion
+# MAGIC Path: /Workspace/course/notebooks/02_week/06_file_ingestion # Modify with your notebook path
 # MAGIC Cluster: [Select or create cluster. Remember that serverless is fully managed.]
 # MAGIC ```
 # MAGIC
@@ -567,21 +567,21 @@ print("  - One job, multiple use cases")
 # MAGIC **Task 3: Database Ingestion (Parallel)**
 # MAGIC ```
 # MAGIC Task name: bronze_database_ingestion
-# MAGIC Path: /Workspace/course/notebooks/02_week/08_database_ingest
+# MAGIC Path: /Workspace/course/notebooks/02_week/08_database_ingest # Modify with your notebook path
 # MAGIC Dependencies: None
 # MAGIC ```
 # MAGIC
 # MAGIC **Task 4: S3 Ingestion (Parallel)**
 # MAGIC ```
 # MAGIC Task name: bronze_s3_ingestion
-# MAGIC Path: /Workspace/course/notebooks/02_week/09_s3_ingest
+# MAGIC Path: /Workspace/course/notebooks/02_week/09_s3_ingest # Modify with your notebook path
 # MAGIC Dependencies: None
 # MAGIC ```
 # MAGIC
 # MAGIC **Task 5: Validation (Depends on all ingestion tasks)**
 # MAGIC ```
 # MAGIC Task name: validate_ingestion
-# MAGIC Path: /Workspace/course/notebooks/custom/validate_bronze
+# MAGIC Path: /Workspace/course/notebooks/custom/validate_bronze # Modify with your notebook path
 # MAGIC Dependencies:
 # MAGIC   - bronze_file_ingestion
 # MAGIC   - bronze_api_ingestion
@@ -882,7 +882,7 @@ tasks = [
         task_key="ingest_files",
         description="Ingest CSV/JSON/Parquet files",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/06_file_ingestion.py",
+            notebook_path="/Workspace/course/notebooks/02_week/06_file_ingestion.py", # Replace
             source=Source.WORKSPACE,
             base_parameters={"catalog": "{CATALOG}"}
         ),
@@ -894,7 +894,7 @@ tasks = [
         task_key="ingest_api",
         description="Ingest data from REST APIs",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/07_api_ingest.py",
+            notebook_path="/Workspace/course/notebooks/02_week/07_api_ingest.py", # Replace
             source=Source.WORKSPACE,
             base_parameters={"catalog": "{CATALOG}"}
         ),
@@ -906,7 +906,7 @@ tasks = [
         task_key="ingest_database",
         description="Ingest data from databases",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/08_database_ingest.py",
+            notebook_path="/Workspace/course/notebooks/02_week/08_database_ingest.py", # Replace
             source=Source.WORKSPACE,
             base_parameters={"catalog": "{CATALOG}"}
         ),
@@ -918,7 +918,7 @@ tasks = [
         task_key="ingest_s3",
         description="Ingest data from S3/cloud storage",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/09_s3_ingest.py",
+            notebook_path="/Workspace/course/notebooks/02_week/09_s3_ingest.py", # Replace
             source=Source.WORKSPACE,
             base_parameters={"catalog": "{CATALOG}"}
         ),
@@ -1164,7 +1164,7 @@ def create_etl_job(
                 task_key=nb['task_key'],
                 description=nb.get('description', f"Task {idx+1}"),
                 notebook_task=NotebookTask(
-                    notebook_path=nb['notebook_path'], # Relative path to notebook
+                    notebook_path=nb['notebook_path'], # Relative path to defined notebook path
                     source=Source.WORKSPACE,
                     base_parameters={
                         "catalog": catalog,
