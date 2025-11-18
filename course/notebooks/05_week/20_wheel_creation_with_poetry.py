@@ -1105,7 +1105,7 @@
 # MAGIC
 # MAGIC ```python
 # MAGIC # Set up user schema
-# MAGIC %run ../utils/user_schema_setup
+# MAGIC %run ../utils/user_schema_setup.py
 # MAGIC
 # MAGIC # Install wheel from Unity Catalog Volume
 # MAGIC %pip install /Volumes/databricks_course/shared_bronze/libraries/databricks_course_utils-0.1.0-py3-none-any.whl --quiet

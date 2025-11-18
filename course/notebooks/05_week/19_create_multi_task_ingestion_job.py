@@ -34,7 +34,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/user_schema_setup
+# MAGIC %run ../utils/user_schema_setup.py
 
 # COMMAND ----------
 
@@ -394,7 +394,7 @@ tasks = [
         task_key="ingest_files",
         description="Ingest CSV, JSON, and Parquet files to Bronze layer",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/06_file_ingestion",
+            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/06_file_ingestion.py",
             source=Source.WORKSPACE,
             base_parameters=base_params
 
@@ -407,7 +407,7 @@ tasks = [
         task_key="ingest_api",
         description="Ingest data from REST APIs to Bronze layer",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/07_api_ingest",
+            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/07_api_ingest.py",
             source=Source.WORKSPACE,
             base_parameters=base_params
         ),
@@ -419,7 +419,7 @@ tasks = [
         task_key="ingest_database",
         description="Ingest data from databases via JDBC to Bronze layer",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/08_database_ingest",
+            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/08_database_ingest.py",
             source=Source.WORKSPACE,
             base_parameters=base_params
         ),
@@ -431,7 +431,7 @@ tasks = [
         task_key="ingest_s3",
         description="Ingest data from S3/cloud storage to Bronze layer",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/09_s3_ingest",
+            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/09_s3_ingest.py",
             source=Source.WORKSPACE,
             base_parameters=base_params
         ),

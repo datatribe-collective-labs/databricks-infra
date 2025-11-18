@@ -1163,302 +1163,435 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Part 5: Job Orchestration - SDK Approach
+# MAGIC # Part 5: Job Orchestration with SDK - Reference Example
 # MAGIC
-# MAGIC Now let's create the same job programmatically using the Databricks SDK.
+# MAGIC This section shows **how to automate job creation using the Databricks SDK** for production deployments.
 # MAGIC
-# MAGIC ## Advantages of SDK Approach
-# MAGIC - **Version controlled**: Job definition in code
-# MAGIC - **Reproducible**: Easy to recreate in different environments
-# MAGIC - **Automated**: Part of CI/CD pipelines
-# MAGIC - **Parameterized**: Easy to create variations
-# MAGIC - **Scalable**: Create multiple jobs programmatically
-
-# COMMAND ----------
-
-# Import Databricks SDK
-from databricks.sdk import WorkspaceClient
-from databricks.sdk.service import jobs
-from databricks.sdk.service.jobs import Task, NotebookTask, Source
-
-# Initialize client
-w = WorkspaceClient()
-
-print("✅ Databricks SDK initialized")
-
-# COMMAND ----------
-
-# Job configuration
-JOB_NAME = "Stock Market Pipeline - Production (SDK)"
-NOTEBOOK_PATH = "/Workspace/course/notebooks/05_week/21_stock_market_wheel_deployment"
-WHEEL_PATH = f"/Volumes/{CATALOG}/{USER_SCHEMA}/production_libraries/stock_market_utils-1.0.0-py3-none-any.whl"
-
-# Stock symbols and date range
-SYMBOLS_PARAM = "AAPL,GOOGL,MSFT,AMZN,NVDA"
-START_DATE_PARAM = "2024-01-01"
-END_DATE_PARAM = "2024-12-31"
-
-print(f"📝 Job Configuration:")
-print(f"   Name: {JOB_NAME}")
-print(f"   Notebook: {NOTEBOOK_PATH}")
-print(f"   Wheel: {WHEEL_PATH}")
-print(f"   Symbols: {SYMBOLS_PARAM}")
-print(f"   Date Range: {START_DATE_PARAM} to {END_DATE_PARAM}")
-
-# COMMAND ----------
-
-# Define cluster configuration 
-cluster_config = jobs.ClusterSpec(
-    spark_version="14.3.x-scala2.12",
-    node_type_id="i3.xlarge",
-    num_workers=2,
-    spark_conf={
-        "spark.databricks.delta.preview.enabled": "true"
-    }
-)
-
-# Define shared libraries for all tasks
-shared_libraries = [
-    jobs.Library(whl=WHEEL_PATH),
-    jobs.Library(pypi=jobs.PythonPyPiLibrary(package="yfinance"))
-]
-
-print("✅ Cluster configuration defined")
-
-# COMMAND ----------
-
-# Define tasks
-tasks = [
-    # Task 1: Bronze - Ingest stock data
-    Task(
-        task_key="bronze_ingest_stock_data",
-        description="Ingest raw stock market data from Yahoo Finance API",
-        notebook_task=NotebookTask(
-            notebook_path=NOTEBOOK_PATH,
-            source=Source.WORKSPACE,
-            base_parameters={
-                "symbols": SYMBOLS_PARAM,
-                "start_date": START_DATE_PARAM,
-                "end_date": END_DATE_PARAM,
-                "layer": "bronze"
-            }
-        ),
-        new_cluster=cluster_config,
-        libraries=shared_libraries,
-        timeout_seconds=3600,
-        max_retries=2,
-        min_retry_interval_millis=60000
-    ),
-
-    # Task 2: Silver - Calculate returns and metrics
-    Task(
-        task_key="silver_calculate_returns",
-        description="Calculate daily returns, cumulative returns, and price metrics",
-        notebook_task=NotebookTask(
-            notebook_path=NOTEBOOK_PATH,
-            source=Source.WORKSPACE,
-            base_parameters={"layer": "silver"}
-        ),
-        depends_on=[jobs.TaskDependency(task_key="bronze_ingest_stock_data")],
-        new_cluster=cluster_config,
-        libraries=shared_libraries,
-        timeout_seconds=1800,
-        max_retries=2,
-        min_retry_interval_millis=60000
-    ),
-
-    # Task 3: Gold - Create market insights
-    Task(
-        task_key="gold_market_insights",
-        description="Aggregate analytics and create market performance summary",
-        notebook_task=NotebookTask(
-            notebook_path=NOTEBOOK_PATH,
-            source=Source.WORKSPACE,
-            base_parameters={"layer": "gold"}
-        ),
-        depends_on=[jobs.TaskDependency(task_key="silver_calculate_returns")],
-        new_cluster=cluster_config,
-        libraries=shared_libraries,
-        timeout_seconds=1800,
-        max_retries=1,
-        min_retry_interval_millis=60000
-    )
-]
-
-print(f"✅ Defined {len(tasks)} tasks:")
-for task in tasks:
-    print(f"   - {task.task_key}: {task.description}")
-
-# COMMAND ----------
-
-# Check if job already exists
-existing_jobs = list(w.jobs.list(name=JOB_NAME))
-
-if existing_jobs:
-    print(f"⚠️  Job '{JOB_NAME}' already exists")
-    job_id = existing_jobs[0].job_id
-    print(f"   Job ID: {job_id}")
-    print(f"   Updating existing job...")
-
-    # Update existing job
-    w.jobs.update(
-        job_id=job_id,
-        new_settings=jobs.JobSettings(
-            name=JOB_NAME,
-            tasks=tasks,
-            email_notifications=jobs.JobEmailNotifications(
-                on_success=[w.current_user.me().user_name],
-                on_failure=[w.current_user.me().user_name]
-            ),
-            max_concurrent_runs=1,
-            timeout_seconds=7200
-        )
-    )
-    print(f"✅ Job updated successfully")
-else:
-    print(f"📝 Creating new job: {JOB_NAME}")
-
-    # Create new job
-    created_job = w.jobs.create(
-        name=JOB_NAME,
-        tasks=tasks,
-        email_notifications=jobs.JobEmailNotifications(
-            on_success=[w.current_user.me().user_name],
-            on_failure=[w.current_user.me().user_name]
-        ),
-        max_concurrent_runs=1,
-        timeout_seconds=7200
-    )
-
-    job_id = created_job.job_id
-    print(f"✅ Job created successfully")
-    print(f"   Job ID: {job_id}")
-
-# Get job URL
-job_url = f"{w.config.host}#job/{job_id}"
-print(f"\n🔗 Job URL: {job_url}")
+# MAGIC > **Note**: This is an educational reference. For hands-on SDK practice, see **Notebook 19** which orchestrates real notebooks.
+# MAGIC
+# MAGIC ## Why Use SDK for Job Creation?
+# MAGIC
+# MAGIC - ✅ **Version Control**: Job definitions live in Git alongside code
+# MAGIC - ✅ **Automation**: Create/update jobs in CI/CD pipelines
+# MAGIC - ✅ **Reproducibility**: Deploy identical jobs across dev/staging/prod
+# MAGIC - ✅ **Parameterization**: Easily create job variations
+# MAGIC - ✅ **Scale**: Manage hundreds of jobs programmatically
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ## Example: Creating a Multi-Layer Pipeline Job
+# MAGIC
+# MAGIC Here's how you would create a job that orchestrates Bronze → Silver → Gold transformations using the SDK:
+# MAGIC
+# MAGIC ### Step 1: Setup and Configuration
+# MAGIC
+# MAGIC ```python
+# MAGIC from databricks.sdk import WorkspaceClient
+# MAGIC from databricks.sdk.service import jobs
+# MAGIC from databricks.sdk.service.jobs import Task, NotebookTask, Source, TaskDependency
+# MAGIC
+# MAGIC # Initialize SDK client (auto-authenticated in Databricks notebooks)
+# MAGIC w = WorkspaceClient()
+# MAGIC
+# MAGIC print("✅ Databricks SDK initialized")
+# MAGIC print(f"   Workspace: {w.config.host}")
+# MAGIC print(f"   User: {w.current_user.me().user_name}")
+# MAGIC ```
+# MAGIC
+# MAGIC ### Step 2: Define Job Configuration
+# MAGIC
+# MAGIC ```python
+# MAGIC # Job metadata
+# MAGIC JOB_NAME = "Stock Market Pipeline - Production"
+# MAGIC
+# MAGIC # Notebook paths (these would be separate notebooks in production)
+# MAGIC BRONZE_NOTEBOOK = "/Workspace/pipelines/bronze_stock_ingestion"
+# MAGIC SILVER_NOTEBOOK = "/Workspace/pipelines/silver_stock_transformations"
+# MAGIC GOLD_NOTEBOOK = "/Workspace/pipelines/gold_stock_analytics"
+# MAGIC
+# MAGIC # Wheel path in Unity Catalog Volume
+# MAGIC WHEEL_PATH = "/Volumes/databricks_course/user_schema/libraries/stock_market_utils-1.0.0-py3-none-any.whl"
+# MAGIC
+# MAGIC # Job parameters
+# MAGIC SYMBOLS = "AAPL,GOOGL,MSFT,AMZN,NVDA"
+# MAGIC START_DATE = "2024-01-01"
+# MAGIC END_DATE = "2024-12-31"
+# MAGIC ```
+# MAGIC
+# MAGIC ### Step 3: Define Tasks with Dependencies
+# MAGIC
+# MAGIC ```python
+# MAGIC tasks = [
+# MAGIC     # Task 1: Bronze Layer (no dependencies - runs first)
+# MAGIC     Task(
+# MAGIC         task_key="bronze_ingest_stock_data",
+# MAGIC         description="Ingest raw stock market data from Yahoo Finance",
+# MAGIC         notebook_task=NotebookTask(
+# MAGIC             notebook_path=BRONZE_NOTEBOOK,
+# MAGIC             source=Source.WORKSPACE,
+# MAGIC             base_parameters={
+# MAGIC                 "symbols": SYMBOLS,
+# MAGIC                 "start_date": START_DATE,
+# MAGIC                 "end_date": END_DATE
+# MAGIC             }
+# MAGIC         ),
+# MAGIC         libraries=[
+# MAGIC             jobs.Library(whl=WHEEL_PATH),
+# MAGIC             jobs.Library(pypi=jobs.PythonPyPiLibrary(package="yfinance"))
+# MAGIC         ],
+# MAGIC         timeout_seconds=3600,  # 1 hour
+# MAGIC         max_retries=2,
+# MAGIC         min_retry_interval_millis=60000  # 1 minute between retries
+# MAGIC         # NOTE: No cluster config = uses Serverless compute!
+# MAGIC     ),
+# MAGIC
+# MAGIC     # Task 2: Silver Layer (depends on Bronze)
+# MAGIC     Task(
+# MAGIC         task_key="silver_calculate_returns",
+# MAGIC         description="Calculate daily returns and price metrics",
+# MAGIC         notebook_task=NotebookTask(
+# MAGIC             notebook_path=SILVER_NOTEBOOK,
+# MAGIC             source=Source.WORKSPACE
+# MAGIC         ),
+# MAGIC         depends_on=[TaskDependency(task_key="bronze_ingest_stock_data")],  # Sequential dependency
+# MAGIC         libraries=[jobs.Library(whl=WHEEL_PATH)],
+# MAGIC         timeout_seconds=1800,  # 30 minutes
+# MAGIC         max_retries=2,
+# MAGIC         min_retry_interval_millis=60000
+# MAGIC     ),
+# MAGIC
+# MAGIC     # Task 3: Gold Layer (depends on Silver)
+# MAGIC     Task(
+# MAGIC         task_key="gold_market_insights",
+# MAGIC         description="Create market performance analytics",
+# MAGIC         notebook_task=NotebookTask(
+# MAGIC             notebook_path=GOLD_NOTEBOOK,
+# MAGIC             source=Source.WORKSPACE
+# MAGIC         ),
+# MAGIC         depends_on=[TaskDependency(task_key="silver_calculate_returns")],  # Sequential dependency
+# MAGIC         libraries=[jobs.Library(whl=WHEEL_PATH)],
+# MAGIC         timeout_seconds=1800,
+# MAGIC         max_retries=1,
+# MAGIC         min_retry_interval_millis=60000
+# MAGIC     )
+# MAGIC ]
+# MAGIC
+# MAGIC print(f"✅ Defined {len(tasks)} tasks with dependencies:")
+# MAGIC print(f"   1. bronze_ingest_stock_data (no dependencies)")
+# MAGIC print(f"   2. silver_calculate_returns (depends on bronze)")
+# MAGIC print(f"   3. gold_market_insights (depends on silver)")
+# MAGIC ```
+# MAGIC
+# MAGIC **Key Points**:
+# MAGIC - **No `new_cluster` specified** = Uses **Serverless compute** (instant start, auto-scaling)
+# MAGIC - **`depends_on`** creates sequential execution: Bronze → Silver → Gold
+# MAGIC - **`libraries`** attaches wheel to each task
+# MAGIC - **Retry logic** handles transient failures
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ## Task Dependency Patterns
+# MAGIC
+# MAGIC ### Pattern 1: Sequential (Like This Example)
+# MAGIC ```
+# MAGIC Bronze → Silver → Gold
+# MAGIC ```
+# MAGIC ```python
+# MAGIC # Silver depends on Bronze
+# MAGIC depends_on=[TaskDependency(task_key="bronze_ingest_stock_data")]
+# MAGIC
+# MAGIC # Gold depends on Silver
+# MAGIC depends_on=[TaskDependency(task_key="silver_calculate_returns")]
+# MAGIC ```
+# MAGIC
+# MAGIC ### Pattern 2: Parallel (Like Notebook 19)
+# MAGIC ```
+# MAGIC ┌─ Ingest Files ──┐
+# MAGIC ├─ Ingest API ────┤
+# MAGIC ├─ Ingest DB ─────┤  (All run in parallel)
+# MAGIC └─ Ingest S3 ─────┘
+# MAGIC ```
+# MAGIC ```python
+# MAGIC # No depends_on = all tasks run in parallel
+# MAGIC Task(task_key="ingest_files", ...),  # No dependencies
+# MAGIC Task(task_key="ingest_api", ...),    # No dependencies
+# MAGIC Task(task_key="ingest_db", ...),     # No dependencies
+# MAGIC ```
+# MAGIC
+# MAGIC ### Pattern 3: Fan-Out (Multiple layers depend on one)
+# MAGIC ```
+# MAGIC           ┌─ Silver Sales ───┐
+# MAGIC Bronze ─→ ├─ Silver Marketing ┤
+# MAGIC           └─ Silver Support ──┘
+# MAGIC ```
+# MAGIC ```python
+# MAGIC # All three depend on bronze
+# MAGIC Task(task_key="silver_sales", depends_on=[TaskDependency(task_key="bronze")]),
+# MAGIC Task(task_key="silver_marketing", depends_on=[TaskDependency(task_key="bronze")]),
+# MAGIC Task(task_key="silver_support", depends_on=[TaskDependency(task_key="bronze")])
+# MAGIC ```
+# MAGIC
+# MAGIC ### Pattern 4: Fan-In (One layer depends on multiple)
+# MAGIC ```
+# MAGIC Silver Sales ─────┐
+# MAGIC Silver Marketing ─┤─→ Gold Dashboard
+# MAGIC Silver Support ───┘
+# MAGIC ```
+# MAGIC ```python
+# MAGIC # Gold depends on all three silver tasks
+# MAGIC Task(
+# MAGIC     task_key="gold_dashboard",
+# MAGIC     depends_on=[
+# MAGIC         TaskDependency(task_key="silver_sales"),
+# MAGIC         TaskDependency(task_key="silver_marketing"),
+# MAGIC         TaskDependency(task_key="silver_support")
+# MAGIC     ]
+# MAGIC )
+# MAGIC ```
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Run the Job and Monitor Progress
-
-# COMMAND ----------
-
-# Trigger job run
-print(f"🚀 Triggering job run for: {JOB_NAME}")
-run = w.jobs.run_now(job_id=job_id)
-run_id = run.run_id
-
-print(f"✅ Job run started")
-print(f"   Run ID: {run_id}")
-print(f"   Job ID: {job_id}")
-print(f"🔗 Run URL: {w.config.host}#job/{job_id}/run/{run_id}")
-
-# COMMAND ----------
-
-# Monitor job execution in real-time
-import time
-from datetime import datetime
-
-print(f"\n⏳ Monitoring job execution...\n")
-print("=" * 80)
-
-max_wait_seconds = 3600  # 1 hour timeout
-check_interval = 10  # Check every 10 seconds
-elapsed = 0
-
-while elapsed < max_wait_seconds:
-    run_status = w.jobs.get_run(run_id=run_id)
-    lifecycle_state = run_status.state.life_cycle_state
-
-    # Print overall status
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Overall Status: {lifecycle_state}")
-
-    # Print individual task status
-    if run_status.tasks:
-        for task_run in run_status.tasks:
-            task_state = task_run.state.life_cycle_state
-            task_result = task_run.state.result_state if task_run.state.result_state else "PENDING"
-
-            # Emoji indicators
-            if task_result == "SUCCESS":
-                emoji = "✅"
-            elif task_result == "FAILED":
-                emoji = "❌"
-            elif task_state == "RUNNING":
-                emoji = "🔄"
-            else:
-                emoji = "⏸️"
-
-            print(f"    {emoji} {task_run.task_key:<30} | {task_state:<12} | {task_result}")
-
-    # Check if run completed
-    if lifecycle_state in ["TERMINATED", "SKIPPED", "INTERNAL_ERROR"]:
-        print("\n" + "=" * 80)
-
-        final_result = run_status.state.result_state
-        if final_result == "SUCCESS":
-            print("✅ JOB COMPLETED SUCCESSFULLY")
-            print("\n📊 Pipeline Results:")
-            print(f"   ✅ Bronze: Stock market data ingested")
-            print(f"   ✅ Silver: Returns and metrics calculated")
-            print(f"   ✅ Gold: Market insights aggregated")
-        else:
-            print(f"❌ JOB FAILED: {final_result}")
-            if run_status.state.state_message:
-                print(f"   Error: {run_status.state.state_message}")
-
-        print("=" * 80)
-        break
-
-    time.sleep(check_interval)
-    elapsed += check_interval
-    print()  # Blank line between status updates
-
-if elapsed >= max_wait_seconds:
-    print("⚠️  Monitoring timeout reached. Job may still be running.")
-    print(f"   Check status at: {w.config.host}#job/{job_id}/run/{run_id}")
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## Verify Pipeline Results
-
-# COMMAND ----------
-
-# Query the Gold summary table to see results
-gold_summary_table = get_table_path("gold", "stock_market_summary")
-
-print(f"📊 Querying results from: {gold_summary_table}\n")
-
-df_results = spark.table(gold_summary_table)
-
-print(f"Total Stocks Analyzed: {df_results.count()}")
-print("\n🏆 Top Performers:")
-display(df_results.orderBy(col("total_return_pct").desc()))
-
-# COMMAND ----------
-
-# Show detailed analytics for best performer
-best_stock = df_results.orderBy(col("total_return_pct").desc()).first()
-
-print(f"🏅 Best Performing Stock: {best_stock['symbol']}")
-print(f"   Total Return: {best_stock['total_return_pct']:.2f}%")
-print(f"   Avg Daily Return: {best_stock['avg_daily_return']:.4f}%")
-print(f"   Volatility: {best_stock['volatility']:.4f}")
-print(f"   Performance Tier: {best_stock['performance_tier']}")
-
-# Show price history
-gold_detailed_table = get_table_path("gold", "stock_market_detailed_analytics")
-df_history = spark.table(gold_detailed_table).filter(col("symbol") == best_stock['symbol'])
-
-print(f"\n📈 Price History for {best_stock['symbol']}:")
-display(
-    df_history
-    .select("date", "close", "daily_return", "cumulative_return", "volatility_30d")
-    .orderBy("date")
-)
+# MAGIC ### Step 4: Create or Update the Job
+# MAGIC
+# MAGIC ```python
+# MAGIC # Check if job already exists
+# MAGIC existing_jobs = list(w.jobs.list(name=JOB_NAME))
+# MAGIC
+# MAGIC if existing_jobs:
+# MAGIC     print(f"⚠️  Job '{JOB_NAME}' already exists")
+# MAGIC     job_id = existing_jobs[0].job_id
+# MAGIC     print(f"   Updating existing job (ID: {job_id})")
+# MAGIC
+# MAGIC     # Update existing job with new configuration
+# MAGIC     w.jobs.update(
+# MAGIC         job_id=job_id,
+# MAGIC         new_settings=jobs.JobSettings(
+# MAGIC             name=JOB_NAME,
+# MAGIC             tasks=tasks,
+# MAGIC             email_notifications=jobs.JobEmailNotifications(
+# MAGIC                 on_success=[w.current_user.me().user_name],
+# MAGIC                 on_failure=[w.current_user.me().user_name]
+# MAGIC             ),
+# MAGIC             max_concurrent_runs=1,
+# MAGIC             timeout_seconds=7200  # 2 hours
+# MAGIC         )
+# MAGIC     )
+# MAGIC     print("✅ Job updated successfully")
+# MAGIC
+# MAGIC else:
+# MAGIC     print(f"📝 Creating new job: {JOB_NAME}")
+# MAGIC
+# MAGIC     # Create new job
+# MAGIC     created_job = w.jobs.create(
+# MAGIC         name=JOB_NAME,
+# MAGIC         tasks=tasks,
+# MAGIC         email_notifications=jobs.JobEmailNotifications(
+# MAGIC             on_success=[w.current_user.me().user_name],
+# MAGIC             on_failure=[w.current_user.me().user_name]
+# MAGIC         ),
+# MAGIC         max_concurrent_runs=1,
+# MAGIC         timeout_seconds=7200
+# MAGIC     )
+# MAGIC
+# MAGIC     job_id = created_job.job_id
+# MAGIC     print(f"✅ Job created successfully (ID: {job_id})")
+# MAGIC
+# MAGIC # Get job URL for easy access
+# MAGIC job_url = f"{w.config.host}/#job/{job_id}"
+# MAGIC print(f"\n🔗 Job URL: {job_url}")
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ## Step 5: Run and Monitor the Job
+# MAGIC
+# MAGIC ### Trigger Job Run
+# MAGIC
+# MAGIC ```python
+# MAGIC # Trigger job run
+# MAGIC print(f"🚀 Triggering job run for: {JOB_NAME}")
+# MAGIC run = w.jobs.run_now(job_id=job_id)
+# MAGIC run_id = run.run_id
+# MAGIC
+# MAGIC print(f"✅ Job run started")
+# MAGIC print(f"   Run ID: {run_id}")
+# MAGIC print(f"   Job ID: {job_id}")
+# MAGIC print(f"🔗 Run URL: {w.config.host}/#job/{job_id}/run/{run_id}")
+# MAGIC ```
+# MAGIC
+# MAGIC ### Monitor Execution in Real-Time
+# MAGIC
+# MAGIC ```python
+# MAGIC import time
+# MAGIC from datetime import datetime
+# MAGIC
+# MAGIC print("\n⏳ Monitoring job execution...\n")
+# MAGIC print("=" * 80)
+# MAGIC
+# MAGIC max_wait_seconds = 3600  # 1 hour timeout
+# MAGIC check_interval = 10  # Check every 10 seconds
+# MAGIC elapsed = 0
+# MAGIC
+# MAGIC while elapsed < max_wait_seconds:
+# MAGIC     run_status = w.jobs.get_run(run_id=run_id)
+# MAGIC     lifecycle_state = run_status.state.life_cycle_state
+# MAGIC
+# MAGIC     # Print overall status
+# MAGIC     print(f"[{datetime.now().strftime('%H:%M:%S')}] Overall: {lifecycle_state}")
+# MAGIC
+# MAGIC     # Print task-level status
+# MAGIC     if run_status.tasks:
+# MAGIC         for task_run in run_status.tasks:
+# MAGIC             task_state = task_run.state.life_cycle_state
+# MAGIC             task_result = task_run.state.result_state or "PENDING"
+# MAGIC
+# MAGIC             # Status indicators
+# MAGIC             emoji = "✅" if task_result == "SUCCESS" else \
+# MAGIC                     "❌" if task_result == "FAILED" else \
+# MAGIC                     "🔄" if task_state == "RUNNING" else "⏸️"
+# MAGIC
+# MAGIC             print(f"    {emoji} {task_run.task_key:<30} | {task_state:<12} | {task_result}")
+# MAGIC
+# MAGIC     # Check if completed
+# MAGIC     if lifecycle_state in ["TERMINATED", "SKIPPED", "INTERNAL_ERROR"]:
+# MAGIC         print("\n" + "=" * 80)
+# MAGIC
+# MAGIC         final_result = run_status.state.result_state
+# MAGIC         if final_result == "SUCCESS":
+# MAGIC             print("✅ JOB COMPLETED SUCCESSFULLY")
+# MAGIC             print("\n📊 Pipeline Results:")
+# MAGIC             print("   ✅ Bronze: Stock market data ingested")
+# MAGIC             print("   ✅ Silver: Returns and metrics calculated")
+# MAGIC             print("   ✅ Gold: Market insights aggregated")
+# MAGIC         else:
+# MAGIC             print(f"❌ JOB FAILED: {final_result}")
+# MAGIC
+# MAGIC         print("=" * 80)
+# MAGIC         break
+# MAGIC
+# MAGIC     time.sleep(check_interval)
+# MAGIC     elapsed += check_interval
+# MAGIC     print()
+# MAGIC
+# MAGIC if elapsed >= max_wait_seconds:
+# MAGIC     print("⚠️  Monitoring timeout. Job may still be running.")
+# MAGIC     print(f"   Check: {w.config.host}/#job/{job_id}/run/{run_id}")
+# MAGIC ```
+# MAGIC
+# MAGIC **Expected Output**:
+# MAGIC ```
+# MAGIC ⏳ Monitoring job execution...
+# MAGIC ================================================================================
+# MAGIC [14:30:15] Overall: RUNNING
+# MAGIC     🔄 bronze_ingest_stock_data        | RUNNING      | PENDING
+# MAGIC     ⏸️  silver_calculate_returns        | PENDING      | PENDING
+# MAGIC     ⏸️  gold_market_insights            | PENDING      | PENDING
+# MAGIC
+# MAGIC [14:30:25] Overall: RUNNING
+# MAGIC     ✅ bronze_ingest_stock_data        | TERMINATED   | SUCCESS
+# MAGIC     🔄 silver_calculate_returns        | RUNNING      | PENDING
+# MAGIC     ⏸️  gold_market_insights            | PENDING      | PENDING
+# MAGIC
+# MAGIC [14:30:35] Overall: RUNNING
+# MAGIC     ✅ bronze_ingest_stock_data        | TERMINATED   | SUCCESS
+# MAGIC     ✅ silver_calculate_returns        | TERMINATED   | SUCCESS
+# MAGIC     🔄 gold_market_insights            | RUNNING      | PENDING
+# MAGIC
+# MAGIC [14:30:45] Overall: TERMINATED
+# MAGIC     ✅ bronze_ingest_stock_data        | TERMINATED   | SUCCESS
+# MAGIC     ✅ silver_calculate_returns        | TERMINATED   | SUCCESS
+# MAGIC     ✅ gold_market_insights            | TERMINATED   | SUCCESS
+# MAGIC
+# MAGIC ================================================================================
+# MAGIC ✅ JOB COMPLETED SUCCESSFULLY
+# MAGIC
+# MAGIC 📊 Pipeline Results:
+# MAGIC    ✅ Bronze: Stock market data ingested
+# MAGIC    ✅ Silver: Returns and metrics calculated
+# MAGIC    ✅ Gold: Market insights aggregated
+# MAGIC ================================================================================
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ## Step 6: Verify Results
+# MAGIC
+# MAGIC ### Query Gold Summary Table
+# MAGIC
+# MAGIC ```python
+# MAGIC # Query the Gold summary table
+# MAGIC gold_summary_table = "databricks_course.user_schema.gold_stock_market_summary"
+# MAGIC
+# MAGIC print(f"📊 Querying results from: {gold_summary_table}\n")
+# MAGIC df_results = spark.table(gold_summary_table)
+# MAGIC
+# MAGIC print(f"Total Stocks Analyzed: {df_results.count()}")
+# MAGIC print("\n🏆 Top Performers:")
+# MAGIC display(df_results.orderBy(col("total_return_pct").desc()))
+# MAGIC ```
+# MAGIC
+# MAGIC **Expected Output**:
+# MAGIC ```
+# MAGIC Total Stocks Analyzed: 5
+# MAGIC
+# MAGIC 🏆 Top Performers:
+# MAGIC
+# MAGIC | symbol | total_return_pct | avg_daily_return | volatility | performance_tier   |
+# MAGIC |--------|-----------------|------------------|------------|--------------------|
+# MAGIC | NVDA   | 185.23          | 0.7451           | 3.2145     | 🔥 High Performer |
+# MAGIC | MSFT   | 42.67           | 0.1823           | 1.8234     | ⭐ Good Performer |
+# MAGIC | AAPL   | 38.92           | 0.1654           | 1.6782     | ⭐ Good Performer |
+# MAGIC | GOOGL  | 31.45           | 0.1345           | 1.9123     | ⭐ Good Performer |
+# MAGIC | AMZN   | 28.73           | 0.1234           | 2.0456     | ⭐ Good Performer |
+# MAGIC ```
+# MAGIC
+# MAGIC ### Analyze Best Performer
+# MAGIC
+# MAGIC ```python
+# MAGIC # Get best performing stock
+# MAGIC best_stock = df_results.orderBy(col("total_return_pct").desc()).first()
+# MAGIC
+# MAGIC print(f"🏅 Best Performing Stock: {best_stock['symbol']}")
+# MAGIC print(f"   Total Return: {best_stock['total_return_pct']:.2f}%")
+# MAGIC print(f"   Avg Daily Return: {best_stock['avg_daily_return']:.4f}%")
+# MAGIC print(f"   Volatility: {best_stock['volatility']:.4f}")
+# MAGIC print(f"   Performance Tier: {best_stock['performance_tier']}")
+# MAGIC
+# MAGIC # Show price history
+# MAGIC gold_detailed_table = "databricks_course.user_schema.gold_stock_market_detailed_analytics"
+# MAGIC df_history = spark.table(gold_detailed_table).filter(col("symbol") == best_stock['symbol'])
+# MAGIC
+# MAGIC print(f"\n📈 Price History for {best_stock['symbol']}:")
+# MAGIC display(
+# MAGIC     df_history
+# MAGIC     .select("date", "close", "daily_return", "cumulative_return", "volatility_30d")
+# MAGIC     .orderBy("date")
+# MAGIC )
+# MAGIC ```
+# MAGIC
+# MAGIC **What This Shows**:
+# MAGIC - ✅ Complete pipeline successfully orchestrated Bronze → Silver → Gold
+# MAGIC - ✅ Serverless compute handled all tasks efficiently (no cluster config needed)
+# MAGIC - ✅ Task dependencies ensured correct execution order
+# MAGIC - ✅ Wheel utilities provided consistent business logic across all layers
+# MAGIC - ✅ Real-time monitoring showed progress and caught any errors
+# MAGIC - ✅ Results queryable immediately after job completion
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ## Comparison: Notebook 19 vs Notebook 21
+# MAGIC
+# MAGIC | Feature | Notebook 19 (Practical) | Notebook 21 (Educational) |
+# MAGIC |---------|------------------------|---------------------------|
+# MAGIC | **Executable Code** | ✅ Yes - run it yourself! | ❌ No - reference only |
+# MAGIC | **Orchestrates** | Notebooks 06-09 (file, API, DB, S3) | Wheel-based pipeline (Bronze/Silver/Gold) |
+# MAGIC | **Dependencies** | Parallel (all tasks run together) | Sequential (Bronze → Silver → Gold) |
+# MAGIC | **Libraries** | No wheels needed | Requires wheel deployment |
+# MAGIC | **Purpose** | Learn job orchestration basics | See production wheel patterns |
+# MAGIC | **Best For** | Hands-on learning | Understanding real-world deployment |
+# MAGIC
+# MAGIC **Key Insight**: Notebook 19 gives you practical experience, Notebook 21 shows you production patterns!
 
 # COMMAND ----------
 
