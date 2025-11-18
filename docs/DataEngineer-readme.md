@@ -36,26 +36,29 @@
 # 3. Edit, experiment, and learn!
 ```
 
-## 📚 Course Structure (5 Weeks + Advanced, 19 Notebooks)
+## 📚 Course Structure (5 Weeks + Foundations + Advanced, 27 Notebooks)
 
-| Week | Focus | Notebooks | What You'll Learn |
-|------|-------|-----------|-------------------|
-| **1** | Databricks Fundamentals | 4 | Platform mastery, Unity Catalog, cluster management |
-| **2** | Data Ingestion | 4 | Files, APIs, databases, cloud storage patterns |
-| **3** | Data Transformations | 3 | Advanced Spark operations, window functions |
-| **4** | End-to-End Workflows | 2 | Complete pipeline development |
-| **5** | Production Deployment | 4 | Job orchestration, wheel packages, production patterns |
+| Module | Focus | Notebooks | What You'll Learn |
+|--------|-------|-----------|-------------------|
+| **Week 1** | Databricks Fundamentals | 5 | Platform mastery, Unity Catalog, cluster management, Spark, Delta Lake |
+| **Foundations** | Data Modelling Patterns | 4 | Data modeling basics, medallion architecture, dimensional modeling, SCDs |
+| **Week 2** | Data Ingestion | 5 | Files, APIs, databases, cloud storage patterns |
+| **Week 3** | Data Transformations | 4 | Advanced Spark operations, window functions |
+| **Week 4** | End-to-End Workflows | 3 | Complete pipeline development |
+| **Week 5** | Production Deployment | 4 | Job orchestration, wheel packages, production patterns |
 | **Advanced** | Databricks Apps | 2 | Interactive data applications with Streamlit |
 
 ## 🎯 Learning Paths
 
 ### 🟢 New to Databricks (3-4 weeks)
-- **Weeks 1-2**: Complete all notebooks to understand platform and data ingestion
-- **Week 3**: Master transformations and analytics
+- **Week 1**: Master Databricks platform fundamentals
+- **Foundations**: Learn essential data modeling concepts
+- **Weeks 2-3**: Complete data ingestion and transformations
 - **Week 4**: Build complete end-to-end pipelines
 
 ### 🟡 Know Spark/Data Engineering (2-3 weeks)
-- **Week 3-4**: Master complex transformations and complete pipelines
+- **Foundations**: Review data modeling patterns and medallion architecture
+- **Weeks 3-4**: Master complex transformations and complete pipelines
 - **Week 5**: Production deployment with wheels and job orchestration
 
 ### 🔴 Production Ready (1-2 weeks)
@@ -63,34 +66,45 @@
 - **Advanced**: Build interactive data applications with Streamlit
 
 ### ⭐ Complete Journey (4-6 weeks)
-Follow all weeks sequentially for comprehensive mastery:
+Follow all modules sequentially for comprehensive mastery:
 1. Databricks fundamentals and platform features
-2. Data engineering patterns (ingestion, transformations, pipelines)
-3. Production deployment with professional Python packaging
-4. Interactive applications for stakeholders (no-code UX)
+2. Data modeling foundations for maintainable architectures
+3. Data engineering patterns (ingestion, transformations, pipelines)
+4. Production deployment with professional Python packaging
+5. Interactive applications for stakeholders (no-code UX)
 
 ## 🗂️ Course Content Details
 
-### Week 1: Foundation & Platform Mastery
-- `00_databricks_fundamentals.py` - Platform architecture and best practices
-- `01_unity_catalog_deep_dive.py` - Data governance and permissions  
-- `02_cluster_management.py` - Compute optimization and cost management
-- `03_spark_on_databricks.py` - Distributed computing and performance
+### Week 1: Databricks Fundamentals
+- `01_databricks_fundamentals.py` - Platform architecture and best practices
+- `02_unity_catalog_deep_dive.py` - Data governance and permissions
+- `03_cluster_management.py` - Compute optimization and cost management
+- `04_spark_on_databricks.py` - Distributed computing and performance
+- `05_delta_lake_concepts_explained.py` - Delta Lake fundamentals and ACID properties
+
+### Foundations: Data Modelling Patterns
+- `01_introduction_to_data_modeling.py` - Data modeling fundamentals and design principles
+- `02_medallion_architecture.py` - Bronze, Silver, Gold layers and data lakehouse patterns
+- `03_dimensional_modeling.py` - Star schema, facts, dimensions, and data warehouse design
+- `04_scd_and_delta_patterns.py` - Slowly Changing Dimensions and Delta Lake implementation
 
 ### Week 2: Data Ingestion Mastery
 - `06_file_ingestion.py` - CSV, JSON, Parquet with Delta Lake integration
 - `07_api_ingest.py` - REST APIs, authentication, retry logic
 - `08_database_ingest.py` - JDBC connections and database integration
 - `09_s3_ingest.py` - Cloud storage patterns and data lakehouse
+- `10_ingestion_concepts_explained.py` - Batch/streaming ingestion and schema handling
 
 ### Week 3: Advanced Transformations
 - `11_simple_transformations.py` - Data cleaning and basic operations
 - `12_window_transformations.py` - Advanced analytics with window functions
 - `13_aggregations.py` - Complex grouping and statistical operations
+- `14_transformation_concepts_explained.py` - Lazy evaluation, partitioning, caching strategies
 
-### Week 4: Production Workflows
+### Week 4: End-to-End Workflows
 - `15_file_to_aggregation.py` - Complete file processing pipeline
 - `16_api_to_aggregation.py` - Real-time API data to insights
+- `17_pipeline_patterns_explained.py` - Medallion architecture, data quality, monitoring patterns
 
 ### Week 5: Production Deployment
 - `18_job_orchestration_concepts_explained.py` - Orchestration fundamentals (UI + SDK)

@@ -5,9 +5,9 @@ This file provides comprehensive technical guidance for Claude Code (claude.ai/c
 ## Repository Architecture
 
 This is a **production-deployed** Databricks Infrastructure as Code (IaC) project combining:
-- **Terraform**: Unity Catalog, users, permissions management (currently managing 8 users, 4 catalogs, 13 schemas)
+- **Terraform**: Unity Catalog, users, permissions management (currently managing 8 users, 5 catalogs, 24 schemas)
 - **Python Package**: Professional tooling with Poetry, CLI, validation
-- **Databricks Course**: 17 core notebooks across 5 weeks + 2 advanced modules (fundamentals to production apps)
+- **Databricks Course**: 27 notebooks across 5 weeks + foundations + advanced modules (fundamentals to production apps)
 - **CI/CD Pipeline**: GitHub Actions with automated deployment to Premium Edition workspace
 
 ### Current Production State
@@ -58,14 +58,15 @@ databricks-infra/
 │   ├── utils.py                 # Data generation and utilities
 │   └── user_schema.py           # User schema management (alternative to %run)
 ├── course/                      # Learning materials
-│   ├── notebooks/               # Databricks course notebooks (19 total)
+│   ├── notebooks/               # Databricks course notebooks (27 total)
 │   │   ├── utils/               # Shared utility notebooks
 │   │   │   └── user_schema_setup.py  # User schema config (used via %run)
-│   │   ├── 01_week/             # Week 1: Platform fundamentals (4 notebooks)
-│   │   ├── 02_week/             # Week 2: Data ingestion (4 notebooks, updated with user schemas)
-│   │   ├── 03_week/             # Week 3: Transformations (3 notebooks, updated with user schemas)
-│   │   ├── 04_week/             # Week 4: Pipelines (2 notebooks, updated with user schemas)
-│   │   ├── 05_week/             # Week 5: Job orchestration (4 notebooks)
+│   │   ├── 01_week/             # Week 1: Databricks fundamentals (5 notebooks)
+│   │   ├── foundations/         # Foundations: Data modelling patterns (4 notebooks)
+│   │   ├── 02_week/             # Week 2: Data ingestion (5 notebooks, updated with user schemas)
+│   │   ├── 03_week/             # Week 3: Transformations (4 notebooks, updated with user schemas)
+│   │   ├── 04_week/             # Week 4: End-to-end workflows (3 notebooks, updated with user schemas)
+│   │   ├── 05_week/             # Week 5: Production deployment (4 notebooks)
 │   │   └── advanced/            # Advanced: Databricks Apps (2 notebooks)
 │   └── datasets/                # Sample data (CSV, JSON, Parquet)
 ├── docs/                        # Reference documentation
@@ -87,7 +88,7 @@ databricks-infra/
 - **index.html** - Landing page with two paths:
   - "Data Engineer Learning Track" → links to data-engineer.html
   - "Data Platform Engineer Learning Track" → links to platform-engineer.html
-  - Stats section showing: 19 notebooks, 5 weeks, 100% automated, 0 manual setup
+  - Stats section showing: 27 notebooks, 5 weeks + foundations, 100% automated, 0 manual setup
 
 - **data-engineer.html** - Student guide:
   - 3-step getting started (workspace access, find content, start learning)
@@ -102,9 +103,9 @@ databricks-infra/
   - Troubleshooting common issues
 
 - **curriculum.html** - Complete course curriculum:
-  - All 19 notebooks organized by week with descriptions
+  - All 27 notebooks organized by week with descriptions
   - Topics and learning outcomes
-  - Time estimates for each week
+  - Time estimates for each week/module
   - Interactive topic tags
 
 **Markdown Documentation** (in docs/ for reference):
@@ -284,7 +285,7 @@ Two individual principals have unrestricted access:
 
 **Implementation Date:** 2025-10-27
 **Status:** ✅ Production Ready
-**Coverage:** 10/21 notebooks (all notebooks that write data)
+**Coverage:** 10/27 notebooks (all notebooks that write data; foundations notebooks are educational only)
 
 #### Problem Statement
 Prior to this implementation, all users wrote to shared schemas (`shared_bronze`, `shared_silver`, `shared_gold`), causing:
@@ -415,30 +416,41 @@ print_user_config()                # Display config for debugging
 
 ## Course Curriculum Technical Details
 
-### Week 1: Platform Mastery (4 notebooks)
-Focus: Databricks fundamentals, Unity Catalog, performance optimization
-- **00_databricks_fundamentals.py**: Platform architecture, runtime environments
-- **01_unity_catalog_deep_dive.py**: Data governance, three-level namespace
-- **02_cluster_management.py**: Autoscaling, instance types, cost optimization
-- **03_spark_on_databricks.py**: DataFrames, RDD operations, performance tuning
+### Week 1: Databricks Fundamentals (5 notebooks)
+Focus: Databricks platform, Unity Catalog, cluster management, Spark, Delta Lake
+- **01_databricks_fundamentals.py**: Platform architecture, runtime environments, best practices
+- **02_unity_catalog_deep_dive.py**: Data governance, three-level namespace, permissions
+- **03_cluster_management.py**: Autoscaling, instance types, cost optimization
+- **04_spark_on_databricks.py**: DataFrames, RDD operations, performance tuning
+- **05_delta_lake_concepts_explained.py**: Delta Lake fundamentals, ACID properties, transaction logs
 
-### Week 2: Data Ingestion (4 notebooks)  
+### Foundations: Data Modelling Patterns (4 notebooks)
+Focus: Essential data modeling concepts for maintainable, performant data architectures
+- **01_introduction_to_data_modeling.py**: Data modeling fundamentals, design principles, why modeling matters
+- **02_medallion_architecture.py**: Bronze, Silver, Gold layers, progressive data refinement patterns
+- **03_dimensional_modeling.py**: Star/snowflake schemas, fact and dimension tables, analytics design
+- **04_scd_and_delta_patterns.py**: Slowly Changing Dimensions (Types 1, 2, 3), Delta Lake SCD implementation
+
+### Week 2: Data Ingestion (5 notebooks)
 Focus: Production-grade ingestion patterns with error handling
-- **04_file_ingestion.py**: CSV/JSON/Parquet with explicit schemas, data quality validation
-- **05_api_ingest.py**: REST APIs, authentication, retry logic, rate limiting
-- **06_database_ingest.py**: JDBC connections, incremental loading, change data capture
-- **07_s3_ingest.py**: Cloud storage, partitioning strategies, data lakehouse patterns
+- **06_file_ingestion.py**: CSV/JSON/Parquet with explicit schemas, data quality validation
+- **07_api_ingest.py**: REST APIs, authentication, retry logic, rate limiting
+- **08_database_ingest.py**: JDBC connections, incremental loading, change data capture
+- **09_s3_ingest.py**: Cloud storage, partitioning strategies, data lakehouse patterns
+- **10_ingestion_concepts_explained.py**: Batch/streaming ingestion, schema handling, error patterns
 
-### Week 3: Advanced Transformations (3 notebooks)
+### Week 3: Advanced Transformations (4 notebooks)
 Focus: Complex Spark operations and analytics
-- **08_simple_transformations.py**: Data cleaning, type conversions, business logic
-- **09_window_transformations.py**: Ranking, moving averages, lead/lag functions
-- **10_aggregations.py**: Complex grouping, CUBE/ROLLUP, statistical functions
+- **11_simple_transformations.py**: Data cleaning, type conversions, business logic
+- **12_window_transformations.py**: Ranking, moving averages, lead/lag functions
+- **13_aggregations.py**: Complex grouping, CUBE/ROLLUP, statistical functions
+- **14_transformation_concepts_explained.py**: Lazy evaluation, partitioning, shuffling, caching strategies
 
-### Week 4: Production Workflows (2 notebooks)
-Focus: End-to-end pipeline development
-- **11_file_to_aggregation.py**: Complete ETL pipeline with monitoring
-- **12_api_to_aggregation.py**: Real-time data processing to insights
+### Week 4: End-to-End Workflows (3 notebooks)
+Focus: Complete production pipeline development
+- **15_file_to_aggregation.py**: Complete ETL pipeline (Bronze→Silver→Gold) with monitoring
+- **16_api_to_aggregation.py**: Real-time data processing pipeline to insights
+- **17_pipeline_patterns_explained.py**: Medallion architecture, data quality, monitoring, recovery patterns
 
 ### Week 5: Production Deployment (4 notebooks)
 Focus: Job orchestration, wheel packages, and production deployment
