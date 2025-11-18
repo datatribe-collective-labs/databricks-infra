@@ -356,7 +356,7 @@ cron_patterns = [
     ("0 2 * * *", "Daily at 2:00 AM", "Nightly ETL jobs"),
     ("0 */6 * * *", "Every 6 hours", "Periodic data refresh"),
     ("0 0 * * 0", "Weekly on Sunday midnight", "Weekly aggregations"),
-    ("0 0 1 * *", "Monthly on 1st at midnight", "Monthly reports"),
+    ("0 0 2 1 * ?", "Monthly on 1st at 2 AM", "Monthly reports"),
     ("*/15 * * * *", "Every 15 minutes", "Near real-time updates")
 ]
 
@@ -619,16 +619,16 @@ print("  - One job, multiple use cases")
 # MAGIC **2. Configure Schedule**
 # MAGIC ```
 # MAGIC Schedule type: Cron
-# MAGIC Cron expression: 0 2 * * *  (Daily at 2 AM)
+# MAGIC Cron expression: 0 0 2 * * ?  (Daily at 2 AM) # Quartz Cron Expression!
 # MAGIC Timezone: America/New_York
 # MAGIC Pause status: Active
 # MAGIC ```
 # MAGIC
 # MAGIC **Common Schedules:**
-# MAGIC - Daily at 2 AM: `0 2 * * *`
-# MAGIC - Every 6 hours: `0 */6 * * *`
-# MAGIC - Weekly Sunday 2 AM: `0 2 * * 0`
-# MAGIC - Every 15 minutes: `*/15 * * * *`
+# MAGIC - Daily at 2 AM: `0 0 2 * * ?`
+# MAGIC - Every 6 hours: `0 0 */6 * * ?`
+# MAGIC - Weekly Sunday 2 AM: `0 0 2 ? * SUN`
+# MAGIC - Every 15 minutes: `0 */15 * * * ?`
 # MAGIC
 # MAGIC ---
 # MAGIC
@@ -807,7 +807,7 @@ print("=== Creating Single-Task Job ===\n")
 
 # Define job configuration
 job_name = "SDK_Demo_Simple_Ingestion"
-notebook_path = "/Workspace/course/notebooks/02_week/06_file_ingestion"
+notebook_path = "/Workspace/course/notebooks/02_week/06_file_ingestion" # Modify with your notebook path
 
 try:
     # Create job
@@ -821,8 +821,8 @@ try:
                     notebook_path=notebook_path,
                     source=Source.WORKSPACE,
                     base_parameters={
-                        "catalog": "{CATALOG}", # defaults to databricks_course
-                        "schema": "{USER_SCHEMA}" # defaults to your_schema_name
+                        "catalog": "{CATALOG}",
+                        "schema": "{USER_SCHEMA}"
                     }
                 ),
                 timeout_seconds=3600,  # 1 hour timeout
@@ -884,7 +884,7 @@ tasks = [
         notebook_task=NotebookTask(
             notebook_path="/Workspace/course/notebooks/02_week/06_file_ingestion.py",
             source=Source.WORKSPACE,
-            base_parameters={"catalog": "databricks_course"}
+            base_parameters={"catalog": "{CATALOG}"}
         ),
         #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
@@ -896,7 +896,7 @@ tasks = [
         notebook_task=NotebookTask(
             notebook_path="/Workspace/course/notebooks/02_week/07_api_ingest.py",
             source=Source.WORKSPACE,
-            base_parameters={"catalog": "databricks_course"}
+            base_parameters={"catalog": "{CATALOG}"}
         ),
         #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
@@ -908,7 +908,7 @@ tasks = [
         notebook_task=NotebookTask(
             notebook_path="/Workspace/course/notebooks/02_week/08_database_ingest.py",
             source=Source.WORKSPACE,
-            base_parameters={"catalog": "databricks_course"}
+            base_parameters={"catalog": "{CATALOG}"}
         ),
         #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
@@ -920,7 +920,7 @@ tasks = [
         notebook_task=NotebookTask(
             notebook_path="/Workspace/course/notebooks/02_week/09_s3_ingest.py",
             source=Source.WORKSPACE,
-            base_parameters={"catalog": "databricks_course"}
+            base_parameters={"catalog": "{CATALOG}"}
         ),
         #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
@@ -1164,12 +1164,12 @@ def create_etl_job(
                 task_key=nb['task_key'],
                 description=nb.get('description', f"Task {idx+1}"),
                 notebook_task=NotebookTask(
-                    notebook_path=nb['notebook_path'],
+                    notebook_path=nb['notebook_path'], # Relative path to notebook
                     source=Source.WORKSPACE,
                     base_parameters={
                         "catalog": catalog,
                         "schema": schema,
-                        "environment": environment
+                        "environment": environment #dev/staging/prod
                     }
                 ),
                 depends_on=nb.get('depends_on', []),
@@ -1205,12 +1205,12 @@ def create_etl_job(
 example_notebooks = [
     {
         "task_key": "bronze_ingestion",
-        "notebook_path": "/Workspace/course/notebooks/02_week/06_file_ingestion",
+        "notebook_path": "/Workspace/course/notebooks/02_week/06_file_ingestion.py", # Edit notebook paths
         "description": "Ingest raw data"
     },
     {
         "task_key": "silver_transformation",
-        "notebook_path": "/Workspace/course/notebooks/03_week/11_simple_transformations",
+        "notebook_path": "/Workspace/course/notebooks/03_week/11_simple_transformations.py", # Edit notebook paths
         "description": "Transform to silver",
         "depends_on": [{"task_key": "bronze_ingestion"}]
     }
@@ -1224,7 +1224,7 @@ job = create_etl_job(
     notebooks=example_notebooks,
     catalog="databricks_course",
     schema="my_schema",
-    schedule_cron="0 2 * * *",
+    schedule_cron="0 0 2 * * ?",
     environment="dev"
 )
 """)
@@ -1254,7 +1254,7 @@ job = create_etl_job(
 # MAGIC     }
 # MAGIC   ],
 # MAGIC   "schedule": {
-# MAGIC     "quartz_cron_expression": "0 2 * * *",
+# MAGIC     "quartz_cron_expression": "0 0 2 * * ?",
 # MAGIC     "timezone_id": "America/New_York"
 # MAGIC   }
 # MAGIC }
