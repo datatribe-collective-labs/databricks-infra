@@ -398,29 +398,32 @@ print(f"\nSpark Version: {spark.version}")
 
 # COMMAND ----------
 
-"""
-COMMENT: This cell should be replaced with theory, since 'not enabled' is not conveying anything meaningful here.
-"""
-
-# Analyze current cluster resource utilization
-print("=== Resource Utilization Analysis ===")
-
-# Examine current configuration
-important_configs = [
-    'spark.sql.adaptive.enabled',
-    'spark.sql.adaptive.coalescePartitions.enabled',
-    'spark.sql.adaptive.skewJoin.enabled',
-    'spark.serializer',
-    'spark.sql.execution.arrow.pyspark.enabled'
-]
-
-print("\nImportant Spark Configurations:")
-for config in important_configs:
-    try:
-        value = spark.conf.get(config)
-    except Exception:
-        value = "Not available"
-    print(f"  {config}: {value}")
+# MAGIC %md
+# MAGIC ## Example of Cluster Analysis
+# MAGIC ### Reference only. 
+# MAGIC This example cannot be performed on Databricks Free Edition, but can be studied with open-source Apache Spark cluster locally or in cloud.
+# MAGIC
+# MAGIC ```
+# MAGIC # Analyze current cluster resource utilization
+# MAGIC print("=== Resource Utilization Analysis ===")
+# MAGIC
+# MAGIC # Examine current configuration
+# MAGIC important_configs = [
+# MAGIC    'spark.sql.adaptive.enabled',
+# MAGIC    'spark.sql.adaptive.coalescePartitions.enabled',
+# MAGIC    'spark.sql.adaptive.skewJoin.enabled',
+# MAGIC    'spark.serializer',
+# MAGIC    'spark.sql.execution.arrow.pyspark.enabled'
+# MAGIC ]
+# MAGIC
+# MAGIC print("\nImportant Spark Configurations:")
+# MAGIC for config in important_configs:
+# MAGIC    try:
+# MAGIC        value = spark.conf.get(config)
+# MAGIC    except Exception:
+# MAGIC        value = "Not available"
+# MAGIC    print(f"  {config}: {value}")
+# MAGIC ```
 
 # COMMAND ----------
 

@@ -911,24 +911,48 @@
 
 # COMMAND ----------
 
-# Example: Upload wheel to Unity Catalog Volume programmatically
-# NOTE: This assumes you have the wheel file accessible in your local development environment
-
-# Step 1: Create volume (if not exists)
-spark.sql("""
-CREATE VOLUME IF NOT EXISTS databricks_course.shared_bronze.libraries
-COMMENT 'Python wheels and reusable libraries for course'
-""")
-
-# Step 2: Use dbutils to copy (when running locally with wheel file)
-# dbutils.fs.cp(
-#     "file:///path/to/dist/databricks_course_utils-0.1.0-py3-none-any.whl",
-#     "/Volumes/databricks_course/shared_bronze/libraries/databricks_course_utils-0.1.0-py3-none-any.whl"
-# )
-
-# Step 3: Verify upload
-print("📦 Files in libraries volume:")
-display(dbutils.fs.ls("/Volumes/databricks_course/shared_bronze/libraries/"))
+# MAGIC %md
+# MAGIC ### Example: Programmatic Upload to Unity Catalog Volume
+# MAGIC
+# MAGIC If you prefer to automate the upload process using Python, here's how you would do it:
+# MAGIC
+# MAGIC **Step 1: Create Volume (SQL or Python)**
+# MAGIC ```sql
+# MAGIC CREATE VOLUME IF NOT EXISTS databricks_course.shared_bronze.libraries
+# MAGIC COMMENT 'Python wheels and reusable libraries for course';
+# MAGIC ```
+# MAGIC
+# MAGIC Or using PySpark:
+# MAGIC ```python
+# MAGIC spark.sql("""
+# MAGIC CREATE VOLUME IF NOT EXISTS databricks_course.shared_bronze.libraries
+# MAGIC COMMENT 'Python wheels and reusable libraries for course'
+# MAGIC """)
+# MAGIC ```
+# MAGIC
+# MAGIC **Step 2: Upload Wheel File**
+# MAGIC ```python
+# MAGIC # Copy from local file system to Unity Catalog Volume
+# MAGIC dbutils.fs.cp(
+# MAGIC     "file:///path/to/dist/databricks_course_utils-0.1.0-py3-none-any.whl",
+# MAGIC     "/Volumes/databricks_course/shared_bronze/libraries/databricks_course_utils-0.1.0-py3-none-any.whl"
+# MAGIC )
+# MAGIC ```
+# MAGIC
+# MAGIC **Step 3: Verify Upload**
+# MAGIC ```python
+# MAGIC # List files in the volume
+# MAGIC print("📦 Files in libraries volume:")
+# MAGIC display(dbutils.fs.ls("/Volumes/databricks_course/shared_bronze/libraries/"))
+# MAGIC
+# MAGIC # Expected output:
+# MAGIC # databricks_course_utils-0.1.0-py3-none-any.whl
+# MAGIC ```
+# MAGIC
+# MAGIC **When to Use This Approach:**
+# MAGIC - Automating deployments in CI/CD pipelines
+# MAGIC - Scripting wheel updates across multiple environments
+# MAGIC - Integration with version control workflows
 
 # COMMAND ----------
 
@@ -950,33 +974,42 @@ display(dbutils.fs.ls("/Volumes/databricks_course/shared_bronze/libraries/"))
 # MAGIC %md
 # MAGIC # Part 7: Using Wheels in Jobs and Notebooks
 # MAGIC
-# MAGIC Now that the wheel is deployed, let's use it in different contexts.
+# MAGIC Now that the wheel is deployed, here's how you would use it in different contexts.
+# MAGIC
+# MAGIC > **Note**: These are educational examples showing the patterns. For hands-on practice, see **Notebook 19** for practical job orchestration.
 # MAGIC
 # MAGIC ## Method 1: Install in Notebook with %pip
 # MAGIC
 # MAGIC The simplest way to use a wheel in a notebook:
-
-# COMMAND ----------
-
-# Install wheel from Unity Catalog Volume
-%pip install /Volumes/databricks_course/shared_bronze/libraries/databricks_course_utils-0.1.0-py3-none-any.whl
-
-# Restart Python to load the package
-dbutils.library.restartPython()
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC After restart, import and use:
-
-# COMMAND ----------
-
-# Import from our wheel package
-from databricks_course_utils import ingest_csv, remove_duplicates, save_to_delta
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
-
-print("✅ Successfully imported from databricks_course_utils wheel")
-print(f"📦 Available functions: ingest_csv, remove_duplicates, save_to_delta")
+# MAGIC
+# MAGIC ```python
+# MAGIC # Install wheel from Unity Catalog Volume
+# MAGIC %pip install /Volumes/databricks_course/shared_bronze/libraries/databricks_course_utils-0.1.0-py3-none-any.whl
+# MAGIC
+# MAGIC # Restart Python to load the package
+# MAGIC dbutils.library.restartPython()
+# MAGIC ```
+# MAGIC
+# MAGIC **After Python restarts, import and use**:
+# MAGIC
+# MAGIC ```python
+# MAGIC # Import from our wheel package
+# MAGIC from databricks_course_utils import ingest_csv, remove_duplicates, save_to_delta
+# MAGIC from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+# MAGIC
+# MAGIC print("✅ Successfully imported from databricks_course_utils wheel")
+# MAGIC print(f"📦 Available functions: ingest_csv, remove_duplicates, save_to_delta")
+# MAGIC
+# MAGIC # Now you can use the functions
+# MAGIC df = ingest_csv(spark, "/path/to/data.csv", schema=my_schema)
+# MAGIC df_clean = remove_duplicates(df, subset=["id"])
+# MAGIC save_to_delta(df_clean, "catalog.schema.table")
+# MAGIC ```
+# MAGIC
+# MAGIC **When to Use This Method:**
+# MAGIC - Interactive notebook development
+# MAGIC - Quick prototyping with wheel utilities
+# MAGIC - Testing new wheel versions before production deployment
 
 # COMMAND ----------
 
@@ -1064,162 +1097,168 @@ print(f"📦 Available functions: ingest_csv, remove_duplicates, save_to_delta")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Example: Using the Wheel in a Real Pipeline
+# MAGIC ## Example: Complete Pipeline Using Wheel Utilities
 # MAGIC
-# MAGIC Let's demonstrate using our wheel utilities in a complete data pipeline:
-
-# COMMAND ----------
-
+# MAGIC Here's what a complete medallion architecture pipeline would look like using wheel utilities:
+# MAGIC
+# MAGIC ### Setup and Installation
+# MAGIC
+# MAGIC ```python
+# MAGIC # Set up user schema
 # MAGIC %run ../utils/user_schema_setup
-
-# COMMAND ----------
-
-# Ensure wheel is installed (if not already via cluster libraries)
-%pip install /Volumes/databricks_course/shared_bronze/libraries/databricks_course_utils-0.1.0-py3-none-any.whl --quiet
-dbutils.library.restartPython()
-
-# COMMAND ----------
-
-# Import utilities from our wheel
-from databricks_course_utils import (
-    ingest_csv,
-    standardize_string_columns,
-    remove_duplicates,
-    fill_missing_values,
-    validate_data_quality,
-    save_to_delta
-)
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
-from pyspark.sql.functions import col, current_timestamp
-
-print("✅ Wheel utilities loaded successfully")
-
-# COMMAND ----------
-
-# Define schema for customer data
-customer_schema = StructType([
-    StructField("customer_id", IntegerType(), False),
-    StructField("customer_name", StringType(), True),
-    StructField("email", StringType(), True),
-    StructField("country", StringType(), True),
-    StructField("total_purchases", DoubleType(), True)
-])
-
-# Create sample customer data to simulate CSV file
-sample_customers = spark.createDataFrame([
-    (1, "  alice johnson  ", "alice@example.com", "usa", 1500.00),
-    (2, "Bob Smith", "bob@example.com", "uk", 2300.50),
-    (3, "CHARLIE BROWN", None, "canada", 980.00),  # Missing email
-    (1, "Alice Johnson", "alice@example.com", "usa", 1500.00),  # Duplicate
-    (4, "Diana Prince", "diana@example.com", None, 3200.00),  # Missing country
-    (5, "  ethan hunt  ", "ethan@example.com", "usa", None),  # Missing total
-], schema=customer_schema)
-
-# Save as temporary CSV to simulate file ingestion
-temp_csv_path = get_table_path("bronze", "temp_customer_csv")
-sample_customers.write.format("delta").mode("overwrite").saveAsTable(temp_csv_path)
-
-print(f"✅ Created sample customer data at: {temp_csv_path}")
-
-# COMMAND ----------
-
-# BRONZE LAYER: Ingest raw data using wheel utility
-print("🔹 BRONZE: Ingesting customer data...")
-
-# Read raw data (simulating CSV read)
-df_bronze = spark.table(temp_csv_path)
-
-# Save to bronze layer
-bronze_table = get_table_path("bronze", "customers_raw")
-save_to_delta(df_bronze, bronze_table, mode="overwrite")
-
-print(f"✅ Bronze layer saved: {bronze_table}")
-print(f"   Records: {df_bronze.count()}")
-display(df_bronze)
-
-# COMMAND ----------
-
-# SILVER LAYER: Clean and standardize data using wheel utilities
-print("🔹 SILVER: Cleaning and standardizing customer data...")
-
-# Step 1: Remove duplicates
-df_silver = remove_duplicates(df_bronze, subset=["customer_id"])
-print(f"   After deduplication: {df_silver.count()} records")
-
-# Step 2: Standardize string columns
-df_silver = standardize_string_columns(
-    df_silver,
-    columns=["customer_name", "country"],
-    case="upper",
-    trim_spaces=True
-)
-print(f"   ✅ Standardized name and country columns")
-
-# Step 3: Fill missing values
-df_silver = fill_missing_values(df_silver, column="email", fill_value="unknown@example.com")
-df_silver = fill_missing_values(df_silver, column="country", fill_value="UNKNOWN")
-df_silver = fill_missing_values(df_silver, column="total_purchases", fill_value=0.0)
-print(f"   ✅ Filled missing values")
-
-# Step 4: Add metadata
-df_silver = df_silver.withColumn("processed_at", current_timestamp())
-
-# Save to silver layer
-silver_table = get_table_path("silver", "customers_cleaned")
-save_to_delta(df_silver, silver_table, mode="overwrite")
-
-print(f"✅ Silver layer saved: {silver_table}")
-display(df_silver)
-
-# COMMAND ----------
-
-# GOLD LAYER: Validate quality and create final dataset
-print("🔹 GOLD: Validating and creating analytics-ready dataset...")
-
-# Validate data quality: separate good and bad records
-good_records, bad_records = validate_data_quality(
-    df_silver,
-    required_columns=["customer_id", "customer_name", "email"],
-    non_null_columns=["customer_id", "customer_name"]
-)
-
-print(f"   Good records: {good_records.count()}")
-print(f"   Bad records: {bad_records.count()}")
-
-# Save good records to gold layer
-gold_table = get_table_path("gold", "customers_validated")
-save_to_delta(good_records, gold_table, mode="overwrite")
-
-# Save bad records to quarantine (if any)
-if bad_records.count() > 0:
-    quarantine_table = get_table_path("bronze", "customers_quarantine")
-    save_to_delta(bad_records, quarantine_table, mode="overwrite")
-    print(f"   ⚠️ Quarantined {bad_records.count()} records: {quarantine_table}")
-
-print(f"✅ Gold layer saved: {gold_table}")
-display(good_records)
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## What We Just Demonstrated
 # MAGIC
-# MAGIC Using our `databricks_course_utils` wheel, we:
+# MAGIC # Install wheel from Unity Catalog Volume
+# MAGIC %pip install /Volumes/databricks_course/shared_bronze/libraries/databricks_course_utils-0.1.0-py3-none-any.whl --quiet
+# MAGIC dbutils.library.restartPython()
 # MAGIC
-# MAGIC 1. ✅ **Ingested** data with `save_to_delta()` (Bronze layer)
-# MAGIC 2. ✅ **Cleaned** data with:
-# MAGIC    - `remove_duplicates()` - Eliminated duplicate customer records
-# MAGIC    - `standardize_string_columns()` - Normalized text to uppercase
-# MAGIC    - `fill_missing_values()` - Handled null values
-# MAGIC 3. ✅ **Validated** data with `validate_data_quality()` (Gold layer)
-# MAGIC 4. ✅ **Saved** results to Delta tables in user's schema
+# MAGIC # Import wheel utilities
+# MAGIC from databricks_course_utils import (
+# MAGIC     ingest_csv,
+# MAGIC     standardize_string_columns,
+# MAGIC     remove_duplicates,
+# MAGIC     fill_missing_values,
+# MAGIC     validate_data_quality,
+# MAGIC     save_to_delta
+# MAGIC )
+# MAGIC from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
+# MAGIC from pyspark.sql.functions import col, current_timestamp
 # MAGIC
-# MAGIC **Key Benefits of Using Wheels**:
-# MAGIC - **Reusable**: Same utilities work across all notebooks and jobs
-# MAGIC - **Testable**: Functions are unit tested before deployment
-# MAGIC - **Maintainable**: Update once in wheel, all jobs benefit
-# MAGIC - **Version controlled**: Track changes with semantic versioning
-# MAGIC - **Team collaboration**: Everyone uses same tested utilities
+# MAGIC print("✅ Wheel utilities loaded successfully")
+# MAGIC ```
+# MAGIC
+# MAGIC ### Bronze Layer: Data Ingestion
+# MAGIC
+# MAGIC ```python
+# MAGIC # Define schema for customer data
+# MAGIC customer_schema = StructType([
+# MAGIC     StructField("customer_id", IntegerType(), False),
+# MAGIC     StructField("customer_name", StringType(), True),
+# MAGIC     StructField("email", StringType(), True),
+# MAGIC     StructField("country", StringType(), True),
+# MAGIC     StructField("total_purchases", DoubleType(), True)
+# MAGIC ])
+# MAGIC
+# MAGIC # Ingest CSV file using wheel utility
+# MAGIC df_bronze = ingest_csv(
+# MAGIC     spark,
+# MAGIC     file_path="/Volumes/databricks_course/shared_bronze/data/customers.csv",
+# MAGIC     schema=customer_schema
+# MAGIC )
+# MAGIC
+# MAGIC # Save to Bronze layer
+# MAGIC bronze_table = get_table_path("bronze", "customers_raw")
+# MAGIC save_to_delta(df_bronze, bronze_table, mode="overwrite")
+# MAGIC
+# MAGIC print(f"✅ Bronze layer saved: {bronze_table}")
+# MAGIC print(f"   Records: {df_bronze.count()}")
+# MAGIC ```
+# MAGIC
+# MAGIC ### Silver Layer: Data Cleaning and Transformation
+# MAGIC
+# MAGIC ```python
+# MAGIC # Read from Bronze layer
+# MAGIC df_silver = spark.table(bronze_table)
+# MAGIC
+# MAGIC # Step 1: Remove duplicates using wheel utility
+# MAGIC df_silver = remove_duplicates(df_silver, subset=["customer_id"])
+# MAGIC print(f"After deduplication: {df_silver.count()} records")
+# MAGIC
+# MAGIC # Step 2: Standardize string columns using wheel utility
+# MAGIC df_silver = standardize_string_columns(
+# MAGIC     df_silver,
+# MAGIC     columns=["customer_name", "country"],
+# MAGIC     case="upper",
+# MAGIC     trim_spaces=True
+# MAGIC )
+# MAGIC print("✅ Standardized name and country columns")
+# MAGIC
+# MAGIC # Step 3: Fill missing values using wheel utility
+# MAGIC df_silver = fill_missing_values(df_silver, column="email", fill_value="unknown@example.com")
+# MAGIC df_silver = fill_missing_values(df_silver, column="country", fill_value="UNKNOWN")
+# MAGIC df_silver = fill_missing_values(df_silver, column="total_purchases", fill_value=0.0)
+# MAGIC print("✅ Filled missing values")
+# MAGIC
+# MAGIC # Step 4: Add metadata
+# MAGIC df_silver = df_silver.withColumn("processed_at", current_timestamp())
+# MAGIC
+# MAGIC # Save to Silver layer
+# MAGIC silver_table = get_table_path("silver", "customers_cleaned")
+# MAGIC save_to_delta(df_silver, silver_table, mode="overwrite")
+# MAGIC
+# MAGIC print(f"✅ Silver layer saved: {silver_table}")
+# MAGIC ```
+# MAGIC
+# MAGIC ### Gold Layer: Data Validation and Quality
+# MAGIC
+# MAGIC ```python
+# MAGIC # Read from Silver layer
+# MAGIC df_gold = spark.table(silver_table)
+# MAGIC
+# MAGIC # Validate data quality using wheel utility
+# MAGIC good_records, bad_records = validate_data_quality(
+# MAGIC     df_gold,
+# MAGIC     required_columns=["customer_id", "customer_name", "email"],
+# MAGIC     non_null_columns=["customer_id", "customer_name"]
+# MAGIC )
+# MAGIC
+# MAGIC print(f"Good records: {good_records.count()}")
+# MAGIC print(f"Bad records: {bad_records.count()}")
+# MAGIC
+# MAGIC # Save good records to Gold layer
+# MAGIC gold_table = get_table_path("gold", "customers_validated")
+# MAGIC save_to_delta(good_records, gold_table, mode="overwrite")
+# MAGIC
+# MAGIC # Save bad records to quarantine (if any)
+# MAGIC if bad_records.count() > 0:
+# MAGIC     quarantine_table = get_table_path("bronze", "customers_quarantine")
+# MAGIC     save_to_delta(bad_records, quarantine_table, mode="overwrite")
+# MAGIC     print(f"⚠️ Quarantined {bad_records.count()} records: {quarantine_table}")
+# MAGIC
+# MAGIC print(f"✅ Gold layer saved: {gold_table}")
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ## What This Pipeline Demonstrates
+# MAGIC
+# MAGIC Using the `databricks_course_utils` wheel, this pipeline achieves:
+# MAGIC
+# MAGIC 1. ✅ **Bronze Layer** - Raw data ingestion with schema validation
+# MAGIC    - `ingest_csv()` - Type-safe CSV ingestion
+# MAGIC    - `save_to_delta()` - Standardized Delta table writes
+# MAGIC
+# MAGIC 2. ✅ **Silver Layer** - Data cleaning and standardization
+# MAGIC    - `remove_duplicates()` - Deduplication by key columns
+# MAGIC    - `standardize_string_columns()` - Consistent text formatting
+# MAGIC    - `fill_missing_values()` - Handle nulls with defaults
+# MAGIC
+# MAGIC 3. ✅ **Gold Layer** - Data quality validation
+# MAGIC    - `validate_data_quality()` - Separate good/bad records
+# MAGIC    - Quarantine pattern for bad records
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ## Key Benefits of This Approach
+# MAGIC
+# MAGIC **Reusability**:
+# MAGIC - Same utilities work across all notebooks and jobs
+# MAGIC - No code duplication - import and use
+# MAGIC
+# MAGIC **Testability**:
+# MAGIC - Functions are unit tested before deployment
+# MAGIC - Confident code changes with test coverage
+# MAGIC
+# MAGIC **Maintainability**:
+# MAGIC - Update once in wheel, all jobs benefit immediately
+# MAGIC - Centralized business logic
+# MAGIC
+# MAGIC **Version Control**:
+# MAGIC - Track changes with semantic versioning
+# MAGIC - Easy rollback to previous versions
+# MAGIC
+# MAGIC **Team Collaboration**:
+# MAGIC - Everyone uses same tested utilities
+# MAGIC - Consistent data patterns across projects
 
 # COMMAND ----------
 
