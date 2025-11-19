@@ -807,7 +807,7 @@ print("=== Creating Single-Task Job ===\n")
 
 # Define job configuration
 job_name = "SDK_Demo_Simple_Ingestion"
-notebook_path = "/Workspace/course/notebooks/02_week/06_file_ingestion" # Modify with your notebook path
+notebook_path = "/Workspace/Shared/terraform-managed/course/notebooks/02_week/06_file_ingestion.py"
 
 try:
     # Create job
@@ -860,33 +860,16 @@ print("=== Creating Multi-Task Ingestion Job ===\n")
 
 multi_task_job_name = "SDK_Demo_Multi_Source_Ingestion"
 
-# Define shared cluster configuration. This is not needed for serverless.
-# job_cluster = JobCluster(
-#     job_cluster_key="ingestion_cluster",
-#     new_cluster=ClusterSpec(
-#         spark_version="14.3.x-scala2.13",
-#         node_type_id="i3.xlarge",  # Adjust based on your workspace
-#         autoscale=AutoScale(min_workers=2, max_workers=8),
-#         spark_conf={
-#             "spark.databricks.cluster.profile": "serverless",
-#             "spark.databricks.repl.allowedLanguages": "python,sql"
-#         }
-#     )
-# )
-
 # Define tasks
-# Note: Uncomment job_cluster_key to use serverless cluster
-# Important: Replace notebook_path with your actual notebook path, and verify that file ends with .py
 tasks = [
     Task(
         task_key="ingest_files",
         description="Ingest CSV/JSON/Parquet files",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/06_file_ingestion.py", # Replace
+            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/06_file_ingestion.py",
             source=Source.WORKSPACE,
             base_parameters={"catalog": "{CATALOG}"}
         ),
-        #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
         max_retries=2
     ),
@@ -894,11 +877,10 @@ tasks = [
         task_key="ingest_api",
         description="Ingest data from REST APIs",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/07_api_ingest.py", # Replace
+            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/07_api_ingest.py",
             source=Source.WORKSPACE,
             base_parameters={"catalog": "{CATALOG}"}
         ),
-        #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
         max_retries=2
     ),
@@ -906,11 +888,10 @@ tasks = [
         task_key="ingest_database",
         description="Ingest data from databases",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/08_database_ingest.py", # Replace
+            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/08_database_ingest.py",
             source=Source.WORKSPACE,
             base_parameters={"catalog": "{CATALOG}"}
         ),
-        #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
         max_retries=2
     ),
@@ -918,11 +899,10 @@ tasks = [
         task_key="ingest_s3",
         description="Ingest data from S3/cloud storage",
         notebook_task=NotebookTask(
-            notebook_path="/Workspace/course/notebooks/02_week/09_s3_ingest.py", # Replace
+            notebook_path="/Workspace/Shared/terraform-managed/course/notebooks/02_week/09_s3_ingest.py",
             source=Source.WORKSPACE,
             base_parameters={"catalog": "{CATALOG}"}
         ),
-        #job_cluster_key="ingestion_cluster",
         timeout_seconds=3600,
         max_retries=2
     )
@@ -933,7 +913,6 @@ try:
     created_multi_job = w.jobs.create(
         name=multi_task_job_name,
         tasks=tasks,
-        #job_clusters=[job_cluster],
         tags={
             "environment": "dev",
             "pipeline": "bronze_ingestion",
