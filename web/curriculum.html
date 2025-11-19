@@ -45,7 +45,7 @@
     <!-- Hero -->
     <section class="page-hero">
         <h1>📚 Course Curriculum</h1>
-        <p>21 comprehensive notebooks across 5 weeks + advanced modules</p>
+        <p>27 comprehensive notebooks including data modelling foundations across 5 weeks + advanced modules</p>
     </section>
 
     <!-- Content -->
@@ -61,7 +61,7 @@
                 </div>
                 <div class="path-box">
                     <div class="path-badge green">Notebooks</div>
-                    <h3>21 Total</h3>
+                    <h3>27 Total</h3>
                     <p>Hands-on practice with real-world patterns</p>
                 </div>
                 <div class="path-box">
@@ -132,6 +132,55 @@
                         <span class="topic-tag">Delta Lakes</span>
                         <span class="topic-tag">ACID</span>
                         <span class="topic-tag">Delta transaction logs</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Foundations -->
+        <section class="content-section">
+            <h2><a href="https://github.com/datatribe-collective-labs/databricks-infra/tree/main/course/notebooks/foundations">Foundations: Data Modelling Patterns</a></h2>
+            <p class="week-meta">4 notebooks | ~6-8 hours</p>
+            <p style="margin-bottom: 2rem;">Essential data modeling concepts for building maintainable, performant data architectures including medallion patterns, dimensional modeling, and slowly changing dimensions.</p>
+
+            <div class="weeks-grid">
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/foundations/01_introduction_to_data_modeling.py">01_introduction_to_data_modeling.py</a></h3>
+                    <p>Fundamentals of data modeling: organizing data for consistency, accessibility, and performance. Learn why modeling matters and key design principles.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Data Modeling Basics</span>
+                        <span class="topic-tag">Design Principles</span>
+                        <span class="topic-tag">Best Practices</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/foundations/02_medallion_architecture.py">02_medallion_architecture.py</a></h3>
+                    <p>Bronze, Silver, Gold layers: progressive data refinement pattern for data lakes. Understand when to use each layer and how they work together.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Medallion Architecture</span>
+                        <span class="topic-tag">Data Layers</span>
+                        <span class="topic-tag">Lake Patterns</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/foundations/03_dimensional_modeling.py">03_dimensional_modeling.py</a></h3>
+                    <p>Star and snowflake schemas, fact and dimension tables for analytics. Learn to design data warehouses optimized for business intelligence.</p>
+                    <div class="topics">
+                        <span class="topic-tag">Star Schema</span>
+                        <span class="topic-tag">Facts & Dimensions</span>
+                        <span class="topic-tag">Analytics Design</span>
+                    </div>
+                </div>
+
+                <div class="week-card">
+                    <h3><a href="https://github.com/datatribe-collective-labs/databricks-infra/blob/main/course/notebooks/foundations/04_scd_and_delta_patterns.py">04_scd_and_delta_patterns.py</a></h3>
+                    <p>Slowly Changing Dimensions (SCD Types 1, 2, 3) and Delta Lake implementation patterns. Handle historical data changes in production systems.</p>
+                    <div class="topics">
+                        <span class="topic-tag">SCD Types</span>
+                        <span class="topic-tag">Historical Data</span>
+                        <span class="topic-tag">Delta Patterns</span>
                     </div>
                 </div>
             </div>

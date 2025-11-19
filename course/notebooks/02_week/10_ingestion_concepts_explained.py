@@ -121,12 +121,14 @@ print(f"  Source: rate (1 record/second)")
 print(f"  Processing: Continuous micro-batches")
 print(f"  Schema: {streaming_df.schema.simpleString()}")
 
+"""
 # Note: In a real notebook, you would run this streaming query
-# streaming_query = streaming_df.writeStream \
-#     .format("delta") \
-#     .outputMode("append") \
-#     .option("checkpointLocation", "/tmp/ingestion_examples/checkpoint") \
-#     .start("/tmp/ingestion_examples/streaming_sales")
+ streaming_query = streaming_df.writeStream \
+     .format("delta") \
+     .outputMode("append") \
+     .option("checkpointLocation", "/tmp/ingestion_examples/checkpoint") \
+     .start("/tmp/ingestion_examples/streaming_sales")
+"""
 
 print("\n✅ Streaming concept demonstrated")
 print("   Characteristics: Low latency, continuous processing, record-by-record")
@@ -176,11 +178,7 @@ df_json_strings = spark.createDataFrame([Row(value=js) for js in json_strings])
 temp_infer_table = get_table_path("bronze", "temp_schema_inference_data")
 df_json_strings.write.format("delta").mode("overwrite").saveAsTable(temp_infer_table)
 
-# Read with schema inference
 print("Reading with schema inference:")
-# Serverless compute restricts RDD operations on PySpark..
-# df_inferred = spark.read.json(spark.table(temp_infer_table).rdd.map(lambda row: row.value))
-# .. but similar operation can be defined as a DataFrame operation
 
 # Define schema for JSON
 json_schema = StructType([
@@ -215,6 +213,7 @@ print("  - Performance overhead from scanning")
 
 print("=== Explicit Schema (Production-Ready) ===\n")
 
+
 # Define explicit schema
 user_schema = StructType([
     StructField("user_id", IntegerType(), False),
@@ -231,10 +230,15 @@ for field in user_schema.fields:
 # Read with explicit schema (from the same data that had bad values)
 print("\nReading with explicit schema:")
 try:
-    df_explicit = spark.read.schema(user_schema).json(spark.table(temp_infer_table).rdd.map(lambda row: row.value))
+    # To demonstrate FAILFAST, we write the JSON strings to a temporary path 
+    # and read it back with the FAILFAST option.
+    temp_json_path = f"{VOLUME_PATH}temp_json_for_failfast"
+    spark.table(temp_infer_table).select("value").write.mode("overwrite").text(temp_json_path)
+    
+    df_explicit = spark.read.schema(user_schema).option("mode", "FAILFAST").json(temp_json_path)
     df_explicit.show()
 except Exception as e:
-    print(f"✅ Schema validation caught error: {e}")
+    print(f"✅ Schema validation caught error: {str(e)}")
     print("   This is GOOD - fails fast on bad data!")
 
 # Clean data example
@@ -251,15 +255,16 @@ df_json_clean = spark.createDataFrame([Row(value=js) for js in json_strings_clea
 temp_clean_table = get_table_path("bronze", "temp_schema_clean_data")
 df_json_clean.write.format("delta").mode("overwrite").saveAsTable(temp_clean_table)
 
-# df_explicit = spark.read.schema(user_schema).json(spark.table(temp_clean_table).rdd.map(lambda row: row.value))
 
-# Read clean data with explicit schema
+# Read clean data with explicit schema using from_json
 df_json_clean_read = spark.table(temp_clean_table).select("value")
-df_explicit_clean = spark.read.schema(user_schema).json(df_json_clean_read)
+df_explicit_clean = df_json_clean_read.select(
+    from_json(col("value"), user_schema).alias("parsed")
+).select("parsed.*")
 
 print("\nWith clean data and explicit schema:")
-df_explicit.printSchema()
-df_explicit.show()
+df_explicit_clean.printSchema()
+df_explicit_clean.show()
 
 print("\n✅ Benefits of explicit schema:")
 print("  - Correct data types enforced")
@@ -313,12 +318,6 @@ order_schema = StructType([
 ])
 
 # PERMISSIVE mode (default): null out bad values
-"""
-df_permissive = spark.read \
-    .schema(order_schema) \
-    .option("mode", "PERMISSIVE") \
-    .json(spark.table(temp_mixed_table).rdd.map(lambda row: row.value))
-"""
 # Read Delta table and parse JSON using from_json
 df_json = spark.table(temp_mixed_table)
 df_permissive = df_json.withColumn(
@@ -338,17 +337,13 @@ print("  - Silent data quality issues possible")
 
 print("=== Error Handling Pattern 2: DROPMALFORMED Mode ===\n")
 
-# DROPMALFORMED: Skip bad records entirely
-"""
-df_dropmalformed = spark.read \
-    .schema(order_schema) \
-    .option("mode", "DROPMALFORMED") \
-    .json(spark.table(temp_mixed_table).rdd.map(lambda row: row.value))
+""" 
+ DROPMALFORMED: Skip bad records entirely
+ To use DROPMALFORMED mode with the DataFrame API, we can write the parsed JSON strings to a file
+ and then read it back. This is a workaround for environments where RDDs are restricted.
+ DROPMALFORMED: Skip bad records entirely using from_json 
 """
 
-# To use DROPMALFORMED mode with the DataFrame API, we can write the parsed JSON strings to a file
-# and then read it back. This is a workaround for environments where RDDs are restricted.
-# DROPMALFORMED: Skip bad records entirely using from_json
 temp_json_path = f"{VOLUME_PATH}temp_json_for_dropmalformed"
 spark.table(temp_mixed_table).select("value").write.format("text").mode("overwrite").save(temp_json_path)
 
@@ -368,14 +363,6 @@ print("  - Data loss possible (track separately)")
 # COMMAND ----------
 
 print("=== Error Handling Pattern 3: Rescue Column (Recommended) ===\n")
-
-# Use _rescued_data column to capture malformed records
-"""
-df_rescue = spark.read \
-    .option("mode", "PERMISSIVE") \
-    .option("columnNameOfCorruptRecord", "_rescued_data") \
-    .json(spark.table(temp_mixed_table).rdd.map(lambda row: row.value))
-"""
 
 # Parse JSON and capture malformed records in a rescue column
 df = spark.table(temp_mixed_table)

@@ -387,7 +387,7 @@ try:
     # List available file systems (if dbutils is available)
     print("\nAttempting to list file systems:")
     
-    # Try to access DBFS
+    # Try to access DBFS. This is not allowed in the Free Edition of Databricks, and query will fail.
     try:
         dbutils.fs.ls("/")[:5]  # Show first 5 entries
         print("DBFS root directory accessible")
@@ -404,7 +404,7 @@ try:
     try:
         # List the contents of the /dbfs/ directory
         contents = os.listdir(dbfs_mount_path)
-        print(f"DBFS root directory accessible via {dbfs_mount_path}")
+        print(f"DBFS root directory visible in {dbfs_mount_path}")
         print(f"First 5 entries: {contents[:5]}")
     except FileNotFoundError:
         print(f"Error: Directory not found: {dbfs_mount_path}")
@@ -420,7 +420,7 @@ print("\nSaving data in various formats for volume storage:")
 
 # Save as Parquet (optimized for analytics)
 try:
-    sales_df.write.mode("overwrite").parquet(f"{VOLUME_PATH}sales_data.parquet")
+    sales_df.write.mode("overwrite").parquet(f"{VOLUME_PATH}sales_data")
     print("✓ Saved as Parquet format")
 except Exception as e:
     print(f"Parquet save failed: {e}")

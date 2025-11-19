@@ -408,6 +408,6 @@ print(f"✅ Written to: {marketing_table}")
 # MAGIC
 # MAGIC ### Next Steps
 # MAGIC
-# MAGIC - Move to Week 2 Notebook 05: API ingestion
-# MAGIC - Learn about database ingestion (JDBC)
-# MAGIC - Explore S3/cloud storage ingestion
+# MAGIC - Move on API ingestion in notebook 7
+# MAGIC - Learn about database ingestion (JDBC) in notebook 8
+# MAGIC - Explore S3/cloud storage ingestion in notebook 9

@@ -30,7 +30,7 @@ variable "create_users" {
 
 variable "notebook_subdirs" {
   type    = list(string)
-  default = ["utils", "01_week", "02_week", "03_week", "04_week", "05_week", "advanced"]
+  default = ["utils", "01_week", "foundations", "02_week", "03_week", "04_week", "05_week", "advanced"]
 }
 
 variable "notebooks" {
@@ -45,6 +45,12 @@ variable "notebooks" {
     "01_week/03_cluster_management.py"            = "PYTHON"
     "01_week/04_spark_on_databricks.py"           = "PYTHON"
     "01_week/05_delta_lake_concepts_explained.py" = "PYTHON"
+
+    # Foundations: Data Modelling Patterns (01-04)
+    "foundations/01_introduction_to_data_modeling.py" = "PYTHON"
+    "foundations/02_medallion_architecture.py"        = "PYTHON"
+    "foundations/03_dimensional_modeling.py"          = "PYTHON"
+    "foundations/04_scd_and_delta_patterns.py"        = "PYTHON"
 
     # Week 2: Data Ingestion (06-10)
     "02_week/06_file_ingestion.py"               = "PYTHON"

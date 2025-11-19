@@ -32,3 +32,13 @@ df_bronze.write.format("delta").mode("overwrite").saveAsTable(table)
 
 print(f"✅ Written to: {table}")
 spark.table(table).show()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Summary
+# MAGIC
+# MAGIC This notebook demonstrated a simplified database ingestion workflow. It simulated a customer database table, loaded it into a DataFrame, enriched it with an ingestion timestamp, and wrote the result to a bronze Delta table in Unity Catalog, preparing it for downstream processing.
+# MAGIC
+# MAGIC ### Table Created
+# MAGIC - `bronze_db_customers`

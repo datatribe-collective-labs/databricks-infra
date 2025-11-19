@@ -3,7 +3,7 @@
 > **Production-Ready Infrastructure as Code + Comprehensive Data Engineering Course**
 
 A complete Databricks learning platform combining:
-- 🎓 **21 hands-on notebooks** across 5 weeks (fundamentals to production apps)
+- 🎓 **27 hands-on notebooks** (fundamentals to production apps + data modelling)
 - 🏗️ **Terraform automation** for Unity Catalog, users, permissions, and RBAC
 - 🚀 **Zero-setup learning** for students + 15-minute deployment for admins
 
@@ -18,7 +18,7 @@ A complete Databricks learning platform combining:
 The web UI provides:
 - **Student Guide** - Get workspace access and start learning in 3 steps
 - **Admin Guide** - Deploy complete infrastructure in 15 minutes
-- **Course Curriculum** - Browse all 21 notebooks organized by week
+- **Course Curriculum** - Browse all 27 notebooks organized by module
 - **🌙 Day/Night Mode** - Toggle theme for comfortable viewing
 - **📱 Mobile-Friendly** - Responsive design with hamburger menu
 
@@ -42,7 +42,7 @@ databricks-infra/
 │   ├── USER_SCHEMA_GUIDE.md        # User isolation technical guide
 │   └── assets/                     # Logo and images
 ├── course/                         # Course content
-│   ├── notebooks/                  # 19 Databricks notebooks
+│   ├── notebooks/                  # 27 Databricks notebooks
 │   └── datasets/                   # Sample data files
 ├── terraform/                      # Infrastructure as Code
 │   ├── main.tf, groups.tf, catalogs.tf
@@ -76,12 +76,19 @@ databricks-infra/
 
 ## 📊 What's Included
 
-### Course (5 Weeks + Advanced)
+### Course Structure
+
+**Foundational Knowledge:**
 - **Week 1**: Databricks Fundamentals (5 notebooks)
+- **Foundations**: Data Modelling Patterns (4 notebooks)
+
+**Applied Learning:**
 - **Week 2**: Data Ingestion (5 notebooks)
 - **Week 3**: Advanced Transformations (4 notebooks)
 - **Week 4**: End-to-End Workflows (3 notebooks)
 - **Week 5**: Production Deployment (4 notebooks)
+
+**Advanced Topics:**
 - **Advanced**: Databricks Apps with Streamlit (2 notebooks)
 
 ### Infrastructure

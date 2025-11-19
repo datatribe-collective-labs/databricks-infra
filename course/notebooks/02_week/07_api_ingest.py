@@ -224,6 +224,8 @@ print(f" Written to: {customers_table}")
 # MAGIC %md
 # MAGIC ## Summary
 # MAGIC
+# MAGIC This notebook demonstrated how to ingest data from two simulated REST APIs: a product API with nested JSON and a paginated customer API. The raw data was parsed, flattened, and written to two separate bronze tables in Unity Catalog. Key practices like schema definition, metadata enrichment, and handling pagination were implemented.
+# MAGIC
 # MAGIC ### Tables Created
 # MAGIC - `bronze_api_products`
 # MAGIC - `bronze_api_customers`

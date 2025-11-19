@@ -62,7 +62,7 @@
 # COMMAND ----------
 
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, TimestampType, BooleanType
-from pyspark.sql.functions import col, current_timestamp, to_timestamp, regexp_replace, trim, upper, sum as _sum, avg, count, when, lit, try_cast
+from pyspark.sql.functions import col, current_timestamp, to_timestamp, regexp_replace, trim, upper, sum as _sum, avg, count, when, lit
 from datetime import datetime
 
 print("=== Medallion Architecture Implementation ===\n")
@@ -427,6 +427,8 @@ print(f"Failed consistency: {failed_consistency} records")
 
 # COMMAND ----------
 
+from pyspark.sql.functions import concat_ws
+
 print("=== Combined Quality Score ===\n")
 
 # Combine all validations
@@ -469,8 +471,6 @@ print("  - Good data → Silver layer")
 print("  - Bad data → Quarantine for investigation")
 
 # COMMAND ----------
-
-from pyspark.sql.functions import concat_ws
 
 # MAGIC %md
 # MAGIC ## 4. Monitoring and Observability
