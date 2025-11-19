@@ -1143,7 +1143,7 @@ def create_etl_job(
                 task_key=nb['task_key'],
                 description=nb.get('description', f"Task {idx+1}"),
                 notebook_task=NotebookTask(
-                    notebook_path=nb['notebook_path'], # Relative path to defined notebook path
+                    notebook_path=nb['notebook_path'], # Relative path to defined notebook path, defined in workspace
                     source=Source.WORKSPACE,
                     base_parameters={
                         "catalog": catalog,
@@ -1184,12 +1184,12 @@ def create_etl_job(
 example_notebooks = [
     {
         "task_key": "bronze_ingestion",
-        "notebook_path": "/Workspace/course/notebooks/02_week/06_file_ingestion.py", # Edit notebook paths
+        "notebook_path": "/Workspace/course/notebooks//Workspace/Shared/terraform-managed/course/notebooks/02_week/06_file_ingestion.py",
         "description": "Ingest raw data"
     },
     {
         "task_key": "silver_transformation",
-        "notebook_path": "/Workspace/course/notebooks/03_week/11_simple_transformations.py", # Edit notebook paths
+        "notebook_path": "/Workspace/Shared/terraform-managed/course/notebooks/03_week/11_simple_transformations.py", # 
         "description": "Transform to silver",
         "depends_on": [{"task_key": "bronze_ingestion"}]
     }
@@ -1256,7 +1256,9 @@ job = create_etl_job(
 # MAGIC       - uses: actions/checkout@v2
 # MAGIC
 # MAGIC       - name: Install Databricks CLI
-# MAGIC         run: pip install databricks-cli
+# MAGIC         run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+# MAGIC         
+# MAGIC              echo "$HOME/.databricks/bin" >> $GITHUB_PATH
 # MAGIC
 # MAGIC       - name: Deploy Jobs
 # MAGIC         env:
