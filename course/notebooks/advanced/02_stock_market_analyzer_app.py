@@ -2,35 +2,304 @@
 # MAGIC %md
 # MAGIC # Advanced: Stock Market Analyzer - Streamlit App
 # MAGIC
-# MAGIC ## About This App
+# MAGIC ## 📚 Table of Contents
 # MAGIC
-# MAGIC This Streamlit application demonstrates how to build an interactive data application on Databricks that:
-# MAGIC - Queries Unity Catalog gold layer tables
-# MAGIC - Provides interactive visualizations
-# MAGIC - Enables self-service analytics
-# MAGIC - Requires no coding knowledge for end users
+# MAGIC 1. [Getting Started](#getting-started) - **START HERE if you're new**
+# MAGIC 2. [Prerequisites Checklist](#prerequisites) - What you need before starting
+# MAGIC 3. [Understanding the App](#understanding) - What this app does
+# MAGIC 4. [Step-by-Step Setup](#setup) - How to run it
+# MAGIC 5. [App Code with Explanations](#code) - The actual Streamlit application
+# MAGIC 6. [Testing Guide](#testing) - How to verify it works
+# MAGIC 7. [Deployment Guide](#deployment) - How to publish it
+# MAGIC 8. [Troubleshooting](#troubleshooting) - Common issues and solutions
+# MAGIC
+# MAGIC ---
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # 🚀 Getting Started
+# MAGIC
+# MAGIC ## What is This Notebook?
+# MAGIC
+# MAGIC This notebook teaches you how to build an **interactive data application** using Streamlit on Databricks. Think of it as transforming your data analysis into a user-friendly web app that anyone can use - no coding required for end users!
+# MAGIC
+# MAGIC ## What Will You Learn?
+# MAGIC
+# MAGIC ✅ **Build Interactive Apps**: Create web applications with charts, filters, and user inputs
+# MAGIC ✅ **Connect to Unity Catalog**: Query your gold layer tables from the app
+# MAGIC ✅ **Visualize Data**: Use Plotly for professional, interactive charts
+# MAGIC ✅ **Deploy Apps**: Publish your app so others can access it via URL
+# MAGIC ✅ **Real-World Skills**: This pattern works for sales dashboards, marketing analytics, operations monitoring, etc.
+# MAGIC
+# MAGIC ## Who is This For?
+# MAGIC
+# MAGIC - **Data Engineers**: Learn to build self-service analytics tools
+# MAGIC - **Business Analysts**: Create interactive reports without asking IT
+# MAGIC - **ML Engineers**: Build model demos and prediction interfaces
+# MAGIC - **Anyone**: Who wants to share their data insights through a web app
+# MAGIC
+# MAGIC ---
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # ✅ Prerequisites Checklist
+# MAGIC
+# MAGIC Before you start, make sure you have completed these steps:
+# MAGIC
+# MAGIC ## Required (Must Have)
+# MAGIC
+# MAGIC - [ ] **Completed Notebook 21**: This app uses gold tables from the Stock Market Wheel Deployment notebook
+# MAGIC   - You should have these tables in your schema:
+# MAGIC     - `gold_stock_market_summary`
+# MAGIC     - `gold_stock_market_detailed_analytics`
+# MAGIC
+# MAGIC - [ ] **Know Your Schema Name**: You need to know your personal schema name
+# MAGIC   - Format: `firstname_lastname` (e.g., `chanukya_pekala`)
+# MAGIC   - Check with: `SHOW SCHEMAS IN databricks_course`
+# MAGIC
+# MAGIC - [ ] **Have Data in Gold Tables**: Verify you have data
+# MAGIC   - Run: `SELECT COUNT(*) FROM databricks_course.your_schema.gold_stock_market_summary`
+# MAGIC   - Should return 5 (for 5 stocks: AAPL, GOOGL, MSFT, AMZN, NVDA)
+# MAGIC
+# MAGIC ## Nice to Have (Helpful but Optional)
+# MAGIC
+# MAGIC - [ ] **Basic Python Knowledge**: Understanding of variables, functions, and data structures
+# MAGIC - [ ] **Familiarity with Pandas**: Experience with DataFrames
+# MAGIC - [ ] **Read Notebook 01 (Apps Guide)**: Understanding of Databricks Apps concepts
+# MAGIC
+# MAGIC ## Quick Verification
+# MAGIC
+# MAGIC Run this cell to check if your data is ready:
+# MAGIC
+# MAGIC ```python
+# MAGIC # Replace with your schema name
+# MAGIC schema_name = "your_schema_name"
+# MAGIC
+# MAGIC # Check if tables exist
+# MAGIC summary_count = spark.sql(f"SELECT COUNT(*) FROM databricks_course.{schema_name}.gold_stock_market_summary").collect()[0][0]
+# MAGIC details_count = spark.sql(f"SELECT COUNT(*) FROM databricks_course.{schema_name}.gold_stock_market_detailed_analytics").collect()[0][0]
+# MAGIC
+# MAGIC print(f"✅ Summary table has {summary_count} stocks")
+# MAGIC print(f"✅ Details table has {details_count} daily records")
+# MAGIC print(f"\nYou're ready to proceed!")
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # 🎯 Understanding the App
+# MAGIC
+# MAGIC ## What Does This App Do?
+# MAGIC
+# MAGIC This Streamlit application provides an **interactive stock market dashboard** with four main features:
+# MAGIC
+# MAGIC ### 1. 📊 Market Overview
+# MAGIC **What it shows**: High-level metrics and performance comparison
+# MAGIC **User sees**:
+# MAGIC - Total number of stocks analyzed
+# MAGIC - Average return across all stocks
+# MAGIC - Best performing stock
+# MAGIC - Average volatility (risk measure)
+# MAGIC - Bar chart comparing all stocks' returns
+# MAGIC
+# MAGIC **Why it's useful**: Gives a quick snapshot of overall market performance
+# MAGIC
+# MAGIC ### 2. ⚖️ Risk-Return Analysis
+# MAGIC **What it shows**: Interactive scatter plot showing risk vs. reward
+# MAGIC **User sees**:
+# MAGIC - Each stock as a bubble on the chart
+# MAGIC - X-axis = Volatility (risk)
+# MAGIC - Y-axis = Total return (reward)
+# MAGIC - Bubble size = Trading volume
+# MAGIC - Color = Performance tier (high/good/positive/negative)
+# MAGIC
+# MAGIC **Why it's useful**: Helps identify which stocks have good returns with lower risk (ideal quadrant is top-left: high return, low volatility)
+# MAGIC
+# MAGIC ### 3. 🔍 Detailed Stock Analysis
+# MAGIC **What it shows**: Deep dive into a single stock's performance
+# MAGIC **User sees**:
+# MAGIC - Price history over time
+# MAGIC - Trading volume chart
+# MAGIC - Daily returns distribution (how often the stock goes up/down)
+# MAGIC - Cumulative returns (if you invested on day 1, what's your total gain?)
+# MAGIC - 30-day rolling volatility (is risk increasing or decreasing?)
+# MAGIC - Raw data table
+# MAGIC
+# MAGIC **Why it's useful**: Understand a stock's behavior patterns before investing
+# MAGIC
+# MAGIC ### 4. 💼 Portfolio Simulator
+# MAGIC **What it shows**: Build a hypothetical portfolio and see its performance
+# MAGIC **User can**:
+# MAGIC - Select multiple stocks
+# MAGIC - Set number of shares for each
+# MAGIC - See total investment amount
+# MAGIC - See total return (profit/loss)
+# MAGIC - Visualize portfolio composition (pie chart)
+# MAGIC
+# MAGIC **Why it's useful**: Test different investment strategies without risking real money
 # MAGIC
 # MAGIC ## Data Source
 # MAGIC
-# MAGIC This app uses gold layer tables created in **Notebook 21 (Stock Market Wheel Deployment)**:
-# MAGIC - `gold_stock_market_summary` - Aggregate performance metrics
-# MAGIC - `gold_stock_market_detailed_analytics` - Daily time series with volatility
+# MAGIC This app uses **gold layer tables** created in Notebook 21:
+# MAGIC - `gold_stock_market_summary` - Aggregate performance metrics (1 row per stock)
+# MAGIC - `gold_stock_market_detailed_analytics` - Daily time series with volatility (1 row per stock per day)
 # MAGIC
-# MAGIC ## Deployment Instructions
+# MAGIC ## Architecture
 # MAGIC
-# MAGIC ### Option 1: Deploy from This Notebook
-# MAGIC 1. Run all cells to verify app works
-# MAGIC 2. Click **Publish** → **Databricks App**
-# MAGIC 3. Configure app name and settings
-# MAGIC 4. Click **Deploy**
-# MAGIC
-# MAGIC ### Option 2: Deploy from Git Repository
-# MAGIC 1. Copy the Streamlit code (cell below) to `app.py` in Git repo
-# MAGIC 2. Add `requirements.txt` with dependencies
-# MAGIC 3. Connect repo to Databricks Repos
-# MAGIC 4. Deploy via Apps UI
+# MAGIC ```
+# MAGIC User's Browser
+# MAGIC      ↓ (views app)
+# MAGIC Streamlit App
+# MAGIC      ↓ (queries data)
+# MAGIC Unity Catalog Gold Tables
+# MAGIC      ↓ (reads from)
+# MAGIC Delta Lake Storage
+# MAGIC ```
 # MAGIC
 # MAGIC ---
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # 🛠️ Step-by-Step Setup
+# MAGIC
+# MAGIC Follow these steps to run the app. Each step is explained in detail.
+# MAGIC
+# MAGIC ## Step 1: Install Required Libraries
+# MAGIC
+# MAGIC **What we're doing**: Installing Streamlit (web app framework) and Plotly (charting library)
+# MAGIC
+# MAGIC **Why**: These libraries don't come pre-installed on Databricks clusters
+# MAGIC
+# MAGIC **What happens**:
+# MAGIC - `%pip install` downloads and installs the packages
+# MAGIC - `--quiet` suppresses verbose installation logs
+# MAGIC - `dbutils.library.restartPython()` restarts Python to load new libraries
+# MAGIC
+# MAGIC **Run the cell below** ⬇️
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Step 2: Verify Your Data
+# MAGIC
+# MAGIC **What we're doing**: Checking that you have data in your gold tables
+# MAGIC
+# MAGIC **Why**: The app won't work without data
+# MAGIC
+# MAGIC **Instructions**:
+# MAGIC 1. Replace `"your_schema_name"` with your actual schema name
+# MAGIC 2. Run the cell
+# MAGIC 3. You should see: "✅ Summary table has 5 stocks" and "✅ Details table has XXX daily records"
+# MAGIC
+# MAGIC If you see errors, go back to Notebook 21 and run it first!
+
+# COMMAND ----------
+
+# VERIFICATION CELL - Update schema name and run this
+schema_name = "chanukya_pekala"  # ⚠️ CHANGE THIS to your schema name
+
+try:
+    # Check summary table
+    summary_count = spark.sql(f"SELECT COUNT(*) FROM databricks_course.{schema_name}.gold_stock_market_summary").collect()[0][0]
+    print(f"✅ Summary table has {summary_count} stocks")
+
+    # Check details table
+    details_count = spark.sql(f"SELECT COUNT(*) FROM databricks_course.{schema_name}.gold_stock_market_detailed_analytics").collect()[0][0]
+    print(f"✅ Details table has {details_count} daily records")
+
+    # Check which stocks we have
+    stocks = spark.sql(f"SELECT symbol FROM databricks_course.{schema_name}.gold_stock_market_summary").toPandas()
+    print(f"\n📊 Stocks available: {', '.join(stocks['symbol'].tolist())}")
+
+    print(f"\n🎉 You're ready to proceed!")
+except Exception as e:
+    print(f"❌ Error: {str(e)}")
+    print(f"\n⚠️ Troubleshooting steps:")
+    print(f"1. Verify schema name is correct: {schema_name}")
+    print(f"2. Run Notebook 21 to create the gold tables")
+    print(f"3. Check table names match exactly")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Step 3: Understand the App Structure
+# MAGIC
+# MAGIC Before diving into the code, let's understand how the app is organized:
+# MAGIC
+# MAGIC ### Code Organization
+# MAGIC
+# MAGIC ```python
+# MAGIC 1. Page Configuration
+# MAGIC    ├── Set page title, icon, layout
+# MAGIC    └── Configure sidebar behavior
+# MAGIC
+# MAGIC 2. Spark Session Setup
+# MAGIC    ├── Connect to Databricks cluster
+# MAGIC    └── Enable querying Unity Catalog
+# MAGIC
+# MAGIC 3. Data Loading Functions
+# MAGIC    ├── load_stock_summary() - Get aggregate metrics
+# MAGIC    ├── load_stock_details() - Get daily time series
+# MAGIC    └── Use @st.cache_data for performance
+# MAGIC
+# MAGIC 4. App Layout
+# MAGIC    ├── Title and description
+# MAGIC    ├── Sidebar (configuration inputs)
+# MAGIC    ├── Market Overview section
+# MAGIC    ├── Performance Comparison charts
+# MAGIC    ├── Risk-Return Analysis
+# MAGIC    ├── Detailed Stock Analysis
+# MAGIC    ├── Portfolio Simulator
+# MAGIC    └── Footer
+# MAGIC ```
+# MAGIC
+# MAGIC ### Key Streamlit Concepts Used
+# MAGIC
+# MAGIC | Concept | What It Does | Example |
+# MAGIC |---------|--------------|---------|
+# MAGIC | `st.title()` | Creates a large heading | `st.title("My App")` |
+# MAGIC | `st.sidebar` | Adds elements to sidebar | `st.sidebar.text_input()` |
+# MAGIC | `st.metric()` | Shows a metric card | `st.metric("Sales", "$100K")` |
+# MAGIC | `st.selectbox()` | Creates dropdown menu | `st.selectbox("Pick", [1,2,3])` |
+# MAGIC | `st.plotly_chart()` | Displays Plotly chart | `st.plotly_chart(fig)` |
+# MAGIC | `st.columns()` | Creates side-by-side layout | `col1, col2 = st.columns(2)` |
+# MAGIC | `@st.cache_data` | Caches function results | Prevents re-querying same data |
+# MAGIC
+# MAGIC ### Data Flow
+# MAGIC
+# MAGIC ```
+# MAGIC User opens app
+# MAGIC    ↓
+# MAGIC User enters catalog/schema in sidebar
+# MAGIC    ↓
+# MAGIC App queries Unity Catalog tables
+# MAGIC    ↓
+# MAGIC Data is cached (for 1 hour)
+# MAGIC    ↓
+# MAGIC App renders visualizations
+# MAGIC    ↓
+# MAGIC User interacts (clicks, selects, filters)
+# MAGIC    ↓
+# MAGIC App updates without re-querying data
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # 💻 App Code with Detailed Explanations
+# MAGIC
+# MAGIC Now let's look at the actual Streamlit code. Each section is heavily commented to explain what's happening.
+# MAGIC
+# MAGIC ## Installation Cell
+# MAGIC
+# MAGIC This cell installs the required Python libraries and restarts the Python interpreter to load them.
 
 # COMMAND ----------
 
@@ -48,56 +317,151 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-from pyspark.sql import SparkSession
-from pyspark.sql import functions as F
-from datetime import datetime, timedelta
+# =====================================================================
+# PART 1: IMPORTS AND INITIAL SETUP
+# =====================================================================
+# Import all required libraries for the Streamlit app
+import streamlit as st          # Web app framework
+import pandas as pd             # Data manipulation
+import plotly.express as px     # High-level charting (bar, scatter, line charts)
+import plotly.graph_objects as go  # Low-level charting (custom visualizations)
+from plotly.subplots import make_subplots  # Create multi-chart layouts
+from pyspark.sql import SparkSession       # Connect to Databricks/Spark
+from pyspark.sql import functions as F     # Spark SQL functions
+from datetime import datetime, timedelta   # Date/time handling
 
-# Page configuration
+# =====================================================================
+# PART 2: PAGE CONFIGURATION
+# =====================================================================
+# Configure the Streamlit app's appearance and behavior
+# This MUST be the first Streamlit command in the script
 st.set_page_config(
-    page_title="Stock Market Analyzer",
-    page_icon="📈",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_title="Stock Market Analyzer",    # Browser tab title
+    page_icon="📈",                        # Browser tab icon
+    layout="wide",                         # Use full screen width (vs. "centered")
+    initial_sidebar_state="expanded"       # Show sidebar by default
 )
 
-# Initialize Spark session
-@st.cache_resource
+# =====================================================================
+# PART 3: SPARK SESSION SETUP
+# =====================================================================
+# Initialize connection to Databricks cluster to query Unity Catalog tables
+
+@st.cache_resource  # Cache this connection across all users (singleton pattern)
 def get_spark():
-    """Get or create Spark session."""
+    """
+    Get or create Spark session.
+
+    Why @st.cache_resource?
+    - This is a connection/resource that should be shared across users
+    - Only created once and reused for all sessions
+    - Different from @st.cache_data which is for data caching
+    """
     return SparkSession.builder.getOrCreate()
 
+# Create the Spark session (runs once, then cached)
 spark = get_spark()
 
-# Data loading functions
-@st.cache_data(ttl=3600)  # Cache for 1 hour
+# =====================================================================
+# PART 3B: AUTO-DETECT USER SCHEMA
+# =====================================================================
+# Automatically determine the user's schema name from their email
+# This matches the pattern used in user_schema_setup.py
+
+@st.cache_data  # Cache the user's schema detection
+def get_user_schema():
+    """
+    Auto-detect the current user's schema name.
+
+    This uses the same logic as ../utils/user_schema_setup.py:
+    - Gets current user's email from Databricks
+    - Extracts username before @ symbol
+    - Replaces special characters with underscores
+    - Returns lowercase schema name
+
+    Example: chanukya.pekala@gmail.com → chanukya_pekala
+    """
+    import re
+    try:
+        # Get current user from Databricks context
+        user_email = spark.sql("SELECT current_user()").collect()[0][0]
+
+        # Extract schema name from email (same logic as user_schema_setup.py)
+        user_schema = re.sub(r'[^a-zA-Z0-9_]', '_', user_email.split('@')[0]).lower()
+
+        return user_schema, user_email
+    except Exception as e:
+        # Fallback if auto-detection fails
+        st.warning(f"⚠️ Could not auto-detect user schema: {str(e)}")
+        return None, None
+
+# =====================================================================
+# PART 4: DATA LOADING FUNCTIONS
+# =====================================================================
+# Functions to query Unity Catalog gold tables and convert to Pandas
+
+@st.cache_data(ttl=3600)  # Cache for 1 hour (3600 seconds)
 def load_stock_summary(catalog: str, schema: str):
-    """Load stock market summary from gold layer."""
+    """
+    Load stock market summary from gold layer.
+
+    Returns aggregate metrics for all stocks:
+    - symbol: Stock ticker (AAPL, GOOGL, etc.)
+    - total_return_pct: Overall return percentage
+    - avg_daily_return: Average daily return
+    - volatility: Risk measure (standard deviation of returns)
+    - performance_tier: Categorization (High/Good/Positive/Negative)
+
+    Why @st.cache_data with ttl=3600?
+    - Avoids re-querying Unity Catalog on every app interaction
+    - Data refreshes every hour automatically
+    - Improves app performance dramatically
+    """
     table_name = f"{catalog}.{schema}.gold_stock_market_summary"
     try:
+        # Query Unity Catalog table using Spark
         df_spark = spark.table(table_name)
+
+        # Convert to Pandas for easier manipulation in Streamlit
+        # (Streamlit and Plotly work better with Pandas than PySpark)
         df_pandas = df_spark.toPandas()
+
         return df_pandas
     except Exception as e:
+        # User-friendly error handling
         st.error(f"Failed to load summary data: {str(e)}")
         st.info(f"Attempted to load: {table_name}")
         st.info("Please ensure you've run Notebook 21 to create the gold tables.")
+
+        # Return empty DataFrame instead of crashing the app
         return pd.DataFrame()
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600)  # Cache for 1 hour
 def load_stock_details(catalog: str, schema: str, symbol: str = None):
-    """Load detailed stock data from gold layer."""
+    """
+    Load detailed stock data from gold layer.
+
+    Returns daily time series data:
+    - date: Trading date
+    - close: Closing price
+    - volume: Trading volume
+    - daily_return: Daily return percentage
+    - cumulative_return: Cumulative return from start
+    - volatility_30d: 30-day rolling volatility
+
+    Parameters:
+    - symbol: Optional filter for specific stock (e.g., "AAPL")
+    """
     table_name = f"{catalog}.{schema}.gold_stock_market_detailed_analytics"
     try:
+        # Query Unity Catalog table
         df_spark = spark.table(table_name)
 
+        # Filter for specific symbol if provided
         if symbol:
             df_spark = df_spark.filter(F.col("symbol") == symbol)
 
+        # Convert to Pandas
         df_pandas = df_spark.toPandas()
         return df_pandas
     except Exception as e:
@@ -118,9 +482,27 @@ Data is sourced from Yahoo Finance and processed through a medallion architectur
 # Sidebar - Configuration
 st.sidebar.title("⚙️ Configuration")
 
-# Catalog and schema selection
-catalog = st.sidebar.text_input("Unity Catalog", value="databricks_course", help="Enter your catalog name")
-schema = st.sidebar.text_input("Schema", value="chanukya_pekala", help="Enter your schema name")
+# Auto-detect user schema
+detected_schema, detected_email = get_user_schema()
+
+# Catalog and schema selection with auto-detection
+catalog = st.sidebar.text_input(
+    "Unity Catalog",
+    value="databricks_course",
+    help="Enter your catalog name"
+)
+
+# Use detected schema as default, or fallback to empty string
+default_schema = detected_schema if detected_schema else ""
+schema = st.sidebar.text_input(
+    "Schema",
+    value=default_schema,
+    help="Auto-detected from your email. Change if needed."
+)
+
+# Show detected user info
+if detected_email:
+    st.sidebar.info(f"👤 Detected user: {detected_email}\n\n📁 Auto-detected schema: `{detected_schema}`")
 
 # Load data button
 if st.sidebar.button("🔄 Reload Data", help="Refresh data from Unity Catalog"):
@@ -680,6 +1062,311 @@ st.markdown("""
 # MAGIC - Optimize caching strategies
 # MAGIC - Add more data sources
 # MAGIC - Implement user segmentation
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # 🔧 Troubleshooting Guide
+# MAGIC
+# MAGIC ## Common Issues and Solutions
+# MAGIC
+# MAGIC ### Issue 1: "Failed to load summary data: Table or view not found"
+# MAGIC
+# MAGIC **Symptoms:**
+# MAGIC - Error message: `Table or view not found: databricks_course.your_schema.gold_stock_market_summary`
+# MAGIC - App shows "⚠️ No data available"
+# MAGIC
+# MAGIC **Root Cause:**
+# MAGIC - Gold tables haven't been created yet
+# MAGIC - Schema name is incorrect
+# MAGIC - You're looking in the wrong catalog
+# MAGIC
+# MAGIC **Solution:**
+# MAGIC ```sql
+# MAGIC -- Step 1: Verify your schema exists
+# MAGIC SHOW SCHEMAS IN databricks_course;
+# MAGIC
+# MAGIC -- Step 2: Check if gold tables exist
+# MAGIC SHOW TABLES IN databricks_course.your_schema;
+# MAGIC
+# MAGIC -- Step 3: If no gold tables, run Notebook 21 first
+# MAGIC -- Go back and complete: 05_week/21_stock_market_wheel_deployment.py
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Issue 2: "ModuleNotFoundError: No module named 'streamlit'"
+# MAGIC
+# MAGIC **Symptoms:**
+# MAGIC - Error when running Streamlit import cell
+# MAGIC - Python can't find streamlit package
+# MAGIC
+# MAGIC **Root Cause:**
+# MAGIC - Streamlit not installed on cluster
+# MAGIC - Python wasn't restarted after installation
+# MAGIC
+# MAGIC **Solution:**
+# MAGIC ```python
+# MAGIC # Run this cell again
+# MAGIC %pip install streamlit plotly --quiet
+# MAGIC dbutils.library.restartPython()
+# MAGIC
+# MAGIC # Wait for Python to restart, then run imports again
+# MAGIC ```
+# MAGIC
+# MAGIC **Alternative:**
+# MAGIC ```bash
+# MAGIC # If above doesn't work, try without --quiet to see errors
+# MAGIC %pip install streamlit plotly
+# MAGIC dbutils.library.restartPython()
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Issue 3: "Schema name doesn't match my username"
+# MAGIC
+# MAGIC **Symptoms:**
+# MAGIC - You see error: `Table not found: databricks_course.chanukya_pekala.gold_*`
+# MAGIC - But your name isn't "chanukya_pekala"
+# MAGIC
+# MAGIC **Root Cause:**
+# MAGIC - Default schema name in sidebar is hardcoded
+# MAGIC
+# MAGIC **Solution:**
+# MAGIC ```python
+# MAGIC # In the sidebar input, change the schema to YOUR schema name
+# MAGIC # Format: firstname_lastname (e.g., john_smith)
+# MAGIC
+# MAGIC # Find your schema name:
+# MAGIC SHOW SCHEMAS IN databricks_course;
+# MAGIC
+# MAGIC # Or programmatically:
+# MAGIC user_email = spark.sql("SELECT current_user()").collect()[0][0]
+# MAGIC user_schema = user_email.split('@')[0].replace('.', '_')
+# MAGIC print(f"Your schema name: {user_schema}")
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Issue 4: App loads but shows empty charts
+# MAGIC
+# MAGIC **Symptoms:**
+# MAGIC - App interface loads
+# MAGIC - But all charts are empty or show "No data"
+# MAGIC - No error messages
+# MAGIC
+# MAGIC **Root Cause:**
+# MAGIC - Data exists but is malformed
+# MAGIC - Missing required columns
+# MAGIC - Gold tables are empty
+# MAGIC
+# MAGIC **Solution:**
+# MAGIC ```sql
+# MAGIC -- Step 1: Check if gold tables have data
+# MAGIC SELECT COUNT(*) FROM databricks_course.your_schema.gold_stock_market_summary;
+# MAGIC -- Should return 5 (for 5 stocks)
+# MAGIC
+# MAGIC -- Step 2: Verify columns exist
+# MAGIC DESCRIBE TABLE databricks_course.your_schema.gold_stock_market_summary;
+# MAGIC -- Should see: symbol, total_return_pct, avg_daily_return, volatility, etc.
+# MAGIC
+# MAGIC -- Step 3: Check a sample row
+# MAGIC SELECT * FROM databricks_course.your_schema.gold_stock_market_summary LIMIT 1;
+# MAGIC -- Should see actual stock data (AAPL, GOOGL, etc.)
+# MAGIC ```
+# MAGIC
+# MAGIC **If tables are empty:**
+# MAGIC - Re-run Notebook 21 completely
+# MAGIC - Check for errors in bronze/silver layer processing
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Issue 5: "KeyError: 'total_return_pct'" or similar column errors
+# MAGIC
+# MAGIC **Symptoms:**
+# MAGIC - Python error: `KeyError: 'total_return_pct'`
+# MAGIC - App crashes when trying to display metrics
+# MAGIC
+# MAGIC **Root Cause:**
+# MAGIC - Gold table schema doesn't match expected format
+# MAGIC - Notebook 21 was modified or incomplete
+# MAGIC
+# MAGIC **Solution:**
+# MAGIC ```sql
+# MAGIC -- Check actual columns in your table
+# MAGIC DESCRIBE TABLE databricks_course.your_schema.gold_stock_market_summary;
+# MAGIC
+# MAGIC -- Expected columns:
+# MAGIC -- - symbol
+# MAGIC -- - total_return_pct
+# MAGIC -- - avg_daily_return
+# MAGIC -- - volatility
+# MAGIC -- - performance_tier
+# MAGIC -- - avg_close
+# MAGIC -- - avg_daily_volume
+# MAGIC -- - trading_days
+# MAGIC ```
+# MAGIC
+# MAGIC **Fix:**
+# MAGIC - If columns are missing, re-run Notebook 21
+# MAGIC - Ensure you're using the unmodified version
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Issue 6: Cache not refreshing / seeing old data
+# MAGIC
+# MAGIC **Symptoms:**
+# MAGIC - Updated data in gold tables
+# MAGIC - But app still shows old data
+# MAGIC
+# MAGIC **Root Cause:**
+# MAGIC - Streamlit caching is working (as designed!)
+# MAGIC - Data cached for 1 hour (ttl=3600)
+# MAGIC
+# MAGIC **Solution:**
+# MAGIC ```
+# MAGIC Click "🔄 Reload Data" button in sidebar
+# MAGIC
+# MAGIC OR
+# MAGIC
+# MAGIC Wait 1 hour for automatic cache expiration
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Issue 7: "Connection error" or Spark session issues
+# MAGIC
+# MAGIC **Symptoms:**
+# MAGIC - Error: "Unable to connect to Spark"
+# MAGIC - Spark session fails to initialize
+# MAGIC
+# MAGIC **Root Cause:**
+# MAGIC - Cluster is not running
+# MAGIC - Cluster restarted mid-execution
+# MAGIC
+# MAGIC **Solution:**
+# MAGIC ```python
+# MAGIC # Check cluster status in Databricks UI
+# MAGIC # Restart cluster if needed
+# MAGIC # Re-run the Spark session initialization cell
+# MAGIC
+# MAGIC @st.cache_resource
+# MAGIC def get_spark():
+# MAGIC     return SparkSession.builder.getOrCreate()
+# MAGIC
+# MAGIC spark = get_spark()
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Issue 8: Deployment fails
+# MAGIC
+# MAGIC **Symptoms:**
+# MAGIC - "Publish → Databricks App" button grayed out
+# MAGIC - Deployment starts but fails
+# MAGIC
+# MAGIC **Root Cause:**
+# MAGIC - Databricks Apps not available on your workspace tier
+# MAGIC - Insufficient permissions
+# MAGIC - Code has errors
+# MAGIC
+# MAGIC **Solution:**
+# MAGIC ```
+# MAGIC 1. Verify Databricks Apps is enabled:
+# MAGIC    - Check workspace edition (Premium/Enterprise required)
+# MAGIC    - Contact workspace admin
+# MAGIC
+# MAGIC 2. Ensure all cells run without errors:
+# MAGIC    - Run notebook top-to-bottom
+# MAGIC    - Fix any errors before deploying
+# MAGIC
+# MAGIC 3. Check permissions:
+# MAGIC    - Need "Can Manage" or "Can Run" on workspace
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Issue 9: Performance is slow
+# MAGIC
+# MAGIC **Symptoms:**
+# MAGIC - App takes a long time to load
+# MAGIC - Charts render slowly
+# MAGIC - Feels sluggish
+# MAGIC
+# MAGIC **Root Cause:**
+# MAGIC - Large dataset
+# MAGIC - Cache not working
+# MAGIC - Complex queries
+# MAGIC
+# MAGIC **Solution:**
+# MAGIC ```python
+# MAGIC # Optimization 1: Verify caching is enabled
+# MAGIC # Look for @st.cache_data decorators on load functions
+# MAGIC
+# MAGIC # Optimization 2: Reduce data volume
+# MAGIC # Filter in Spark before converting to Pandas
+# MAGIC df_spark = spark.table(table_name).limit(1000)  # Add limit
+# MAGIC
+# MAGIC # Optimization 3: Check cluster size
+# MAGIC # Larger cluster = faster queries
+# MAGIC # Databricks → Compute → Select larger instance type
+# MAGIC
+# MAGIC # Optimization 4: Optimize Delta tables
+# MAGIC # OPTIMIZE databricks_course.your_schema.gold_stock_market_summary;
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Issue 10: "This app is not accessible" after deployment
+# MAGIC
+# MAGIC **Symptoms:**
+# MAGIC - App deployed successfully
+# MAGIC - But you get "Access Denied" when visiting URL
+# MAGIC
+# MAGIC **Root Cause:**
+# MAGIC - App permissions not configured
+# MAGIC - User not in allowed group
+# MAGIC
+# MAGIC **Solution:**
+# MAGIC ```
+# MAGIC 1. Go to Databricks UI → Apps
+# MAGIC 2. Find your app → Click "Permissions"
+# MAGIC 3. Add users/groups who should have access
+# MAGIC 4. Options:
+# MAGIC    - Viewer: Can only view the app
+# MAGIC    - Editor: Can modify the app code
+# MAGIC    - Owner: Full control
+# MAGIC ```
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ## Still Having Issues?
+# MAGIC
+# MAGIC ### Debug Checklist
+# MAGIC
+# MAGIC Run through this checklist systematically:
+# MAGIC
+# MAGIC - [ ] **Completed Notebook 21**: Gold tables exist with data
+# MAGIC - [ ] **Correct schema name**: Matches your personal schema
+# MAGIC - [ ] **Libraries installed**: Streamlit and Plotly installed and Python restarted
+# MAGIC - [ ] **Cluster running**: Databricks cluster is active
+# MAGIC - [ ] **No code errors**: All cells run without exceptions
+# MAGIC - [ ] **Data exists**: `SELECT COUNT(*)` returns rows
+# MAGIC - [ ] **Columns match**: All required columns present in gold tables
+# MAGIC
+# MAGIC ### Getting Help
+# MAGIC
+# MAGIC If you're still stuck:
+# MAGIC
+# MAGIC 1. **Check error messages carefully**: Copy the full error text
+# MAGIC 2. **Test data access directly**: Run SQL queries to verify tables
+# MAGIC 3. **Start simple**: Comment out sections to isolate the problem
+# MAGIC 4. **Ask for help**: Share:
+# MAGIC    - Error message (full text)
+# MAGIC    - What you've tried
+# MAGIC    - Results of verification queries
+# MAGIC
+# MAGIC ---
 
 # COMMAND ----------
 
