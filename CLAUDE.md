@@ -94,6 +94,11 @@ databricks-infra/
   - 3-step getting started (workspace access, find content, start learning)
   - Learning path selection (new to Databricks, know Spark, production ready, complete journey)
   - Tips for success
+  - **Google Form access request** - Simple form-based access requests (line 220)
+    - Replaced broken mailto: link that caused browser popup issues
+    - Requires admin to create Google Form and update `YOUR_FORM_ID_HERE` placeholder
+    - Benefits: No email client required, mobile-friendly, structured data, GDPR compliant
+    - Alternative email link provided for direct contact
   - Direct workspace URL: https://dbc-d8111651-e8b1.cloud.databricks.com
 
 - **platform-engineer.html** - Admin guide:

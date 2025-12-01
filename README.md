@@ -127,6 +127,36 @@ terraform apply
 
 ---
 
+## 🔐 Request Workspace Access
+
+### For Students
+Visit the web UI and click "Request Workspace Access" - you'll be directed to a Google Form to submit your request. We'll respond within 24 hours.
+
+### For Admins: Google Form Setup
+The web UI uses a Google Form for access requests (replacing the old broken mailto: link). To set up:
+
+1. **Create Google Form** at https://forms.google.com with fields:
+   - Full Name (short answer, required)
+   - Email Address (short answer with email validation, required)
+   - Background (multiple choice: Student/Professional/Academic/Other)
+   - Why do you want to learn Databricks? (paragraph, required)
+   - GDPR Consent checkbox (required)
+
+2. **Configure Settings**:
+   - Enable "Collect email addresses"
+   - Enable "Limit to 1 response" (optional)
+   - Set confirmation message: "Thank you! We'll contact you within 24 hours."
+
+3. **Get Form URL**: Click Send → Link icon → Copy URL
+
+4. **Update Web UI**: Edit `web/data-engineer.html` line 220 and replace `YOUR_FORM_ID_HERE` with your actual form URL
+
+5. **Enable Notifications**: In form settings, enable email notifications for new responses
+
+**Benefits**: No email client required, mobile-friendly, structured data collection, GDPR compliant
+
+---
+
 ## 📞 Support
 
 - **🐛 Issues**: Use [GitHub Issues](https://github.com/datatribe-collective-labs/databricks-infra/issues)

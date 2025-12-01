@@ -58,24 +58,60 @@
                 <div class="step-card">
                     <div class="step-number">1</div>
                     <h3>Access Databricks Workspace</h3>
-                    <p><strong>Option A: Use Provided Workspace</strong></p>
-                    <ul>
-                        <li>Get workspace URL from your instructor</li>
-                        <li>Login with provided credentials</li>
-                        <li>Zero setup required!</li>
-                    </ul>
 
-                    <div class="workspace-box">
-                        <strong>Workspace URL:</strong>
-                        <div class="url-box">https://dbc-d8111651-e8b1.cloud.databricks.com</div>
+                    <!-- Request Access CTA -->
+                    <div style="background: linear-gradient(135deg, rgba(8, 145, 178, 0.1), rgba(249, 115, 22, 0.1)); border: 2px solid rgba(8, 145, 178, 0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; text-align: center;">
+                        <p style="font-size: 1rem; margin-bottom: 1rem; color: var(--card-text);"><strong>🔐 Don't Have Access Yet?</strong></p>
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdjLAu4yo-WNoIjVCyOIL6KnMtI2xBBRok3rS6KPe7qc2esPQ/viewform?usp=preview"
+                           target="_blank"
+                           style="display: inline-block; background: linear-gradient(135deg, #0891b2 0%, #f97316 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: all 0.3s ease;">
+                            📝 Request Workspace Access
+                        </a>
+                        <p style="font-size: 0.85rem; margin-top: 0.75rem; color: var(--card-text-secondary);">
+                            Or email: <a href="mailto:datatribe.collective@gmail.com" style="color: #38bdf8;">datatribe.collective@gmail.com</a>
+                        </p>
                     </div>
 
-                    <p style="margin-top: 1.5rem;"><strong>Option B: Your Own Free Trial</strong></p>
-                    <ul>
-                        <li>Sign up at <a href="https://databricks.com/try-databricks" target="_blank">databricks.com/try-databricks</a></li>
-                        <li>Choose Free Edition (serverless compute, no credit card required)</li>
-                        <li>Complete workspace setup (2 minutes)</li>
-                    </ul>
+                    <p style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--card-text); text-align: center;"><strong>Choose Your Workspace Option:</strong></p>
+
+                    <!-- Option Cards Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- Option A Card -->
+                        <div style="background: linear-gradient(135deg, rgba(8, 145, 178, 0.1), rgba(59, 130, 246, 0.1)); border: 2px solid rgba(8, 145, 178, 0.5); border-radius: 12px; padding: 1.5rem; position: relative;">
+                            <div style="position: absolute; top: -12px; right: 12px; background: linear-gradient(135deg, #0891b2, #3b82f6); color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">RECOMMENDED</div>
+                            <h4 style="color: var(--card-text); margin-bottom: 1rem; font-size: 1.1rem;">✅ Option A: Provided Workspace</h4>
+                            <ul style="font-size: 0.9rem; line-height: 1.8; color: var(--card-text-secondary); margin-bottom: 1rem;">
+                                <li>✅ All 27 course notebooks pre-loaded</li>
+                                <li>✅ Unity Catalog & reference data</li>
+                                <li>✅ Zero setup required</li>
+                                <li>✅ Personal isolated workspace</li>
+                            </ul>
+                            <div class="workspace-box" style="margin-top: 1rem;">
+                                <strong>Workspace URL:</strong>
+                                <div class="url-box">https://dbc-d8111651-e8b1.cloud.databricks.com</div>
+                            </div>
+                        </div>
+
+                        <!-- Option B Card -->
+                        <div style="background: rgba(249, 115, 22, 0.05); border: 2px solid rgba(249, 115, 22, 0.3); border-radius: 12px; padding: 1.5rem;">
+                            <h4 style="color: var(--card-text); margin-bottom: 1rem; font-size: 1.1rem;">⚠️ Option B: Your Own Workspace</h4>
+                            <p style="font-size: 0.85rem; color: var(--card-text-secondary); margin-bottom: 0.75rem;"><strong>Good for:</strong> Independent practice</p>
+                            <ul style="font-size: 0.85rem; line-height: 1.6; color: var(--card-text-secondary); margin-bottom: 1rem;">
+                                <li>❌ No course content pre-loaded</li>
+                                <li>❌ No Unity Catalog setup</li>
+                                <li>❌ Manual notebook setup required</li>
+                                <li>✅ Free Community Edition</li>
+                            </ul>
+                            <div style="background: rgba(249, 115, 22, 0.1); border-radius: 8px; padding: 0.75rem; margin-top: 1rem;">
+                                <p style="font-size: 0.8rem; color: var(--card-text-secondary); margin: 0;"><strong>Setup:</strong></p>
+                                <ol style="font-size: 0.75rem; margin: 0.5rem 0 0 1rem; padding: 0;">
+                                    <li>Sign up: <a href="https://databricks.com/try-databricks" target="_blank" style="color: #38bdf8;">databricks.com</a></li>
+                                    <li>Clone from <a href="https://github.com/datatribe-collective-labs/databricks-infra" target="_blank" style="color: #38bdf8;">GitHub</a></li>
+                                    <li>Adapt code manually</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="step-card">
@@ -211,21 +247,10 @@
             </div>
         </section>
 
-        <!-- Request Access -->
+        <!-- GDPR Disclaimer -->
         <section class="content-section">
-            <h2>🔐 Don't Have Access Yet?</h2>
-            <p style="font-size: 1.1rem; margin-bottom: 2rem;">Request access to the DataTribe Databricks workspace and start learning within 24 hours.</p>
-
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <a href="mailto:datatribe.collective@gmail.com?subject=Databricks%20Workspace%20Access%20Request&body=Hi%20DataTribe%20Team%2C%0A%0AI%20would%20like%20to%20request%20access%20to%20the%20Databricks%20learning%20platform.%0A%0AMy%20Details%3A%0AName%3A%20%5BYour%20Full%20Name%5D%0AEmail%3A%20%5BYour%20Email%20Address%5D%0ABackground%3A%20%5BStudent%2FProfessional%2FOther%5D%0AReason%20for%20Access%3A%20%5BWhy%20you%20want%20to%20learn%20Databricks%5D%0A%0ABy%20submitting%20this%20request%2C%20I%20consent%20to%20the%20processing%20of%20my%20personal%20data%20for%20workspace%20provisioning%20purposes.%0A%0AThank%20you%21"
-                   class="cta-button-large">
-                    📧 Request Workspace Access
-                </a>
-            </div>
-
-            <!-- GDPR Disclaimer -->
-            <div style="background: rgba(255, 255, 255, 0.05); border-left: 4px solid #0891b2; padding: 1.5rem; border-radius: 8px; margin-top: 2rem;">
-                <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--card-text);">🔒 Privacy & Data Protection (GDPR Compliance)</h3>
+            <h2>🔒 Privacy & Data Protection</h2>
+            <div style="background: rgba(255, 255, 255, 0.05); border-left: 4px solid #0891b2; padding: 1.5rem; border-radius: 8px;">
                 <p style="font-size: 0.9rem; line-height: 1.7; margin-bottom: 0.5rem; color: var(--card-text-secondary);">
                     <strong>Data Collection:</strong> By requesting access, you consent to the collection of your name and email address.
                 </p>
