@@ -152,9 +152,12 @@ poetry run pre-commit run --all-files     # All quality checks
 
 **IMPORTANT**: This project uses **Personal Access Token (PAT)** authentication for full Terraform automation.
 
+**CRITICAL**: Local Terraform must use the **resource owner's PAT** (currently `chanukya.pekala@gmail.com`) to manage grants. Mismatch between PAT user and resource owner causes permission errors.
+
 #### Prerequisites
 - Databricks workspace admin role (required for user/group management via SCIM API)
 - Personal Access Token with admin privileges
+- **PAT must belong to the user who owns the catalogs/schemas** (currently chanukya.pekala@gmail.com)
 
 #### Generate Personal Access Token (PAT)
 1. **Login to Databricks workspace** as workspace admin:

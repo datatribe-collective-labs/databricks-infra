@@ -4,6 +4,7 @@
 resource "databricks_catalog" "shared_catalogs" {
   for_each       = var.create_catalogs ? toset(local.shared_catalog_config) : toset([])
   name           = each.key
+  owner          = "chanukya.pekala@gmail.com"
   comment        = "Shared reference catalog managed by Terraform - Read-only for users"
   properties     = {}
   isolation_mode = "ISOLATED"
@@ -20,6 +21,7 @@ resource "databricks_catalog" "shared_catalogs" {
 resource "databricks_catalog" "course_catalog" {
   count          = var.create_catalogs ? 1 : 0
   name           = local.course_catalog_name
+  owner          = "chanukya.pekala@gmail.com"
   comment        = "Course catalog with user-specific schemas - Managed by Terraform"
   properties     = {}
   isolation_mode = "ISOLATED"
@@ -45,6 +47,7 @@ resource "databricks_schema" "custom_schemas_with_created_catalogs" {
   for_each      = (var.create_catalogs && var.create_schemas) ? { for schema in local.schemas_config : "${schema.catalog_name}.${schema.schema_name}" => schema } : {}
   catalog_name  = each.value.catalog_name
   name          = each.value.schema_name
+  owner         = "chanukya.pekala@gmail.com"
   comment       = "Schema managed by Terraform"
   properties    = {}
   force_destroy = true
@@ -60,6 +63,7 @@ resource "databricks_schema" "custom_schemas_with_existing_catalogs" {
   for_each      = (!var.create_catalogs && var.create_schemas) ? { for schema in local.schemas_config : "${schema.catalog_name}.${schema.schema_name}" => schema } : {}
   catalog_name  = each.value.catalog_name
   name          = each.value.schema_name
+  owner         = "chanukya.pekala@gmail.com"
   comment       = "Schema managed by Terraform"
   properties    = {}
   force_destroy = true
