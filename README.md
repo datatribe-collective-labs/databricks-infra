@@ -127,6 +127,95 @@ terraform apply
 
 ---
 
+## 🛠️ User Management CLI
+
+**For Admins**: Manage users efficiently with the built-in CLI tool.
+
+### Quick Reference
+
+```bash
+# View all users
+poetry run user-list
+
+# Get detailed user info
+poetry run user-get
+# Then type email when prompted
+
+# Add new user (interactive)
+poetry run user-add
+
+# Add multiple users
+poetry run user-add-batch
+
+# Remove user
+poetry run user-remove
+
+# Infrastructure status
+poetry run user-status
+```
+
+### Examples
+
+**Add a new admin user:**
+```bash
+$ poetry run user-add
+Email address: new.user@example.com
+Display name: New User
+Group (admins/students): admins
+
+📝 User will be created with:
+   Email: new.user@example.com
+   Name: New User
+   Group: platform_admins
+   Schema: databricks_course.new_user
+
+Add this user? [Y/n]: y
+✅ Added user: new.user@example.com
+
+📌 Next steps:
+   cd terraform
+   terraform apply ...
+```
+
+**View specific user details:**
+```bash
+$ echo "user@example.com" | poetry run user-get
+👤 User Details
+============================================================
+📧 Email: user@example.com
+👤 Display Name: User Name
+👥 Group: platform_admins
+📁 Personal Schema: databricks_course.user
+
+🔐 Permissions:
+   ✅ ALL_PRIVILEGES on all catalogs and schemas
+   ...
+```
+
+**Filter user list:**
+```bash
+# Find specific user
+poetry run user-list | grep user@example.com
+```
+
+### Features
+- ✅ **Email validation** - Prevents invalid emails
+- ✅ **Duplicate detection** - Won't add existing users
+- ✅ **Preview before commit** - See what will be created
+- ✅ **Safe removal** - Confirmation prompts for deletions
+- ✅ **Auto-deployment** - Optional `--apply` flag to deploy immediately
+- ✅ **Batch operations** - Add multiple users at once
+
+### What Gets Created
+When you add a user, Terraform automatically creates:
+1. Databricks user account
+2. Group membership (platform_admins or platform_students)
+3. Personal schema in `databricks_course` catalog
+4. Appropriate permissions based on group
+5. Access to all 27 course notebooks
+
+---
+
 ## 🔐 Request Workspace Access
 
 ### For Students
