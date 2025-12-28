@@ -20,9 +20,15 @@ pre-commit = "^3.7.1"
 mkdocs-material = "^9.6.23"
 
 [tool.poetry.scripts]
-databricks-setup = "src.cli:setup_databricks"
+# Data generation and utilities
 generate-datasets = "src.utils:generate_sample_data"
-validate-notebooks = "src.validation:validate_notebooks"
+
+# User management CLI
+user-add = "src.cli:add_user_cmd"
+user-add-batch = "src.cli:add_batch_cmd"
+user-list = "src.cli:list_users_cmd"
+user-remove = "src.cli:remove_user_cmd"
+user-status = "src.cli:status_cmd"
 
 [build-system]
 requires = ["poetry-core"]
