@@ -285,6 +285,71 @@ def remove_user(email: str, yes: bool):
 
 
 @cli.command()
+@click.option('--email', help='User email address to lookup')
+@click.argument('user_email', required=False)
+def get_user(email: str, user_email: str):
+    """Get detailed information about a specific user.
+
+    Usage:
+        poetry run user-get --email user@example.com
+        poetry run user-get user@example.com
+        poetry run user-get  (will prompt interactively)
+    """
+
+    # Use email from option, argument, or prompt
+    email_to_lookup = email or user_email
+    if not email_to_lookup:
+        email_to_lookup = click.prompt('User email')
+
+    data = load_users()
+    users = data.get('users', [])
+
+    # Find user
+    user = next((u for u in users if u['user_name'] == email_to_lookup), None)
+    if not user:
+        click.echo(f"❌ User {email_to_lookup} not found in configuration!", err=True)
+        click.echo(f"\n💡 Tip: Run 'poetry run user-list' to see all users")
+        sys.exit(1)
+
+    schema_name = get_schema_name(email_to_lookup)
+    group_display = "platform_" + user['groups'][0]
+
+    # Display user details
+    click.echo("\n" + "=" * 60)
+    click.echo("👤 User Details")
+    click.echo("=" * 60)
+    click.echo(f"\n📧 Email: {user['user_name']}")
+    click.echo(f"👤 Display Name: {user['display_name']}")
+    click.echo(f"👥 Group: {group_display}")
+    click.echo(f"📁 Personal Schema: databricks_course.{schema_name}")
+
+    click.echo(f"\n🔐 Permissions:")
+    if 'admins' in user['groups']:
+        click.echo(f"   ✅ ALL_PRIVILEGES on all catalogs and schemas")
+        click.echo(f"   ✅ Can create clusters")
+        click.echo(f"   ✅ Can manage users")
+        click.echo(f"   ✅ Full workspace access")
+    else:
+        click.echo(f"   ✅ ALL_PRIVILEGES on personal schema (databricks_course.{schema_name})")
+        click.echo(f"   ✅ SELECT + USE_SCHEMA on all shared catalogs (read-only)")
+        click.echo(f"   ✅ SELECT + USE_SCHEMA on peer schemas (read-only)")
+        click.echo(f"   ❌ Limited workspace access")
+
+    click.echo(f"\n📚 Course Access:")
+    click.echo(f"   ✅ All 27 notebooks in /Shared/terraform-managed/course/notebooks/")
+    click.echo(f"   ✅ Access to 5 Unity Catalogs")
+    click.echo(f"      - databricks_course (personal workspace)")
+    click.echo(f"      - sales_dev, sales_prod (read-only)")
+    click.echo(f"      - marketing_dev, marketing_prod (read-only)")
+
+    click.echo(f"\n🌐 Workspace:")
+    click.echo(f"   URL: https://dbc-d8111651-e8b1.cloud.databricks.com")
+    click.echo(f"   Login: {email_to_lookup}")
+
+    click.echo("=" * 60 + "\n")
+
+
+@cli.command()
 def status():
     """Show infrastructure status summary."""
     data = load_users()
@@ -358,6 +423,11 @@ def status_cmd():
 def add_batch_cmd():
     """Entry point for user-add-batch command."""
     cli(['add-users-batch'])
+
+
+def get_user_cmd():
+    """Entry point for user-get command."""
+    cli(['get-user'])
 
 
 if __name__ == '__main__':
